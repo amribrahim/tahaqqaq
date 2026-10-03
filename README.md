@@ -68,7 +68,7 @@ cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # 37 checks
 cd frontend && npx playwright test                                 # 55 browser scenarios, Arabic and English
 ```
 
-Every failure found and fixed is recorded in [`QA_LOG.md`](QA_LOG.md); screenshots of every state are in [`qa/screenshots/`](qa/screenshots/). Self-assessment against the judging criteria: [`qa/judging-self-assessment.md`](qa/judging-self-assessment.md).
+Every failure found and fixed is recorded in [`QA_LOG.md`](QA_LOG.md). Test fixtures, screenshots and the benchmark report are generated into a local `qa/` folder, which is not published.
 
 ## Deploy
 
@@ -94,5 +94,4 @@ CI (`ci.yml`) runs lint, unit tests, type-check and the production build on ever
 design/      exported UI design (source of truth for layout, colours, copy)
 frontend/    Next.js app (static export), Playwright e2e
 backend/     FastAPI app, ingestion, evaluation set, tests
-qa/          fixtures, screenshots, benchmark report, self-assessment
 ```

@@ -68,7 +68,7 @@ cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # ٣٧ فح
 cd frontend && npx playwright test                                 # ٥٥ سيناريو متصفح بالعربية والإنجليزية
 ```
 
-كل خطأ وُجد وأُصلح موثق في [`QA_LOG.md`](QA_LOG.md)، ولقطات كل حالة في [`qa/screenshots/`](qa/screenshots/)، والتقييم الذاتي وفق معايير التحكيم في [`qa/judging-self-assessment.md`](qa/judging-self-assessment.md).
+كل خطأ وُجد وأُصلح موثق في [`QA_LOG.md`](QA_LOG.md). وتُولَّد ملفات الاختبار واللقطات وتقرير القياس في مجلد `qa/` محلي غير منشور.
 
 ## النشر
 

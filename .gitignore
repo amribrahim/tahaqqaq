@@ -26,6 +26,6 @@ next-env.d.ts
 .idea/
 .vscode/
 
-# qa artefacts
-qa/playwright-report/
+# qa folder (local only: fixtures, screenshots, benchmark report, self-assessment)
+qa/
 frontend/test-results/
