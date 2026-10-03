@@ -19,7 +19,7 @@ jobs:
           path: ~/.cache/fastembed
           key: fastembed-minilm-multilingual-v1
       - run: pip install -e ".[dev]"
-      - run: ruff check app ingest tests
+      - run: ruff check app ingest tests eval
       - run: pytest -q
 
   frontend:
@@ -30,6 +30,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: "22", cache: npm, cache-dependency-path: frontend/package-lock.json }
       - run: npm ci
+      - run: npm run lint
       - run: npx tsc --noEmit -p .
       - run: npm run build
-        env: { NEXT_PUBLIC_API_URL: https://tahqaq-api.onrender.com }
+        env: { NEXT_PUBLIC_API_URL: "${{ vars.API_URL || 'http://localhost:8000' }}" }

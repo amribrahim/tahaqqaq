@@ -1,0 +1,26 @@
+name: Uptime
+
+# Checks the public site and the API every 30 minutes. A failed run is e-mailed by GitHub to whoever last edited
+# this schedule. (GitHub pauses schedules in repositories with no activity for 60 days.)
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check:
+    if: vars.API_URL != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: API health (database connected)
+        run: |
+          body=$(curl -fsS --retry 3 --retry-delay 10 --max-time 20 "${{ vars.API_URL }}/health")
+          echo "$body"
+          echo "$body" | grep -q '"db":true'
+      - name: A real verification answers
+        run: |
+          curl -fsS --retry 2 --max-time 60 -X POST "${{ vars.API_URL }}/api/verify" \
+            -H 'content-type: application/json' -d '{"text":"إنما الأعمال بالنيات","explain":false}' | grep -q '"state":"verified"'
+      - name: Site
+        run: curl -fsS --retry 3 --retry-delay 10 --max-time 20 -o /dev/null https://${{ vars.CF_PAGES_PROJECT || 'tahaqqaq' }}.pages.dev/

@@ -29,3 +29,6 @@ next-env.d.ts
 # qa folder (local only: fixtures, screenshots, benchmark report, self-assessment)
 qa/
 frontend/test-results/
+
+# production database dumps (server only)
+backups/
