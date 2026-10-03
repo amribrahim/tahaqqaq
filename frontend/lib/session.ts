@@ -5,7 +5,8 @@ import type { State } from "./tokens";
 export type Pending = { text?: string; url?: string; via: "text" | "image" | "url"; extracted?: string };
 export type HistoryRow = { id: string; text: string; via: "text" | "image" | "url"; lang: "ar" | "en"; state: State; grade: string; closest: boolean; time: string };
 
-const H = "tahqaq.history";
+export const HISTORY_KEY = "tahqaq.history";
+const H = HISTORY_KEY;
 const ss = () => (typeof window === "undefined" ? null : window.sessionStorage);
 
 export function newId(): string { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4); }

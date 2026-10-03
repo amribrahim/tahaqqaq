@@ -389,6 +389,22 @@ test.describe("cross-cutting", () => {
     await expect(page.getByTestId("review-btn-aside")).toBeDisabled();
   });
 
+  test("narrations list the same report in other books, and the share image downloads", async ({ page }) => {
+    await verifyText(page, "ar", "إنما الأعمال بالنيات");
+    await expect(page.getByTestId("narrations-card")).toBeVisible();
+    expect(await page.getByTestId("narration").count()).toBeGreaterThan(2);
+    const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId("share-btn").click()]);
+    expect(download.suggestedFilename()).toMatch(/\.png$/);
+    await download.saveAs(path.join(SHOTS, "share-card-ar.png"));
+    await expect(page.getByTestId("share-btn")).toContainText("حُفظت");
+  });
+
+  test("share image in English for a fabricated saying", async ({ page }) => {
+    await verifyText(page, "en", "اطلبوا العلم ولو في الصين");
+    const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId("share-btn").click()]);
+    await download.saveAs(path.join(SHOTS, "share-card-en.png"));
+  });
+
   test("AI explanation block is labelled and separated when an LLM provider is configured", async ({ page, request }) => {
     const h = await (await request.get(`${API}/health`)).json();
     test.skip(!h.llm, "no LLM provider configured on the stack");

@@ -2,6 +2,7 @@
 
 import { NextIntlClientProvider } from "next-intl";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { notifyStorage, useStorageItem } from "@/lib/storage";
 import ar from "@/messages/ar.json";
 import en from "@/messages/en.json";
 
@@ -12,14 +13,9 @@ const KEY = "tahqaq.lang";
 const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: "ar", setLang: () => {} });
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("ar");
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(KEY);
-      if (saved === "en" || saved === "ar") setLangState(saved);
-    } catch {}
-  }, []);
+  const saved = useStorageItem("local", KEY, "ar");
+  const [chosen, setChosen] = useState<Lang | null>(null);   // used when storage is unavailable
+  const lang: Lang = chosen ?? (saved === "en" ? "en" : "ar");
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -27,8 +23,9 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
   }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
-    setLangState(l);
+    setChosen(l);
     try { localStorage.setItem(KEY, l); } catch {}
+    notifyStorage();
   }, []);
 
   const value = useMemo(() => ({ lang, setLang }), [lang, setLang]);

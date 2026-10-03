@@ -107,7 +107,7 @@ export function VerifyCard({ text, setText, tab, setTab }: { text: string; setTe
         <div style={{ padding: "clamp(16px,2vw,24px)", display: "flex", flexDirection: "column", gap: 12 }}>
           <label style={{ fontSize: 14, fontWeight: 500, color: "#5a5d80" }}>{t("urlLabel")}</label>
           <div dir="ltr" className="field" style={{ display: "flex", alignItems: "center", gap: 8, height: 60, padding: "0 18px" }}>
-            <span style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 15, color: "#8e90ad" }}>{url.startsWith("http://") ? "" : "https://"}</span>
+            <span style={{ fontFamily: "ui-monospace, Menlo, monospace", fontSize: 15, color: "#5a5d80" }}>{url.startsWith("http://") ? "" : "https://"}</span>
             <input data-testid="input-url" aria-label={t("urlLabel")} type="text" inputMode="url" value={url} onChange={(e) => setUrl(e.target.value.replace(/^https:\/\//, ""))} placeholder={t("urlPlaceholder")}
               onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
               style={{ flex: 1, minWidth: 0, border: 0, background: "transparent", outline: "none", fontFamily: "var(--font-tajawal)", fontSize: 17, color: "#14173d" }} />

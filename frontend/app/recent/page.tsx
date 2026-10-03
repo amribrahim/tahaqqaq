@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useLang } from "@/lib/i18n";
 import { timeOf } from "@/lib/format";
-import { clearHistory, history, type HistoryRow } from "@/lib/session";
+import { clearHistory, HISTORY_KEY, type HistoryRow } from "@/lib/session";
+import { notifyStorage, useStorageItem } from "@/lib/storage";
 import { gradeFamily, GRADE_CHIP, STATE } from "@/lib/tokens";
 
 export default function RecentPage() {
@@ -13,9 +14,9 @@ export default function RecentPage() {
   const r = useTranslations("result");
   const s = useTranslations("states");
   const { lang } = useLang();
-  const [rows, setRows] = useState<HistoryRow[]>([]);
-  useEffect(() => { setRows(history()); }, []);
-  const clear = () => { clearHistory(); setRows([]); };
+  const raw = useStorageItem("session", HISTORY_KEY, null);
+  const rows = useMemo<HistoryRow[]>(() => { try { return raw ? JSON.parse(raw) : []; } catch { return []; } }, [raw]);
+  const clear = () => { clearHistory(); notifyStorage(); };
   const via = (row: HistoryRow) => (row.via === "image" ? r("viaImage") : row.via === "url" ? r("viaUrl") : r("viaText")) + (row.lang === "en" ? ` · ${r("en")}` : "");
   const gradeColor = (g: string) => { const f = gradeFamily(g); return f === "other" ? "#3d4066" : GRADE_CHIP[f].fg; };
   const cols = "minmax(0,1fr) 250px 150px 110px 80px";

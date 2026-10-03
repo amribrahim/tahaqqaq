@@ -15,11 +15,17 @@ type Mode = "brief" | "extended";
 export function ExplanationCard({ report, text, model }: { report: Report; text: string; model: string | null }) {
   const t = useTranslations("result");
   const { lang } = useLang();
-  const [code, setCode] = useState<string>(lang);
+  // A saved explanation language is applied on first render (this card only renders in the browser).
+  const [initialCode] = useState<string>(() => {
+    let saved = "";
+    try { saved = localStorage.getItem(PREF) || ""; } catch {}
+    return saved && EXPLAIN_LANGUAGES.some((l) => l.code === saved) ? saved : lang;
+  });
+  const [code, setCode] = useState<string>(initialCode);
   const [mode, setMode] = useState<Mode>("brief");
   const [cache, setCache] = useState<Record<string, { text: string; model: string | null; grounding?: { source_ar: string; source_en: string; url: string } | null }>>({ [`brief:${lang}`]: { text, model } });
   const [noSource, setNoSource] = useState<Record<string, boolean>>({});
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(initialCode !== lang);
   const [failed, setFailed] = useState(false);
   const booted = useRef(false);
 
@@ -27,11 +33,7 @@ export function ExplanationCard({ report, text, model }: { report: Report; text:
   const key = `${mode}:${code}`;
   const current = cache[key];
 
-  const load = async (nextMode: Mode, nextCode: string) => {
-    const k = `${nextMode}:${nextCode}`;
-    setMode(nextMode); setCode(nextCode); setFailed(false);
-    if (cache[k] || noSource[k]) return;
-    setBusy(true);
+  const fetchInto = async (k: string, nextMode: Mode, nextCode: string) => {
     try {
       const r = await explainIn(report, nextCode, nextMode);
       if (r.explanation) setCache((c) => ({ ...c, [k]: { text: r.explanation!, model: r.model, grounding: r.grounding } }));
@@ -40,12 +42,18 @@ export function ExplanationCard({ report, text, model }: { report: Report; text:
     } catch { setFailed(true); } finally { setBusy(false); }
   };
 
+  const load = (nextMode: Mode, nextCode: string) => {
+    const k = `${nextMode}:${nextCode}`;
+    setMode(nextMode); setCode(nextCode); setFailed(false);
+    if (cache[k] || noSource[k]) return;
+    setBusy(true);
+    void fetchInto(k, nextMode, nextCode);
+  };
+
   useEffect(() => {
-    if (booted.current) return;
+    if (booted.current || initialCode === lang) return;
     booted.current = true;
-    let saved = "";
-    try { saved = localStorage.getItem(PREF) || ""; } catch {}
-    if (saved && saved !== lang && EXPLAIN_LANGUAGES.some((l) => l.code === saved)) void load("brief", saved);
+    void fetchInto(`brief:${initialCode}`, "brief", initialCode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

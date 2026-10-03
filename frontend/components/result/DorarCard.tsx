@@ -49,7 +49,7 @@ export function DorarCard({ r }: { r: Report }) {
           })}
         </ul>
       )}
-      {lang === "en" && info?.available && <span style={{ fontSize: 12, color: "#8e90ad" }}>Rulings are quoted in Arabic as published.</span>}
+      {lang === "en" && info?.available && <span style={{ fontSize: 12, color: "#5a5d80" }}>Rulings are quoted in Arabic as published.</span>}
     </section>
   );
 }

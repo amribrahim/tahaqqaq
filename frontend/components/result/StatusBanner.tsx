@@ -36,6 +36,11 @@ export function StatusBanner({ r }: { r: Report }) {
         </div>
         <span style={{ fontSize: 12, color: "#9d97d6" }}>{t("threshold")}</span>
         <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#e4e1ff", textWrap: "pretty" }}>{lang === "ar" ? r.reason_ar : r.reason_en}</p>
+        {r.match_check && r.match_check.outcome !== "kept" && (
+          <span data-testid="match-check" style={{ alignSelf: "flex-start", fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 999, background: "rgba(124,108,240,0.25)", color: "#e4e1ff" }}>
+            🤖 {r.match_check.outcome === "confirmed" ? t("checkConfirmed") : t("checkRejected")}
+          </span>
+        )}
       </div>
     </div>
   );

@@ -110,8 +110,9 @@ textarea::placeholder, input::placeholder { color: var(--placeholder); }
 .btn-l { height: 52px; padding: 0 28px; border-radius: 14px; font-size: 16px; }
 .btn-m { height: 44px; padding: 0 20px; border-radius: 12px; font-size: 15px; }
 .btn-s { height: 40px; padding: 0 16px; border-radius: 10px; font-size: 14px; }
-.btn-primary { background: var(--violet); color: #fff; box-shadow: var(--shadow-primary); }
-.btn-primary:hover:not(:disabled) { background: var(--violet-hover); color: #fff; }
+/* white on #6a59e8 is 5.0:1 (WCAG AA for normal text); the lighter brand violet stays for accents */
+.btn-primary { background: var(--violet-hover); color: #fff; box-shadow: var(--shadow-primary); }
+.btn-primary:hover:not(:disabled) { background: #5b4ad6; color: #fff; }
 .btn-secondary { background: #fff; color: var(--violet-ink); border: 1.5px solid var(--secondary-border); }
 .btn-secondary:hover:not(:disabled) { background: #f4f2ff; border-color: var(--violet); color: var(--violet-ink); }
 .btn-ghost { background: transparent; color: var(--violet-ink); }

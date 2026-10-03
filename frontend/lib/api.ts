@@ -12,12 +12,14 @@ export type Source = {
 export type Candidate = { rank: number; text_ar: string; text_en: string; book_ar: string; book_en: string; number: string; kind: string; confidence: number; lexical: number; semantic: number; source_url: string; accepted: boolean };
 export type Issue = { severity: "high" | "low"; text_ar: string; text_en: string; term_ar: string; term_en: string; meaning_ar: string; meaning_en: string; literal: string[]; source_url: string };
 export type Segment = { text: string; type: string; origin: "ai" | "rules"; confidence: number; state: State; book_ar: string; book_en: string; number: string; kind: string; source_url: string };
+export type Narration = { collection: string; book_ar: string; book_en: string; number: string; grade_ar: string; grade_en: string; grader_ar: string; grader_en: string; similarity: number; source_url: string };
+export type MatchCheck = { model: string; outcome: "confirmed" | "rejected" | "kept"; checked: number };
 export type Translation = { original_ar: string; user_tokens: Token[]; approved_tokens: Token[]; approved_text: string; needs_fix: boolean; issues: Issue[] };
 export type Report = {
   id: string; state: State; confidence: number; threshold: number; match_level: string; reason_ar: string; reason_en: string; input_text: string; input_lang: "ar" | "en";
   via: "text" | "image" | "url"; extracted_text: string; source: Source | null; grade: Grade | null; grades: Grade[]; closest_only: boolean;
   diff_input: Token[]; diff_source: Token[]; translation: Translation | null; glossary_terms: Issue[]; quran_note: { ar: string; en: string } | null;
-  candidates: Candidate[]; segments: Segment[]; cleaned_text: string; extraction_model: string | null; machine_translation: { language: string; english: string; model: string } | null; ai_explanation: string | null; ai_model: string | null; created_at: string; timings_ms: Record<string, number>;
+  candidates: Candidate[]; narrations: Narration[]; match_check: MatchCheck | null; segments: Segment[]; cleaned_text: string; extraction_model: string | null; machine_translation: { language: string; english: string; model: string } | null; ai_explanation: string | null; ai_model: string | null; created_at: string; timings_ms: Record<string, number>;
 };
 export type ApiError = { code: string; message: string };
 
@@ -153,7 +155,8 @@ export async function explainIn(report: Report, lang: string, mode: "brief" | "e
   const body = {
     lang, mode, collection: report.source?.collection ?? "", number: report.source?.number ?? "", state: report.state, confidence: report.confidence, input_text: report.input_text,
     matched_text: report.source?.matn_ar ?? "", ruling: report.grade, quran_note: report.quran_note,
-    source: report.source ? { book: report.source.book_ar, number: report.source.number, chapter: report.source.chapter_ar, type: report.source.type_ar } : null,
+    // curated sayings carry an internal list number; the reference number is the ruling's (e.g. السلسلة الضعيفة 416)
+    source: report.source ? { book: report.source.book_ar, number: (report.source.collection === "seed" ? report.grade?.number : "") || report.source.number, chapter: report.source.chapter_ar, type: report.source.type_ar } : null,
     translation_issues: report.translation?.issues.map((i) => i.text_ar) ?? [],
   };
   const res = await fetch(`${API}/api/explain`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });

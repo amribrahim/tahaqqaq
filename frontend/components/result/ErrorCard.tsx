@@ -13,7 +13,7 @@ export function ErrorCard({ code, message, onRetry }: { code: string; message?: 
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <h3 className="font-cairo" style={{ margin: 0, fontWeight: 800, fontSize: 20 }}>{title}</h3>
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.7, color: "#3d4066" }}>{code === "url_unreachable" ? t("errUrlBody") : t("errBody")}</p>
-          {message && <p dir="ltr" style={{ margin: 0, fontSize: 12, color: "#8e90ad", fontFamily: "ui-monospace, Menlo, monospace", textAlign: "start" }}>{message}</p>}
+          {message && <p dir="ltr" style={{ margin: 0, fontSize: 12, color: "#5a5d80", fontFamily: "ui-monospace, Menlo, monospace", textAlign: "start" }}>{message}</p>}
         </div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
