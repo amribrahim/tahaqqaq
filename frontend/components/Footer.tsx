@@ -8,7 +8,7 @@ export function Footer() {
   const b = useTranslations("brand");
   const link = { fontSize: 15, fontWeight: 500, color: "#fff" } as const;
   return (
-    <footer style={{ background: "#0d1035", borderTop: "1px solid rgba(201,195,255,0.12)", marginTop: "auto" }}>
+    <footer className="no-print" style={{ background: "#0d1035", borderTop: "1px solid rgba(201,195,255,0.12)", marginTop: "auto" }}>
       <div className="wrap container-x" style={{ padding: "32px var(--gutter)", display: "flex", flexWrap: "wrap", gap: "20px 40px", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <span className="font-cairo" style={{ fontWeight: 800, fontSize: 20, color: "#fff" }}>{b("name")}</span>

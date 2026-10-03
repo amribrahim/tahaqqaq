@@ -374,11 +374,16 @@ test.describe("cross-cutting", () => {
     }
   });
 
-  test("copy report and request human review", async ({ page, context }) => {
-    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  test("export report as PDF and request human review", async ({ page }) => {
     await verifyText(page, "ar", "إنما الأعمال بالنيات");
-    await page.getByTestId("copy-btn").click();
-    await expect(page.getByTestId("copy-btn")).toContainText("تم نسخ");
+    await page.evaluate(() => { (window as unknown as { __printed: number }).__printed = 0; window.print = () => { (window as unknown as { __printed: number }).__printed++; }; });
+    await page.getByTestId("pdf-btn").click();
+    expect(await page.evaluate(() => (window as unknown as { __printed: number }).__printed)).toBe(1);
+    await page.emulateMedia({ media: "print" });
+    await expect(page.getByTestId("pdf-footer")).toBeVisible();
+    await expect(page.getByTestId("ai-banner")).toBeHidden();
+    await expect(page.getByTestId("pdf-btn")).toBeHidden();
+    await page.emulateMedia({ media: "screen" });
     await page.getByTestId("review-btn-aside").click();
     await expect(page.getByTestId("review-sent")).toBeVisible();
     await expect(page.getByTestId("review-btn-aside")).toBeDisabled();

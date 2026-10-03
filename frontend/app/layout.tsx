@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <LangProvider>
           <a href="#main" className="skip-link">تخطي إلى المحتوى · Skip to content</a>
           <AiBanner />
-          <div className="hero"><Header /></div>
+          <div className="hero no-print"><Header /></div>
           {children}
           <Footer />
         </LangProvider>

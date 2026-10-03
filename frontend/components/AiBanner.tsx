@@ -13,7 +13,7 @@ export function AiBanner() {
   if (!show) return null;
   const dismiss = () => { try { localStorage.setItem(KEY, "1"); } catch {} setShow(false); };
   return (
-    <div role="status" data-testid="ai-banner" style={{ background: "#ecebfe", color: "#4f3fd0", borderBottom: "1px solid #d9d5f5" }}>
+    <div role="status" data-testid="ai-banner" className="no-print" style={{ background: "#ecebfe", color: "#4f3fd0", borderBottom: "1px solid #d9d5f5" }}>
       <div className="wrap container-x" style={{ display: "flex", alignItems: "center", gap: 16, padding: "10px var(--gutter)", fontSize: 14, lineHeight: 1.6 }}>
         <span aria-hidden style={{ flex: "none", width: 8, height: 8, background: "#7c6cf0", transform: "rotate(45deg)" }} />
         <span style={{ flex: 1 }}>{t("text")}</span>

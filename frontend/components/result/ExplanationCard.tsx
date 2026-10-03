@@ -66,7 +66,7 @@ export function ExplanationCard({ report, text, model }: { report: Report; text:
           <span className="chip" style={{ background: extended ? "#fdf0d9" : "#ecebfe", color: extended ? "#8a5300" : "#4f3fd0" }}>🤖 {extended ? t("aiExtendedTitle") : t("aiTitle")}</span>
           <span style={{ fontSize: 12, color: "#5a5d80" }}>{extended ? t("aiExtendedNote") : t("aiSub")}{current?.model ? ` · ${current.model}` : ""}</span>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
+        <div className="no-print" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10 }}>
           {canExtend && <div style={{ display: "flex", gap: 6 }}>{btn("brief", t("aiBrief"), "ai-mode-brief")}{btn("extended", t("aiExtended"), "ai-mode-extended")}</div>}
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#5a5d80" }}>
             {t("aiLang")}

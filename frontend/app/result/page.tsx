@@ -6,7 +6,6 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { requestReview, verifyStream, VerifyError, type Report } from "@/lib/api";
 import { useLang } from "@/lib/i18n";
 import { timeOf } from "@/lib/format";
-import { reportText } from "@/lib/report";
 import { addHistory, getPending, getReport, setPending, setReport } from "@/lib/session";
 import { StatusBanner } from "@/components/result/StatusBanner";
 import { LoadingPanel, SkeletonCards } from "@/components/result/LoadingPanel";
@@ -29,13 +28,11 @@ function ResultView() {
   const params = useSearchParams();
   const id = params.get("id") || "";
   const t = useTranslations("result");
-  const s = useTranslations("states");
   const { lang } = useLang();
   const [status, setStatus] = useState<"loading" | "done" | "error" | "missing">("loading");
   const [step, setStep] = useState(0);
   const [report, setRep] = useState<Report | null>(null);
   const [err, setErr] = useState<{ code: string; message: string }>({ code: "", message: "" });
-  const [copied, setCopied] = useState(false);
   const [reviewSent, setReviewSent] = useState(false);
   const [inputText, setInputText] = useState("");
   const running = useRef(false);
@@ -69,14 +66,16 @@ function ResultView() {
 
   useEffect(() => { run(); }, [run]);
 
-  const onCopy = async () => {
+  const onExport = () => {
     if (!report) return;
-    const text = reportText(report, lang, {
-      header: t("copyHeader"), state: t("stateLbl"), stateLabel: s(`${report.state}.label`, { grade: report.grade?.grade_ar ?? "" }), conf: t("conf"), input: t("input"),
-      correct: report.state === "unreliable" ? t("asRecorded") : report.closest_only ? t("closest") : t("correct"), grade: t("grade"), source: t("source"), link: t("view"), note: t("note"),
-    });
-    try { await navigator.clipboard.writeText(text); } catch {}
-    setCopied(true); setTimeout(() => setCopied(false), 2000);
+    // The browser's print dialog saves a real PDF: Arabic shaping and RTL come out right and the text stays selectable.
+    // The page title becomes the suggested file name.
+    const prev = document.title;
+    const stamp = (report.created_at || new Date().toISOString()).slice(0, 16).replace("T", "-").replace(":", "");
+    document.title = `${t("pdfFileName")}-${stamp}`;
+    const restore = () => { document.title = prev; window.removeEventListener("afterprint", restore); };
+    window.addEventListener("afterprint", restore);
+    window.print();
   };
   const onReview = async () => {
     if (!report || reviewSent) return;
@@ -140,10 +139,15 @@ function ResultView() {
           {status === "done" && r && (
             <>
               {r.state !== "referral" && <Candidates r={r} />}
-              <Actions abstain={!!abstainLike} referral={r.state === "referral"} copied={copied} onCopy={onCopy} onReview={onReview} reviewSent={reviewSent} />
+              <Actions abstain={!!abstainLike} referral={r.state === "referral"} onExport={onExport} onReview={onReview} reviewSent={reviewSent} />
             </>
           )}
         </aside>
+        {status === "done" && r && (
+          <p className="print-only" data-testid="pdf-footer" style={{ width: "100%", margin: 0, fontSize: 12, color: "#5a5d80", lineHeight: 1.7, borderTop: "1px solid #e4e1f5", paddingTop: 10 }}>
+            {t("pdfFooter", { date: new Date(r.created_at).toLocaleString(lang === "ar" ? "ar-SA-u-nu-latn" : "en-GB") })}
+          </p>
+        )}
       </main>
     </>
   );
