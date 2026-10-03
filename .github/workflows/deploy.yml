@@ -1,0 +1,70 @@
+name: Deploy
+
+# Runs after CI succeeds on main (or by hand). Opt-in: set the repository variable DEPLOY_ENABLED=true.
+#   backend  → Oracle Cloud VM over SSH (docker compose, db + api)
+#   frontend → Cloudflare Pages (static export)
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: false
+
+jobs:
+  backend-oracle:
+    if: vars.DEPLOY_ENABLED == 'true' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Pull, rebuild, restart
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          ssh -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" "set -e
+            cd /opt/tahaqqaq
+            git fetch -q origin main
+            git reset -q --hard $SHA
+            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+            docker image prune -f >/dev/null
+            for i in \$(seq 1 60); do
+              if curl -fsS http://127.0.0.1:8000/health >/dev/null; then echo healthy at $SHA; exit 0; fi
+              sleep 5
+            done
+            echo 'API did not become healthy' >&2
+            docker compose -f docker-compose.prod.yml logs --tail 80 api >&2
+            exit 1"
+
+  frontend-cloudflare-pages:
+    if: vars.DEPLOY_ENABLED == 'true' && vars.CF_PAGES_PROJECT != '' && vars.API_URL != '' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    needs: backend-oracle
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: frontend } }
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: "${{ github.event.workflow_run.head_sha || github.sha }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.API_URL }}
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: frontend
+          command: pages deploy out --project-name=${{ vars.CF_PAGES_PROJECT }} --branch=main

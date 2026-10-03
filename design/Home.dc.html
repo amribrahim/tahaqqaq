@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f5f4fb;}a{color:#4f3fd0;}a:hover{color:#7c6cf0;}textarea::placeholder,input::placeholder{color:#8e90ad;}</style>
+</helmet>
+<div dir="rtl" lang="ar" data-screen-label="Home" style="container-type:inline-size;width:100%;background:#f5f4fb;font-family:Tajawal,system-ui,sans-serif;color:#14173d;">
+<section style="background-color:#0d1035;background-image:url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2772%27%20height=%2772%27%20viewBox=%270%200%2072%2072%27%3E%3Cg%20fill=%27none%27%20stroke=%27%23c9c3ff%27%20stroke-opacity=%270.07%27%3E%3Crect%20x=%2718%27%20y=%2718%27%20width=%2736%27%20height=%2736%27/%3E%3Crect%20x=%2718%27%20y=%2718%27%20width=%2736%27%20height=%2736%27%20transform=%27rotate%2845%2036%2036%29%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2736%27%20r=%276%27/%3E%3C/g%3E%3C/svg%3E);padding-bottom:150px;">
+  <dc-import name="Header" lang="ar" active="home" mobile="{{ mobile }}" hint-size="100%,72px"></dc-import>
+  <div style="max-width:860px;margin:0 auto;padding:clamp(48px,7cqi,96px) clamp(16px,4cqi,32px) 0;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;">
+    <h1 style="margin:0;font-family:Cairo,sans-serif;font-weight:800;font-size:clamp(38px,4.4cqi,64px);line-height:1.25;color:#ffffff;text-wrap:balance;">تحقّق قبل أن <span style="color:#3ee6c0;">تنشر</span></h1>
+    <p style="margin:0;max-width:620px;font-size:clamp(16px,1.5cqi,20px);line-height:1.8;color:#c9c3ff;text-wrap:pretty;">الصق حديثًا أو أثرًا أو اقتباسًا بأي لغة، لترى مصدره وحكم المحدّثين عليه ودقة ترجمته.</p>
+  </div>
+</section>
+
+<main style="padding:0 clamp(16px,4cqi,32px) 72px;">
+  <div style="max-width:860px;margin:-110px auto 0;display:flex;flex-direction:column;gap:28px;">
+    <section style="background:#ffffff;border-radius:24px;box-shadow:0 2px 4px rgba(13,16,53,0.06),0 32px 64px -24px rgba(13,16,53,0.35);overflow:hidden;">
+      <div role="tablist" style="display:flex;gap:4px;padding:0 clamp(8px,2cqi,24px);border-bottom:1px solid #ebe9f5;">
+        <button role="tab" onClick="{{ goText }}" style="flex:1 1 0;max-width:180px;height:58px;border:0;border-bottom:3px solid {{ tT.bb }};margin-bottom:-1px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:Cairo,sans-serif;font-size:16px;font-weight:{{ tT.w }};color:{{ tT.fg }};">نص<span style="font-family:Tajawal,sans-serif;font-size:11px;font-weight:500;padding:2px 7px;border-radius:6px;background:#f1effc;color:#5a5d80;">أي لغة</span></button>
+        <button role="tab" onClick="{{ goImage }}" style="flex:1 1 0;max-width:180px;height:58px;border:0;border-bottom:3px solid {{ tI.bb }};margin-bottom:-1px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:Cairo,sans-serif;font-size:16px;font-weight:{{ tI.w }};color:{{ tI.fg }};">صورة<span style="font-family:Tajawal,sans-serif;font-size:11px;font-weight:500;padding:2px 7px;border-radius:6px;background:#f1effc;color:#5a5d80;">OCR</span></button>
+        <button role="tab" onClick="{{ goUrl }}" style="flex:1 1 0;max-width:180px;height:58px;border:0;border-bottom:3px solid {{ tU.bb }};margin-bottom:-1px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:Cairo,sans-serif;font-size:16px;font-weight:{{ tU.w }};color:{{ tU.fg }};">رابط<span style="font-family:Tajawal,sans-serif;font-size:11px;font-weight:500;padding:2px 7px;border-radius:6px;background:#f1effc;color:#5a5d80;">URL</span></button>
+      </div>
+
+      <sc-if value="{{ isText }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:clamp(16px,2cqi,24px);display:flex;flex-direction:column;gap:12px;">
+          <textarea dir="auto" value="{{ text }}" onChange="{{ onText }}" placeholder="الصق النص هنا… حديث، أثر، آية، أو قول منسوب لعالم" style="width:100%;box-sizing:border-box;min-height:168px;resize:vertical;padding:18px 20px;border:1.5px solid #e3e0f2;border-radius:16px;background:#fbfaff;font-family:Tajawal,sans-serif;font-size:19px;line-height:1.8;color:#14173d;outline:none;" style-focus="border-color:#7c6cf0;background:#ffffff;box-shadow:0 0 0 4px rgba(124,108,240,0.15);"></textarea>
+          <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:#5a5d80;">
+            <span style="display:flex;align-items:center;gap:6px;"><span style="width:6px;height:6px;border-radius:50%;background:#3ee6c0;"></span>اللغة: تُكتشف تلقائيًا</span>
+            <span>{{ count }} / ٢٠٠٠</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isImage }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:clamp(16px,2cqi,24px);">
+          <div style="min-height:200px;box-sizing:border-box;border:2px dashed #cfc9f5;border-radius:18px;background:#faf9ff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:28px 20px;text-align:center;">
+            <span style="width:52px;height:52px;border-radius:16px;background:#ecebfe;color:#4f3fd0;display:grid;place-items:center;font-size:24px;font-weight:700;">↑</span>
+            <span style="font-family:Cairo,sans-serif;font-weight:700;font-size:17px;">اسحب صورة المنشور هنا</span>
+            <span style="font-size:14px;line-height:1.6;color:#5a5d80;">PNG أو JPG حتى ١٠ ميجابايت · نستخرج النص آليًا (OCR) ثم نتحقق منه</span>
+            <button style="margin-top:6px;height:44px;padding:0 20px;border-radius:12px;border:1.5px solid #d9d5f5;background:#ffffff;color:#4f3fd0;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;cursor:pointer;" style-hover="background:#f4f2ff;border-color:#7c6cf0;">اختيار صورة</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isUrl }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:clamp(16px,2cqi,24px);display:flex;flex-direction:column;gap:12px;">
+          <label style="font-size:14px;font-weight:500;color:#5a5d80;">رابط المنشور أو المقال</label>
+          <div dir="ltr" style="display:flex;align-items:center;gap:8px;height:60px;box-sizing:border-box;padding:0 18px;border:1.5px solid #e3e0f2;border-radius:16px;background:#fbfaff;">
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:15px;color:#8e90ad;">https://</span>
+            <input type="url" placeholder="x.com/…/status/…" style="flex:1;min-width:0;border:0;background:transparent;outline:none;font-family:Tajawal,sans-serif;font-size:17px;color:#14173d;">
+          </div>
+          <span style="font-size:13px;line-height:1.6;color:#5a5d80;">يدعم منشورات X وفيسبوك وإنستغرام، والمقالات، ووصف مقاطع يوتيوب.</span>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px;padding:18px clamp(16px,2cqi,24px);background:#faf9fe;border-top:1px solid #ebe9f5;">
+        <div style="flex:999 1 340px;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.6;color:#3d4066;">
+          <span style="display:flex;gap:8px;"><span style="flex:none;color:#087a62;font-weight:800;">✓</span>نبحث عن النص في المصادر المعتمدة، ونعرض مصدره ودرجته ودقة ترجمته.</span>
+          <span style="display:flex;gap:8px;"><span style="flex:none;color:#a8324a;font-weight:800;">✕</span>ننقل أحكام المحدّثين من مصادرها، ولا نُصدر حكمًا آليًا</span>
+        </div>
+        <a href="Result.dc.html" style="flex:1 0 160px;height:56px;padding:0 36px;box-sizing:border-box;border-radius:14px;background:#7c6cf0;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;box-shadow:0 8px 20px -8px rgba(124,108,240,0.7);" style-hover="background:#6a59e8;color:#ffffff;">تحقّق<span>←</span></a>
+      </div>
+    </section>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <span style="font-size:14px;font-weight:700;color:#5a5d80;">جرّب مثالًا</span>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <button onClick="{{ ex1 }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 8px;padding-inline-end:16px;border-radius:999px;border:1px solid #e3e0f2;background:#ffffff;cursor:pointer;font-family:Tajawal,sans-serif;font-size:15px;color:#14173d;" style-hover="border-color:#7c6cf0;">
+          <span style="padding:4px 10px;border-radius:999px;background:#dcfaf1;color:#087a62;font-size:12px;font-weight:700;">صحيح</span>إنما الأعمال بالنيات
+        </button>
+        <button onClick="{{ ex2 }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 8px;padding-inline-end:16px;border-radius:999px;border:1px solid #e3e0f2;background:#ffffff;cursor:pointer;font-family:Tajawal,sans-serif;font-size:15px;color:#14173d;" style-hover="border-color:#7c6cf0;">
+          <span style="padding:4px 10px;border-radius:999px;background:#fde4e8;color:#a8324a;font-size:12px;font-weight:700;">موضوع</span>حب الوطن من الإيمان
+        </button>
+        <button onClick="{{ ex3 }}" style="display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 8px;padding-inline-end:16px;border-radius:999px;border:1px solid #e3e0f2;background:#ffffff;cursor:pointer;font-family:Tajawal,sans-serif;font-size:15px;color:#14173d;" style-hover="border-color:#7c6cf0;">
+          <span style="padding:4px 10px;border-radius:999px;background:#fdf0d9;color:#8a5300;font-size:12px;font-weight:700;">ترجمة غير دقيقة</span><span dir="ltr">None of you is a Muslim until…</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+<dc-import name="Footer" lang="ar" hint-size="100%,140px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;tab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;text&quot;,&quot;image&quot;,&quot;url&quot;],&quot;default&quot;:&quot;text&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { tab: null, text: '' };
+  renderVals() {
+    const tab = this.state.tab || this.props.tab || 'text';
+    const ts = k => k === tab ? { fg: '#4f3fd0', bb: '#7c6cf0', w: '700' } : { fg: '#5a5d80', bb: 'transparent', w: '500' };
+    const go = (k, text) => () => this.setState(text != null ? { tab: k, text } : { tab: k });
+    const ar = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    return {
+      mobile: !!this.props.mobile,
+      isText: tab === 'text', isImage: tab === 'image', isUrl: tab === 'url',
+      tT: ts('text'), tI: ts('image'), tU: ts('url'),
+      goText: go('text'), goImage: go('image'), goUrl: go('url'),
+      text: this.state.text, onText: e => this.setState({ text: e.target.value }),
+      count: ar(this.state.text.length),
+      ex1: go('text', 'إنما الأعمال بالنيات، وإنما لكل امرئ ما نوى'),
+      ex2: go('text', 'حب الوطن من الإيمان'),
+      ex3: go('text', 'None of you is a Muslim until he loves for his brother what he loves for himself.')
+    };
+  }
+}
+</script>
+</body>
+</html>

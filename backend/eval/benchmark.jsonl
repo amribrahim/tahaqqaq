@@ -1,0 +1,98 @@
+{"group": "sahih_exact", "text": "من أتى هذا البيت فلم يرفث ولم يفسق رجع كما ولدته أمه", "expect_state": ["verified"], "expect_record": [["muslim", "1350a"]]}
+{"group": "sahih_exact", "text": "من يرد الله به خيرا يفقهه في الدين إنما أنا خازن فمن أعطيته عن طيب نفس فيبارك له فيه ومن أعطيته عن مسألة وشره كان كالذي يأكل ولا يشبع", "expect_state": ["verified"], "expect_record": [["muslim", "1037a"]]}
+{"group": "sahih_exact", "text": "على المنبر فقال من جاء إلى الجمعة فليغتسل", "expect_state": ["verified"], "expect_record": [["bukhari", "919"]]}
+{"group": "sahih_exact", "text": "فأنزل الله ما أنزل، فأخبرها فقالت بحمد الله لا بحمد أحد", "expect_state": ["verified"], "expect_record": [["bukhari", "3388"]]}
+{"group": "sahih_exact", "text": "خطبتان يجلس بينهما يقرأ القرآن ويذكر الناس", "expect_state": ["verified"], "expect_record": [["muslim", "862a"]]}
+{"group": "sahih_exact", "text": "لولا الهجرة لكنت امرأ من الأنصار، ولو سلك الناس واديا وسلكت الأنصار واديا  أو شعبا  لسلكت وادي الأنصار أو شعب الأنصار", "expect_state": ["verified"], "expect_record": [["bukhari", "7244"]]}
+{"group": "sahih_exact", "text": "حدثنا الحسن بن بشر، حدثنا المعافى، عن عثمان بن الأسود، عن ابن أبي مليكة، قال أوتر معاوية بعد العشاء بركعة وعنده مولى لابن عباس، فأتى ابن عباس فقال دعه، فإنه صحب رسول الله صلى الله عليه وسلم", "expect_state": ["verified"], "expect_record": [["bukhari", "3764"]]}
+{"group": "sahih_exact", "text": "كان يصلي العصر، والشمس في حجرتها قبل أن تظهر", "expect_state": ["verified"], "expect_record": [["abudawud", "407"], ["bukhari", "521"], ["bukhari", "522"], ["muslim", "611a"]]}
+{"group": "sahih_exact", "text": "من شىء قال ما ترك إلا ما بين الدفتين. قال ودخلنا على محمد ابن الحنفية فسألناه فقال ما ترك إلا ما بين الدفتين", "expect_state": ["verified"], "expect_record": [["bukhari", "5019"]]}
+{"group": "sahih_exact", "text": "من جر ثوبه من الخيلاء لم ينظر الله إليه يوم القيامة", "expect_state": ["verified"], "expect_record": [["muslim", "2085e"]]}
+{"group": "sahih_exact", "text": "إن بين يدى الساعة أياما يرفع فيها العلم، وينزل فيها الجهل، ويكثر فيها الهرج، والهرج القتل", "expect_state": ["verified"], "expect_record": [["bukhari", "7064"], ["muslim", "2672a"]]}
+{"group": "sahih_exact", "text": "لأعطين الراية  أو ليأخذن الراية  غدا رجلا يحبه الله ورسوله  أو قال يحب الله ورسوله  يفتح الله عليه", "expect_state": ["verified"], "expect_record": [["bukhari", "3702"]]}
+{"group": "sahih_exact", "text": "حدثنا شيبان بن فروخ، حدثنا جرير يعني ابن حازم، ح وحدثنا محمد بن المثنى، حدثنا عبد الوهاب، قال سمعت يحيى بن سعيد، ح وحدثنا محمد بن المثنى، حدثنا ابن، أبي عدي عن ابن عون، كلهم عن نافع، بنحو حديث الليث عن نافع، عن أبي سعيد، الخدري عن النبي صلى الله عليه وسلم", "expect_state": ["verified"], "expect_record": [["muslim", "1584c"]]}
+{"group": "sahih_exact", "text": "مات اليوم عبد لله صالح أصحمة فقام فأمنا وصلى عليه", "expect_state": ["verified"], "expect_record": [["muslim", "952b"]]}
+{"group": "sahih_exact", "text": "في خاتم الذهب نحو حديث الليث", "expect_state": ["verified"], "expect_record": [["muslim", "2091c"]]}
+{"group": "sahih_exact", "text": "والله لأن يغدو أحدكم فيحطب على ظهره فيبيعه", "expect_state": ["verified"], "expect_record": [["muslim", "1042b"]]}
+{"group": "sahih_exact", "text": "صلاته أقبل عليهم ثم قال أحسنتم أو قال قد أصبتم يغبطهم أن صلوا الصلاة لوقتها", "expect_state": ["verified"], "expect_record": [["muslim", "274l"]]}
+{"group": "sahih_exact", "text": "حدثنا محمد بن يوسف، عن ابن عيينة، عن عمرو، عن جابر  رضى الله عنه  قال نزلت هذه الآية فينا {إذ همت طائفتان منكم أن تفشلا} بني سلمة وبني حارثة، وما أحب أنها لم تنزل، والله يقول {والله وليهما}", "expect_state": ["verified"], "expect_record": [["bukhari", "4051"]]}
+{"group": "sahih_exact", "text": "كان يطول في الركعة الأولى من صلاة الظهر، ويقصر في الثانية، ويفعل ذلك في صلاة الصبح", "expect_state": ["verified"], "expect_record": [["bukhari", "779"]]}
+{"group": "sahih_exact", "text": "لكل نبي دعوة مستجابة يدعو بها، وأريد أن أختبئ دعوتي شفاعة لأمتي في الآخرة", "expect_state": ["verified"], "expect_record": [["bukhari", "6304"]]}
+{"group": "sahih_exact", "text": "لا، إنما ذلك عرق، وليس بحيض، فإذا أقبلت حيضتك فدعي الصلاة، وإذا أدبرت فاغسلي عنك الدم ثم صلي ثم توضئي لكل صلاة، حتى يجيء ذلك الوقت", "expect_state": ["verified"], "expect_record": [["bukhari", "228"]]}
+{"group": "sahih_exact", "text": "حدثنا علي بن عبد الله، حدثنا سعيد بن عامر، عن شعبة، عن ابن أبي نجيح، عن عطاء، عن جابر  رضى الله عنه  قال دفن مع أبي رجل فلم تطب نفسي حتى أخرجته فجعلته في قبر على حدة", "expect_state": ["verified"], "expect_record": [["bukhari", "1352"]]}
+{"group": "sahih_exact", "text": "كلاكما محسن فاقرآ  أكبر علمي قال  فإن من كان قبلكم اختلفوا فأهلكهم", "expect_state": ["verified"], "expect_record": [["bukhari", "5062"]]}
+{"group": "sahih_exact", "text": "اشتكت النار إلى ربها فقالت يا رب أكل بعضي بعضا فأذن لها بنفسين نفس في الشتاء ونفس في الصيف فهو أشد ما تجدون من الحر وأشد ما تجدون من الزمهرير", "expect_state": ["verified"], "expect_record": [["muslim", "617a"]]}
+{"group": "sahih_exact", "text": "يغتسل بخمس مكاكيك ويتوضأ بمكوك وقال ابن المثنى بخمس مكاكي وقال ابن معاذ عن عبد الله بن عبد الله ولم يذكر ابن جبر", "expect_state": ["verified"], "expect_record": [["muslim", "325a"]]}
+{"group": "sahih_exact", "text": "حدثنا علي بن الحكم الأنصاري، حدثنا أبو عوانة، عن رقبة، عن طلحة اليامي، عن سعيد بن جبير، قال قال لي ابن عباس هل تزوجت قلت لا. قال فتزوج فإن خير هذه الأمة أكثرها نساء", "expect_state": ["verified"], "expect_record": [["bukhari", "5069"]]}
+{"group": "sahih_exact", "text": "ليس فيما دون خمسة أوساق من تمر ولا حب صدقة", "expect_state": ["verified"], "expect_record": [["muslim", "979e"]]}
+{"group": "sahih_exact", "text": "حدثنا حفص بن عمر، حدثنا شعبة، عن عبد الله بن أبي السفر، عن الشعبي، عن ابن عمر، عن عمر، قال الخمر يصنع من خمسة من الزبيب والتمر والحنطة والشعير والعسل", "expect_state": ["verified"], "expect_record": [["bukhari", "5589"]]}
+{"group": "sahih_exact", "text": "ألا تبايعون رسول الله ألا تبايعون رسول الله ألا تبايعون رسول الله على أن تعبدوا الله ولا تشركوا به شيئا والصلوات الخمس وتطيعوا - وأسر كلمة خفية - ولا تسألوا الناس شيئا", "expect_state": ["verified"], "expect_record": [["muslim", "1043"]]}
+{"group": "sahih_exact", "text": "وحدثناه محمد بن المثنى، حدثنا عبد الوهاب، قال سمعت يحيى بن سعيد، يقول أخبرني نافع، بهذا الإسناد مثله", "expect_state": ["verified"], "expect_record": [["muslim", "1539e"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «ألم ترى أن مجززا نظر آنفا إلى زيد بن حارثة وأسامه بن زيد فقال إن بعض هذه الأقدام لمن بعض»", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1459a"]]}
+{"group": "sahih_variant", "text": "هذا الذي أوفى الله له بأذنه", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "4906"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «ولا من وفاته، ما عدوا إلا من مدمه المدينة»", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "3934"]]}
+{"group": "sahih_variant", "text": "«عن لبستين وعن بيعتن الملامسة والمنابذة» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "2147"]]}
+{"group": "sahih_variant", "text": "«من رآني في النوم فقد رآني فإهن لا ينبغي للشيطان أن يتشبه بي» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "2268b"]]}
+{"group": "sahih_variant", "text": "«صلاته أتاه أبو بكر فقال لها قولا شديدا وقا أتصنعين هذا» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1462"]]}
+{"group": "sahih_variant", "text": "«غلاما أرعى الإبل على أهلي، فلما سمعنا بخروجه فررن إلى النار إلى مسيلمة الكذاب» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "4376"], ["bukhari", "4377"]]}
+{"group": "sahih_variant", "text": "«عن ذلك فقا لا حتى يذوق الآخر من عسيلتها ما ذاق الأول» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1433f"]]}
+{"group": "sahih_variant", "text": "«بين قريش والأنصار في داره التي بالمدينه» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "2529b"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «ترك بعده أعلم بما أنزل الله من هذا القائم فقال أبو موسى أما لئن قلت ذاك لقد كان يشهد إذا غبنا ويؤذن له إذا حجبنا»", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "2461b"]]}
+{"group": "sahih_variant", "text": "ما تأمرني تأمرني أن آمره أن يدع يده في فيك تقضمها كما يقضم الفحل ادفع يدك حتى يضعها ثم انتزعها", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1673d"]]}
+{"group": "sahih_variant", "text": "«حدثني أبو الربيع، وأبو كامل قالا حدثنا حماد، - وهو ابن زيد - عن أيوب، وحدثنا محمد بن عباد، حدثنا حاتم، - يعني ابن إسماعيل - عن موسى بن عقبة، كلاهما عن نافع، عن ابن عمر، عن النبي صلى الله عليه وسلم بمثله» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "169f"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «بمعنى حديث معاذ عن محد بن عمرو»", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1977h"]]}
+{"group": "sahih_variant", "text": "لعله تنفعه شفاعتي يوم القيامة فيجعل في ضحضاح من النار، يبلغ كعبيه، يغلي منه أم دماغه", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "6564"]]}
+{"group": "sahih_variant", "text": "ما من مولود إلا يولد على الفطرة، فأبواه يهودانه أو ينصرانه أو يمجسانه، كما تنتج ابهيمة بهيمة جمعاء هل تحسون فيها من جدعاء", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "1358"], ["bukhari", "1359"], ["bukhari", "4775"]]}
+{"group": "sahih_variant", "text": "أبو بكر رضى الله عنه فحلبت كثبة من لبن في قدح، فشرب حتى رضيت، وأتانا سراقة بن جعشم على فرس فدعا عليه، فطلب إليه سراقة أن لا يدعو عليه، وأن يرجع ففعل النبي صلى الهل عليه وسلم", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "5607"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «أجره وكلم سيده فخفف عنه من ضريتبه ولو كان سحتا لم يعطه النبي صلى الله عليه وسلم»", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1202c"]]}
+{"group": "sahih_variant", "text": "أرأيت إن كان أسلم وغفا ومزينة وأحسبه وجهينة خيرا من بني تميم وبني عامر وأسد وغطفان، خابوا وخسروا والذي نفسي بيده، إنهم لخير منهم", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "3516"]]}
+{"group": "sahih_variant", "text": "كل كلم يكلمه المسلم في سبيل الهل يكون يوم القيامة كهيئتها إذ طعنت، تفجر دما، اللون لون الدم، والعرف عرف المسك", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "237"]]}
+{"group": "sahih_variant", "text": "أنا فرطمك، على الحوض، وليرفعن رجال منكم ثم ليختلجن دوني فأقول يا رب أصحابي فيقال إنك لا تدري ما أحدثوا بعدك", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "6576"]]}
+{"group": "sahih_variant", "text": "«في شأن الركعتين عند طلوع الفجر لهما أحب إلى من الدنيا جميعا» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "725b"]]}
+{"group": "sahih_variant", "text": "«إن ثلاثة في بني إسرائيل أردا الله أن يبتليهم، فبعث ملكا فأتى الأبرص فقال تقطعت بي الحبال، فلا بلاغ لي إلا بالله، ثم بك» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "6653"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «رخص في العرايا أن تباع بخرصها كيلا. قال موسى بن عقبة واعرايا نخلات معلوات تأتيها فتشتريها»", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "2192"]]}
+{"group": "sahih_variant", "text": "أكل ولدك أعطيته هذا أليس تريد منهم البر مثل ما تريد من ذا فإني لا أشهد قاربوا بين أولادكم", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1623j"]]}
+{"group": "sahih_variant", "text": "قال رسول الله ﷺ: «حدثني علي بن حجر السعدي، وزهير بن حرب، ويعقوب بن إبراهيم، جميعا عن ابن علية، عن أيوب، في هذا السناد بمثله»", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "1201b"]]}
+{"group": "sahih_variant", "text": "«فذكر ذلك له فقال تلك السكينة تنزلت للقرآن» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "795a"]]}
+{"group": "sahih_variant", "text": "لغدةو في سبيل الله أو روحة خير من الدنيا وما فيها", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "2792"], ["muslim", "1880"]]}
+{"group": "sahih_variant", "text": "قال النبي صلى الله عليه وسلم: إنكم ستفتحون مصر وهي أرض يسمى فيها القيراط فإذا فتحتموها فأحسنوا إلى أهلها فإن لهم ذمة ورحما ذمة وصهرا فإذا رأيت رجلين يختصمان فيها في موضع لبنة فاخرج منها", "expect_state": ["verified", "partial"], "expect_record": [["muslim", "2543b"]]}
+{"group": "sahih_variant", "text": "يا عائشة ما يؤمني أن يكون فيه عذاب عذب قوم بالريح، وقد رأى قوم العذاب فقالوا {ذها عارض ممطرن}", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "4828"], ["bukhari", "4829"]]}
+{"group": "sahih_variant", "text": "«يا أهل الخندق إن جابرا قد صنع سؤرا، فحى هلا بكم» رواه البخاري", "expect_state": ["verified", "partial"], "expect_record": [["bukhari", "3070"]]}
+{"group": "fabricated_or_weak", "text": "حب الوطن من الإيمان", "expect_state": ["unreliable"], "expect_record": [["seed", "1"]], "expect_grade": "موضوع"}
+{"group": "fabricated_or_weak", "text": "اطلبوا العلم ولو بالصين", "expect_state": ["unreliable"], "expect_record": [["seed", "2"]], "expect_grade": "باطل"}
+{"group": "fabricated_or_weak", "text": "اختلاف أمتي رحمة", "expect_state": ["unreliable"], "expect_record": [["seed", "3"]], "expect_grade": "لا أصل له"}
+{"group": "fabricated_or_weak", "text": "من عرف نفسه فقد عرف ربه", "expect_state": ["unreliable"], "expect_record": [["seed", "4"]], "expect_grade": "موضوع"}
+{"group": "fabricated_or_weak", "text": "لولاك لما خلقت الأفلاك", "expect_state": ["unreliable"], "expect_record": [["seed", "5"]], "expect_grade": "موضوع"}
+{"group": "fabricated_or_weak", "text": "الجنة تحت أقدام الأمهات", "expect_state": ["unreliable"], "expect_record": [["seed", "6"]], "expect_grade": "موضوع"}
+{"group": "fabricated_or_weak", "text": "أنا مدينة العلم وعلي بابها", "expect_state": ["unreliable"], "expect_record": [["seed", "7"]], "expect_grade": "موضوع"}
+{"group": "fabricated_or_weak", "text": "كنت كنزًا مخفيًا فأحببت أن أعرف فخلقت الخلق", "expect_state": ["unreliable"], "expect_record": [["seed", "8"]], "expect_grade": "ليس من كلام النبي ﷺ ولا يُعرف له سند صحيح ولا ضعيف"}
+{"group": "fabricated_or_weak", "text": "ما خاب من استخار ولا ندم من استشار", "expect_state": ["unreliable"], "expect_record": [["seed", "9"]], "expect_grade": "موضوع"}
+{"group": "fabricated_or_weak", "text": "من لم يهتم بأمر المسلمين فليس منهم", "expect_state": ["unreliable"], "expect_record": [["seed", "10"]], "expect_grade": "ضعيف"}
+{"group": "fabricated_or_weak", "text": "صوموا تصحوا", "expect_state": ["unreliable"], "expect_record": [["seed", "11"]], "expect_grade": "ضعيف"}
+{"group": "fabricated_or_weak", "text": "الناس نيام فإذا ماتوا انتبهوا", "expect_state": ["unreliable"], "expect_record": [["seed", "12"]], "expect_grade": "لم أجد له أصلًا مرفوعًا"}
+{"group": "ayah_exact", "text": "تبرك ٱسم ربك ذى ٱلجلل وٱلإكرام", "expect_state": ["verified"], "expect_record": [["quran", "55:78"]]}
+{"group": "ayah_exact", "text": "بل هو ءايت بينت فى صدور ٱلذين أوتوا ٱلعلم  وما يجحد بايتنا إلا ٱلظلمون", "expect_state": ["verified"], "expect_record": [["quran", "29:49"]]}
+{"group": "ayah_exact", "text": "وإذ قتلتم نفسا فٱدرتم فيها  وٱلله مخرج ما كنتم تكتمون", "expect_state": ["verified"], "expect_record": [["quran", "2:72"]]}
+{"group": "ayah_exact", "text": "ولو نشاء لمسخنهم على مكانتهم فما ٱستطعوا مضيا ولا يرجعون", "expect_state": ["verified"], "expect_record": [["quran", "36:67"]]}
+{"group": "ayah_exact", "text": "إن ٱلله ربى وربكم فٱعبدوه  هذا صرط مستقيم", "expect_state": ["verified"], "expect_record": [["quran", "3:51"]]}
+{"group": "ayah_exact", "text": "قل إنما ٱلعلم عند ٱلله وإنما أنا نذير مبين", "expect_state": ["verified"], "expect_record": [["quran", "67:26"]]}
+{"group": "ayah_exact", "text": "ولولا فضل ٱلله عليكم ورحمته فى ٱلدنيا وٱلاخرة لمسكم فى ما أفضتم فيه عذاب عظيم", "expect_state": ["verified"], "expect_record": [["quran", "24:14"]]}
+{"group": "ayah_exact", "text": "فأرسل فرعون فى ٱلمدائن حشرين", "expect_state": ["verified"], "expect_record": [["quran", "26:53"]]}
+{"group": "ayah_exact", "text": "قال ربنا ٱلذى أعطى كل شىء خلقه ثم هدى", "expect_state": ["verified"], "expect_record": [["quran", "20:50"]]}
+{"group": "ayah_exact", "text": "ومن قوم موسى أمة يهدون بٱلحق وبه يعدلون", "expect_state": ["verified"], "expect_record": [["quran", "7:159"]]}
+{"group": "ayah_misquoted", "text": "قالوا لن نبرح عليه عكفين حتى يرجع إلينا موىس", "expect_state": ["verified", "partial"], "expect_record": [["quran", "20:91"]]}
+{"group": "ayah_misquoted", "text": "إلا من ٱرتضى من رسول فإنه يسلك من بين يديه ومن خلفه ردا", "expect_state": ["verified", "partial"], "expect_record": [["quran", "72:27"]]}
+{"group": "ayah_misquoted", "text": "ولقد ءاتينا موسى ٱلهدى وأورثنا بنى إرءيل ٱلكتب", "expect_state": ["verified", "partial"], "expect_record": [["quran", "40:53"]]}
+{"group": "ayah_misquoted", "text": "وٱتل عليهم نبأ ٱلذى ءاتينه ءايتنا فنسلخ منها فأتبعه ٱلشيطن فكان من ٱلغاوين", "expect_state": ["verified", "partial"], "expect_record": [["quran", "7:175"]]}
+{"group": "ayah_misquoted", "text": "وسخر لكم ٱليل وٱلنهار وٱلشمس وٱلقمر وٱلنجوم مسخرت بأمره إن فى ذلك لايت لقمو يعقلون", "expect_state": ["verified", "partial"], "expect_record": [["quran", "16:12"]]}
+{"group": "invented", "text": "من قرأ هذا النص غُفر له كل ذنب", "expect_state": ["abstain"], "expect_record": null}
+{"group": "invented", "text": "من قرأ هذا الدعاء ونشره بين عشرة أشخاص فُرّج همّه في يومه", "expect_state": ["abstain"], "expect_record": null}
+{"group": "invented", "text": "من شرب القهوة بعد الفجر كُتب له أجر صيام يوم", "expect_state": ["abstain"], "expect_record": null}
+{"group": "invented", "text": "من قال سبحان الله مئة مرة يوم الخميس بُني له قصر في الجنة من ذهب", "expect_state": ["abstain"], "expect_record": null}
+{"group": "invented", "text": "إذا رأيتم الهلال في ليلة السبت فتصدقوا بخاتم من فضة", "expect_state": ["abstain"], "expect_record": null}
+{"group": "invented", "text": "من نام على جنبه الأيسر ليلة الجمعة رأى النبي في منامه", "expect_state": ["abstain"], "expect_record": null}
+{"group": "fatwa", "text": "هل يجوز لي أن أفعل كذا في زواجي؟", "expect_state": ["referral"], "expect_record": null}
+{"group": "fatwa", "text": "هل يجوز لي الجمع بين الصلاتين في السفر؟", "expect_state": ["referral"], "expect_record": null}
+{"group": "fatwa", "text": "ما حكم بيع الذهب بالتقسيط؟", "expect_state": ["referral"], "expect_record": null}
+{"group": "fatwa", "text": "نسيت ركعة في صلاة العصر فماذا أفعل؟", "expect_state": ["referral"], "expect_record": null}
+{"group": "fatwa", "text": "هل علي كفارة إذا أفطرت في رمضان بسبب المرض؟", "expect_state": ["referral"], "expect_record": null}

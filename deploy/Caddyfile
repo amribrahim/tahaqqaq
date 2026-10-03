@@ -1,0 +1,6 @@
+# Public HTTPS entry point for the API. Caddy obtains and renews the Let's Encrypt
+# certificate for API_HOST automatically (set in /opt/tahaqqaq/.env, e.g. 193-122-88-237.sslip.io).
+{$API_HOST} {
+	encode gzip
+	reverse_proxy api:8000
+}

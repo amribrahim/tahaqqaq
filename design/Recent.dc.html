@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f5f4fb;}a{color:#4f3fd0;}a:hover{color:#7c6cf0;}</style>
+</helmet>
+<div dir="rtl" lang="ar" data-screen-label="Recent" style="container-type:inline-size;width:100%;background:#f5f4fb;font-family:Tajawal,system-ui,sans-serif;color:#14173d;">
+<section style="background-color:#0d1035;background-image:url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2772%27%20height=%2772%27%20viewBox=%270%200%2072%2072%27%3E%3Cg%20fill=%27none%27%20stroke=%27%23c9c3ff%27%20stroke-opacity=%270.07%27%3E%3Crect%20x=%2718%27%20y=%2718%27%20width=%2736%27%20height=%2736%27/%3E%3Crect%20x=%2718%27%20y=%2718%27%20width=%2736%27%20height=%2736%27%20transform=%27rotate%2845%2036%2036%29%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2736%27%20r=%276%27/%3E%3C/g%3E%3C/svg%3E);">
+  <dc-import name="Header" lang="ar" active="recent" mobile="{{ mobile }}" hint-size="100%,72px"></dc-import>
+  <div style="max-width:1200px;margin:0 auto;padding:clamp(32px,4cqi,56px) clamp(16px,4cqi,64px);display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px;box-sizing:border-box;">
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <h1 style="margin:0;font-family:Cairo,sans-serif;font-weight:800;font-size:clamp(30px,3.2cqi,44px);color:#ffffff;">سجل التحقق</h1>
+      <p style="margin:0;max-width:560px;font-size:16px;line-height:1.7;color:#c9c3ff;">عمليات هذه الجلسة فقط، محفوظة في متصفحك وتُحذف عند إغلاقه. لا حسابات ولا تسجيل دخول.</p>
+    </div>
+    <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ clear }}" style="height:44px;padding:0 18px;border-radius:12px;border:1px solid rgba(201,195,255,0.35);background:transparent;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;cursor:pointer;" style-hover="background:rgba(255,255,255,0.08);">مسح السجل</button>
+    </sc-if>
+  </div>
+</section>
+
+<main style="max-width:1200px;margin:0 auto;padding:32px clamp(16px,4cqi,64px) 72px;box-sizing:border-box;">
+  <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);overflow:hidden;">
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 250px 150px 110px 80px;gap:16px;align-items:center;padding:14px 24px;background:#faf9fe;border-bottom:1px solid #ebe9f5;font-size:13px;font-weight:700;color:#5a5d80;">
+          <span>النص</span><span>النتيجة</span><span>الحكم المنقول</span><span>الوقت</span><span></span>
+        </div>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 250px 150px 110px 80px;gap:16px;align-items:center;padding:16px 24px;border-bottom:1px solid #f0eef8;" style-hover="background:#fbfaff;">
+            <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+              <span dir="{{ r.dir }}" style="font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:start;">{{ r.text }}</span>
+              <span style="font-size:12px;color:#5a5d80;">{{ r.via }}</span>
+            </div>
+            <span style="justify-self:start;display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:{{ r.bg }};color:{{ r.fg }};font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:{{ r.dot }};"></span>{{ r.label }}</span>
+            <span style="font-size:14px;font-weight:700;color:{{ r.gFg }};">{{ r.grade }}</span>
+            <span style="font-size:14px;color:#5a5d80;">{{ r.time }}</span>
+            <a href="{{ r.href }}" style="justify-self:end;height:36px;padding:0 14px;border-radius:10px;display:flex;align-items:center;gap:6px;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;color:#4f3fd0;text-decoration:none;" style-hover="background:#f4f2ff;">فتح<span>←</span></a>
+          </div>
+        </sc-for>
+      </sc-if>
+      <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+          <a href="{{ r.href }}" style="display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-bottom:1px solid #f0eef8;text-decoration:none;color:#14173d;">
+            <span dir="{{ r.dir }}" style="font-size:16px;font-weight:500;line-height:1.6;text-align:start;">{{ r.text }}</span>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+              <span style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:{{ r.bg }};color:{{ r.fg }};font-size:12px;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:{{ r.dot }};"></span>{{ r.label }}</span>
+              <span style="font-size:13px;font-weight:700;color:{{ r.gFg }};">{{ r.grade }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#5a5d80;"><span>{{ r.via }} · {{ r.time }}</span><span style="color:#4f3fd0;font-weight:700;">فتح ←</span></div>
+          </a>
+        </sc-for>
+      </sc-if>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:clamp(40px,6cqi,72px) 24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;">
+      <span style="width:64px;height:64px;border-radius:20px;background:#f1effc;display:grid;place-items:center;"><span style="width:22px;height:22px;border:2px solid #7c6cf0;border-radius:4px;transform:rotate(45deg);"></span></span>
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:20px;">لا توجد عمليات تحقق في هذه الجلسة</h2>
+      <p style="margin:0;max-width:380px;font-size:15px;line-height:1.7;color:#5a5d80;">ستظهر هنا كل نتيجة تتحقق منها حتى تغلق المتصفح.</p>
+      <a href="Home.dc.html" style="margin-top:6px;height:48px;padding:0 24px;border-radius:14px;background:#7c6cf0;color:#ffffff;display:flex;align-items:center;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;text-decoration:none;" style-hover="background:#6a59e8;color:#ffffff;">ابدأ التحقق</a>
+    </section>
+  </sc-if>
+</main>
+<dc-import name="Footer" lang="ar" hint-size="100%,140px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;empty&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const TONE = {
+  verified: { label: 'مؤيَّد بمصدر', fg: '#087a62', bg: '#dcfaf1', dot: '#3ee6c0' },
+  partial: { label: 'مؤيَّد جزئيًا – اختلاف رواية', fg: '#4f3fd0', bg: '#ecebfe', dot: '#7c6cf0' },
+  uncertain: { label: 'غير مؤكد', fg: '#8a5300', bg: '#fdf0d9', dot: '#f2a93b' },
+  abstain: { label: 'لا مرجع – يُمتنع عن الحكم', fg: '#a8324a', bg: '#f1eff4', dot: '#e7647a' }
+};
+const GFG = { 'صحيح': '#087a62', 'موضوع': '#a8324a' };
+const ROWS = [
+  { text: 'إنما الأعمال بالنية، ولكل امرئ ما نوى', via: 'نص', st: 'partial', grade: 'صحيح', time: '١٠:٤٢ ص', href: 'Result.dc.html' },
+  { text: 'None of you is a Muslim until he loves for his brother…', via: 'نص · إنجليزي', st: 'verified', grade: 'صحيح', time: '١٠:٣٥ ص', ltr: true },
+  { text: 'من قرأ هذا الدعاء ونشره بين عشرة أشخاص فُرّج همّه في يومه', via: 'رابط', st: 'abstain', grade: '—', time: '١٠:٢١ ص' },
+  { text: 'النظافة من الإيمان', via: 'نص', st: 'uncertain', grade: 'صحيح (للنص الأقرب)', time: '١٠:٠٨ ص' },
+  { text: 'حب الوطن من الإيمان', via: 'صورة', st: 'verified', grade: 'موضوع', time: '٩:٥٥ ص' },
+  { text: 'وَقُل رَّبِّ زِدْنِي عِلْمًا', via: 'صورة', st: 'verified', grade: 'آية · طه ١١٤', time: '٩:٤٠ ص' }
+];
+class Component extends DCLogic {
+  state = { cleared: false };
+  renderVals() {
+    const mobile = !!this.props.mobile;
+    const empty = !!this.props.empty || this.state.cleared;
+    return {
+      mobile, desktop: !mobile, hasRows: !empty, isEmpty: empty,
+      clear: () => this.setState({ cleared: true }),
+      rows: ROWS.map(r => ({ ...r, ...TONE[r.st], dir: r.ltr ? 'ltr' : 'rtl', gFg: GFG[r.grade] || '#3d4066', href: r.href || 'Result.dc.html' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

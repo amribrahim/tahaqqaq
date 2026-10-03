@@ -1,0 +1,63 @@
+# Production stack for the Oracle Cloud VM (ARM, Always Free): database, API and Caddy.
+# The frontend is served by Cloudflare Pages. Browsers reach the API at https://$API_HOST,
+# where Caddy terminates HTTPS. Postgres is never published; the API port binds to 127.0.0.1 only.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Secrets (LLM keys, CORS origins, API_HOST) live in /opt/tahaqqaq/.env on the server, never in git.
+name: tahaqqaq
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    shm_size: 1gb   # Docker's 64 MB default is too small for parallel HNSW index builds
+    environment:
+      POSTGRES_USER: tahqaq
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tahqaq}
+      POSTGRES_DB: tahqaq
+    command: >
+      postgres -c shared_buffers=2GB -c effective_cache_size=6GB -c work_mem=32MB
+               -c maintenance_work_mem=512MB -c max_connections=40
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/data/dump:/dump:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tahqaq -d tahqaq"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://tahqaq:${POSTGRES_PASSWORD:-tahqaq}@db:5432/tahqaq
+      FASTEMBED_CACHE_PATH: /root/.cache/fastembed
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      API_HOST: ${API_HOST:?set API_HOST in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,72 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: tahqaq
+      POSTGRES_PASSWORD: tahqaq
+      POSTGRES_DB: tahqaq
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tahqaq -d tahqaq"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://tahqaq:tahqaq@db:5432/tahqaq
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      FASTEMBED_CACHE_PATH: /root/.cache/fastembed
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - fastembed-cache:/root/.cache/fastembed
+      - ./backend/data:/app/data
+
+  # One-shot: downloads the open datasets, embeds them and fills the database.
+  # Run with:  docker compose run --rm ingest
+  ingest:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://tahqaq:tahqaq@db:5432/tahqaq
+    command: python -m ingest.run_all
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - fastembed-cache:/root/.cache/fastembed
+      - ./backend/data:/app/data
+    profiles: ["tools"]
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  # Static fixtures for the e2e suite (local hadith page, redirect loop, test images).
+  fixtures:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./qa/fixtures:/usr/share/nginx/html:ro
+      - ./qa/fixtures/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8089:80"
+    profiles: ["qa"]
+
+volumes:
+  pgdata:
+  fastembed-cache:

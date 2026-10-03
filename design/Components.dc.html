@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f5f4fb;}a{color:#4f3fd0;}a:hover{color:#7c6cf0;}@keyframes thqspin{to{transform:rotate(360deg)}}</style>
+</helmet>
+<div dir="rtl" lang="ar" data-screen-label="Components" style="container-type:inline-size;width:100%;background:#f5f4fb;font-family:Tajawal,system-ui,sans-serif;color:#14173d;padding:56px clamp(16px,4cqi,64px) 80px;box-sizing:border-box;display:flex;flex-direction:column;gap:32px;">
+
+  <header style="display:flex;flex-direction:column;gap:8px;">
+    <span style="font-family:ui-monospace,Menlo,monospace;font-size:13px;color:#5a5d80;direction:ltr;text-align:right;">Tahaqqaq · Design system v1 · handoff</span>
+    <h1 style="margin:0;font-family:Cairo,sans-serif;font-weight:800;font-size:44px;">مكوّنات تحقّق</h1>
+    <p style="margin:0;font-size:16px;color:#3d4066;">كل القيم أدناه نهائية للتطوير. RTL افتراضي؛ استخدم الخصائص المنطقية (inline-start/end) ليعمل LTR تلقائيًا.</p>
+  </header>
+
+  <section style="background:#0d1035;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:20px 28px 0;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;"><h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;color:#ffffff;">الترويسة ومبدّل اللغة</h2><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#c9c3ff;direction:ltr;">height 72 · nav 15/500 · toggle pill 34h · active nav bg rgba(124,108,240,.24)</span></div>
+    <dc-import name="Header" lang="ar" active="home" hint-size="100%,72px"></dc-import>
+    <dc-import name="Header" lang="en" active="sources" hint-size="100%,72px"></dc-import>
+    <div style="width:390px;max-width:100%;container-type:inline-size;"><dc-import name="Header" lang="ar" mobile="{{ true }}" hint-size="100%,72px"></dc-import></div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:24px;">
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">الألوان</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;">
+        <sc-for list="{{ colors }}" as="c" hint-placeholder-count="14">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="height:64px;border-radius:12px;background:{{ c.hex }};border:1px solid #ebe9f5;"></div>
+            <span style="font-size:13px;font-weight:700;">{{ c.name }}</span>
+            <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;text-align:right;">{{ c.hex }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:14px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">الخطوط</h2>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid #f0eef8;padding-bottom:10px;"><span style="font-family:Cairo,sans-serif;font-weight:800;font-size:44px;line-height:1.25;">تحقّق قبل أن تنشر</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">Cairo 800 · 64→38 · 1.25</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid #f0eef8;padding-bottom:10px;"><span style="font-family:Cairo,sans-serif;font-weight:800;font-size:30px;">مؤيَّد بمصدر</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">Cairo 800 · 32→22 · banner/H2</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid #f0eef8;padding-bottom:10px;"><span style="font-family:Cairo,sans-serif;font-weight:700;font-size:19px;">الحكم والمصدر</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">Cairo 700 · 19 · card title</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid #f0eef8;padding-bottom:10px;"><span style="font-weight:500;font-size:22px;line-height:2;">إنما الأعمال بالنيات</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">Tajawal 500 · 22 · 2.0 · quoted text</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px solid #f0eef8;padding-bottom:10px;"><span style="font-size:16px;line-height:1.7;">نص أساسي للشرح والوصف.</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">Tajawal 400 · 16 · 1.7 · body</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;"><span style="font-size:13px;font-weight:500;color:#5a5d80;">تسمية حقل</span><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">Tajawal 500 · 13 · label/caption · min 12</span></div>
+    </section>
+  </div>
+
+  <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;">
+    <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">المسافات والزوايا والظلال</h2>
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
+      <sc-for list="{{ space }}" as="s" hint-placeholder-count="10">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:{{ s.px }};height:{{ s.px }};background:#c9c3ff;border-radius:3px;"></div><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;">{{ s.v }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:16px;">
+      <sc-for list="{{ radii }}" as="r" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;"><div style="width:72px;height:56px;border:2px solid #7c6cf0;border-radius:{{ r.px }};"></div><span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">{{ r.v }}</span></div>
+      </sc-for>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;">
+      <div style="flex:1 1 300px;padding:20px;border-radius:20px;background:#fff;border:1px solid #ebe9f5;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);">card · 0 1 2 rgba(13,16,53,.04), 0 12 32 -16 rgba(13,16,53,.14)</div>
+      <div style="flex:1 1 300px;padding:20px;border-radius:24px;background:#fff;box-shadow:0 2px 4px rgba(13,16,53,0.06),0 32px 64px -24px rgba(13,16,53,0.35);">raised (input card) · 0 2 4 rgba(13,16,53,.06), 0 32 64 -24 rgba(13,16,53,.35)</div>
+    </div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:24px;">
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">الأزرار</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+        <button style="height:52px;padding:0 28px;border:0;border-radius:14px;background:#7c6cf0;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 20px -8px rgba(124,108,240,0.7);" style-hover="background:#6a59e8;">أساسي</button>
+        <button style="height:52px;padding:0 28px;border:0;border-radius:14px;background:#6a59e8;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;">أساسي · تمرير</button>
+        <button style="height:52px;padding:0 28px;border:0;border-radius:14px;background:#d9d5f5;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;">معطّل</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+        <button style="height:52px;padding:0 24px;border-radius:14px;border:1.5px solid #d9d5f5;background:#ffffff;color:#4f3fd0;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;cursor:pointer;" style-hover="background:#f4f2ff;border-color:#7c6cf0;">ثانوي</button>
+        <button style="height:52px;padding:0 24px;border-radius:14px;border:0;background:transparent;color:#4f3fd0;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;cursor:pointer;" style-hover="background:#f4f2ff;">شفاف</button>
+        <button style="height:40px;padding:0 16px;border-radius:10px;border:1.5px solid #d9d5f5;background:#ffffff;color:#4f3fd0;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;">صغير ↗</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:16px;border-radius:14px;background:#0d1035;">
+        <button style="height:52px;padding:0 28px;border:0;border-radius:14px;background:#7c6cf0;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;">على داكن</button>
+        <button style="height:44px;padding:0 18px;border-radius:12px;border:1px solid rgba(201,195,255,0.35);background:transparent;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;">ثانوي داكن</button>
+      </div>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;text-align:right;">L 52h/r14 · M 44h/r12 · S 40h/r10 · Cairo 700 16/15/14 · min tap 44</span>
+    </section>
+
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">شارات الحالة والدرجة</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <span style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:#dcfaf1;color:#087a62;font-size:14px;font-weight:700;"><span style="width:8px;height:8px;border-radius:50%;background:#3ee6c0;"></span>مؤيَّد بمصدر</span>
+        <span style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:#ecebfe;color:#4f3fd0;font-size:14px;font-weight:700;"><span style="width:8px;height:8px;border-radius:50%;background:#7c6cf0;"></span>مؤيَّد جزئيًا – اختلاف رواية</span>
+        <span style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:#fdf0d9;color:#8a5300;font-size:14px;font-weight:700;"><span style="width:8px;height:8px;border-radius:50%;background:#f2a93b;"></span>غير مؤكد</span>
+        <span style="display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:#f1eff4;color:#a8324a;font-size:14px;font-weight:700;"><span style="width:8px;height:8px;border-radius:50%;background:#e7647a;"></span>لا مرجع – يُمتنع عن الحكم</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:16px;border-radius:14px;background:#0d1035;">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(62,230,192,0.08);border:1px solid rgba(62,230,192,0.45);"><span style="width:36px;height:36px;border-radius:10px;background:#3ee6c0;color:#0d1035;display:grid;place-items:center;font-weight:800;font-size:18px;">✓</span><span style="color:#fff;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;">مؤيَّد بمصدر</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(124,108,240,0.14);border:1px solid rgba(124,108,240,0.6);"><span style="width:36px;height:36px;border-radius:10px;background:#7c6cf0;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;">≈</span><span style="color:#fff;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;">مؤيَّد جزئيًا</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(242,169,59,0.08);border:1px solid rgba(242,169,59,0.5);"><span style="width:36px;height:36px;border-radius:10px;background:#f2a93b;color:#0d1035;display:grid;place-items:center;font-weight:800;font-size:18px;">؟</span><span style="color:#fff;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;">غير مؤكد</span></div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(240,122,138,0.55);"><span style="width:36px;height:36px;border-radius:10px;background:#f07a8a;color:#0d1035;display:grid;place-items:center;font-weight:800;font-size:18px;">—</span><span style="color:#fff;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;">لا مرجع</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <span style="padding:4px 14px;border-radius:8px;background:#dcfaf1;color:#087a62;font-family:Cairo,sans-serif;font-size:18px;font-weight:800;">صحيح</span>
+        <span style="padding:4px 14px;border-radius:8px;background:#ddf2f8;color:#0f6a85;font-family:Cairo,sans-serif;font-size:18px;font-weight:800;">حسن</span>
+        <span style="padding:4px 14px;border-radius:8px;background:#fdf0d9;color:#8a5300;font-family:Cairo,sans-serif;font-size:18px;font-weight:800;">ضعيف</span>
+        <span style="padding:4px 14px;border-radius:8px;background:#fde4e8;color:#a8324a;font-family:Cairo,sans-serif;font-size:18px;font-weight:800;">موضوع</span>
+        <span style="padding:4px 12px;border-radius:8px;background:#f1effc;color:#4f3fd0;font-size:14px;font-weight:700;">حديث</span>
+        <span style="padding:4px 12px;border-radius:8px;background:#f1effc;color:#4f3fd0;font-size:14px;font-weight:700;">أثر</span>
+        <span style="padding:4px 12px;border-radius:8px;background:#f1effc;color:#4f3fd0;font-size:14px;font-weight:700;">آية</span>
+        <span style="padding:4px 12px;border-radius:8px;background:#f1effc;color:#4f3fd0;font-size:14px;font-weight:700;">قول عالم</span>
+        <span style="padding:4px 12px;border-radius:8px;background:#f1effc;color:#4f3fd0;font-size:14px;font-weight:700;">حكمة منتشرة</span>
+      </div>
+    </section>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:24px;">
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">تبويبات الإدخال</h2>
+      <div style="display:flex;gap:4px;border-bottom:1px solid #ebe9f5;">
+        <span style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;border-bottom:3px solid #7c6cf0;margin-bottom:-1px;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;color:#4f3fd0;">نص</span>
+        <span style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;font-weight:500;font-size:16px;color:#5a5d80;">صورة</span>
+        <span style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;font-weight:500;font-size:16px;color:#5a5d80;">رابط</span>
+      </div>
+      <div style="height:56px;border:1.5px solid #e3e0f2;border-radius:16px;background:#fbfaff;display:flex;align-items:center;padding:0 18px;color:#8e90ad;">حقل · افتراضي</div>
+      <div style="height:56px;border:1.5px solid #7c6cf0;border-radius:16px;background:#ffffff;box-shadow:0 0 0 4px rgba(124,108,240,0.15);display:flex;align-items:center;padding:0 18px;">حقل · تركيز</div>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;text-align:right;">tab 58h · active 3px #7c6cf0 · field r16 · focus ring 4px α.15</span>
+    </section>
+
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:18px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">تظليل الفروق</h2>
+      <p style="margin:0;font-size:22px;line-height:2.1;font-weight:500;">إنما الأعمال <span style="background:#fde4e8;color:#a8324a;border-bottom:2px solid #e7647a;padding:0 4px;border-radius:4px;">بالنية</span></p>
+      <p style="margin:0;font-size:22px;line-height:2.1;font-weight:500;">إنما الأعمال <span style="background:#d6f8ee;color:#076a55;border-bottom:2px solid #3ee6c0;padding:0 4px;border-radius:4px;">بالنيات</span></p>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.7;color:#5a5d80;direction:ltr;text-align:right;">del: bg #fde4e8 · fg #a8324a · underline 2px #e7647a<br>ins: bg #d6f8ee · fg #076a55 · underline 2px #3ee6c0<br>pad 0 4 · r4 · word-level tokens only</span>
+    </section>
+
+    <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:16px;">
+      <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">مقياس الثقة</h2>
+      <div style="display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:14px;background:#0d1035;">
+        <sc-for list="{{ meters }}" as="m" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;color:#c9c3ff;font-size:13px;"><span>{{ m.label }}</span><span style="font-family:Cairo,sans-serif;font-weight:800;font-size:20px;color:#fff;">{{ m.txt }}</span></div>
+            <div style="position:relative;height:8px;border-radius:99px;background:rgba(255,255,255,0.12);"><div style="height:100%;width:{{ m.w }};border-radius:99px;background:{{ m.c }};"></div><span style="position:absolute;top:-4px;bottom:-4px;inset-inline-start:75%;width:2px;background:rgba(255,255,255,0.55);"></span></div>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;text-align:right;">track 8h · fill = state color · tick at 75% threshold</span>
+    </section>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:16px;">
+    <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:22px;">الحالات: فارغ · تحميل · خطأ</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:24px;">
+      <div style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:36px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;">
+        <span style="width:56px;height:56px;border-radius:18px;background:#f1effc;display:grid;place-items:center;"><span style="width:20px;height:20px;border:2px solid #7c6cf0;border-radius:4px;transform:rotate(45deg);"></span></span>
+        <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:18px;">لا توجد عمليات تحقق بعد</h3>
+        <p style="margin:0;font-size:14px;line-height:1.7;color:#5a5d80;">ستظهر هنا نتائج هذه الجلسة.</p>
+        <button style="height:44px;padding:0 20px;border:0;border-radius:12px;background:#7c6cf0;color:#fff;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;">ابدأ التحقق</button>
+      </div>
+      <div style="background:#0d1035;border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;align-items:center;gap:14px;">{{ spinner }}<span style="font-family:Cairo,sans-serif;font-weight:700;font-size:18px;color:#fff;">جارٍ التحقق…</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;">
+          <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:9px;background:#3ee6c0;"></div><span style="font-size:13px;color:#fff;font-weight:700;">تطبيع</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:9px;background:#7c6cf0;"></div><span style="font-size:13px;color:#fff;font-weight:700;">مطابقة</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:9px;background:rgba(255,255,255,0.12);"></div><span style="font-size:13px;color:#c9c3ff;">إسناد</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:9px;background:rgba(255,255,255,0.12);"></div><span style="font-size:13px;color:#c9c3ff;">تقرير</span></div>
+        </div>
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#c9c3ff;direction:ltr;text-align:right;">done #3ee6c0 · current #7c6cf0 · todo α.12</span>
+      </div>
+      <div style="background:#ffffff;border:1px solid #f6dde2;border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="flex:none;width:40px;height:40px;border-radius:12px;background:#fde4e8;color:#a8324a;display:grid;place-items:center;font-family:Cairo,sans-serif;font-weight:800;font-size:20px;">!</span>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:18px;">تعذّر الوصول إلى المصادر</h3>
+            <p style="margin:0;font-size:14px;line-height:1.7;color:#3d4066;">لم يكتمل التحقق، ولم نُصدر أي نتيجة. نصّك محفوظ؛ أعد المحاولة بعد لحظات.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button style="height:44px;padding:0 20px;border:0;border-radius:12px;background:#7c6cf0;color:#fff;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;">إعادة المحاولة</button>
+          <button style="height:44px;padding:0 18px;border:0;border-radius:12px;background:transparent;color:#4f3fd0;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;">تعديل النص</button>
+        </div>
+        <span style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#5a5d80;direction:ltr;text-align:right;">Also: OCR failed · URL unreachable · text &gt; 2000 chars</span>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const colors = [
+      ['Navy · خلفية', '#0d1035'], ['Violet · أساسي', '#7c6cf0'], ['Violet hover', '#6a59e8'], ['Violet ink', '#4f3fd0'],
+      ['Mint · تمييز', '#3ee6c0'], ['Mint ink', '#087a62'], ['Lavender · ثانوي', '#c9c3ff'],
+      ['Amber', '#f2a93b'], ['Amber ink', '#8a5300'], ['Red', '#e7647a'], ['Red ink', '#a8324a'],
+      ['Ink · نص', '#14173d'], ['Muted', '#5a5d80'], ['Border', '#ebe9f5'], ['Surface', '#f5f4fb'], ['Card', '#ffffff']
+    ].map(([name, hex]) => ({ name, hex }));
+    return {
+      colors,
+      space: [4, 8, 12, 16, 20, 24, 32, 40, 56, 72].map(v => ({ v, px: v + 'px' })),
+      radii: [6, 10, 14, 16, 20, 24].map(v => ({ v: 'r' + v, px: v + 'px' })).concat([{ v: 'pill', px: '999px' }]),
+      meters: [
+        { label: 'مؤيَّد بمصدر', txt: '٩٤٪', w: '94%', c: '#3ee6c0' },
+        { label: 'غير مؤكد', txt: '٥٨٪', w: '58%', c: '#f2a93b' },
+        { label: 'لا مرجع', txt: '٢٢٪', w: '22%', c: '#f07a8a' }
+      ],
+      spinner: React.createElement('span', { style: { flex: 'none', display: 'inline-block', width: 32, height: 32, boxSizing: 'border-box', borderRadius: '50%', border: '3px solid rgba(201,195,255,0.2)', borderTopColor: '#3ee6c0', animation: 'thqspin 0.9s linear infinite' } })
+    };
+  }
+}
+</script>
+</body>
+</html>

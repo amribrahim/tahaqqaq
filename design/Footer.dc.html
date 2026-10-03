@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
+</helmet>
+<footer dir="{{ dir }}" style="background:#0d1035;border-top:1px solid rgba(201,195,255,0.12);font-family:Tajawal,system-ui,sans-serif;">
+  <div style="max-width:1200px;margin:0 auto;padding:32px clamp(16px,4cqi,64px);display:flex;flex-wrap:wrap;gap:20px 40px;align-items:center;justify-content:space-between;box-sizing:border-box;">
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <span style="font-family:Cairo,sans-serif;font-weight:800;font-size:20px;color:#ffffff;">تحقّق</span>
+      <span style="font-size:14px;color:#c9c3ff;">{{ challenge }}</span>
+    </div>
+    <nav style="display:flex;flex-wrap:wrap;gap:8px 28px;">
+      <a href="Sources.dc.html" style="font-size:15px;font-weight:500;color:#ffffff;text-decoration:none;" style-hover="color:#3ee6c0;">{{ l1 }}</a>
+      <a href="Sources.dc.html" style="font-size:15px;font-weight:500;color:#ffffff;text-decoration:none;" style-hover="color:#3ee6c0;">{{ l2 }}</a>
+      <a href="#" style="font-size:15px;font-weight:500;color:#ffffff;text-decoration:none;" style-hover="color:#3ee6c0;">{{ l3 }}</a>
+    </nav>
+  </div>
+  <div style="max-width:1200px;margin:0 auto;padding:14px clamp(16px,4cqi,64px) 20px;border-top:1px solid rgba(201,195,255,0.08);font-size:12px;line-height:1.6;color:#9d97d6;box-sizing:border-box;">{{ demo }}</div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:140},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ar&quot;,&quot;en&quot;],&quot;default&quot;:&quot;ar&quot;,&quot;tsType&quot;:&quot;'ar'|'en'&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const en = this.props.lang === 'en';
+    return en ? {
+      dir: 'ltr', challenge: 'AI Challenge Serving Islamic Content 2026',
+      l1: 'Approved sources', l2: 'Methodology', l3: 'Challenge links',
+      demo: 'Texts, numbers and gradings in this design are illustrative and must be reviewed before launch.'
+    } : {
+      dir: 'rtl', challenge: 'تحدي الذكاء الاصطناعي لخدمة المحتوى الإسلامي ٢٠٢٦',
+      l1: 'المصادر المعتمدة', l2: 'المنهجية', l3: 'روابط التحدي',
+      demo: 'النصوص والأرقام والأحكام في هذا التصميم بيانات توضيحية، وتُراجع قبل الإطلاق.'
+    };
+  }
+}
+</script>
+</body>
+</html>

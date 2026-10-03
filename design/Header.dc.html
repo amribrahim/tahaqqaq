@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
+</helmet>
+<header dir="{{ dir }}" style="display:flex;align-items:center;justify-content:space-between;gap:24px;height:72px;padding:0 clamp(16px,4cqi,64px);border-bottom:1px solid rgba(201,195,255,0.12);font-family:Tajawal,system-ui,sans-serif;box-sizing:border-box;">
+  <a href="Home.dc.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
+    <span style="width:32px;height:32px;display:grid;place-items:center;">
+      <span style="width:22px;height:22px;background:#7c6cf0;border-radius:5px;transform:rotate(45deg);display:grid;place-items:center;">
+        <span style="width:8px;height:8px;background:#3ee6c0;border-radius:50%;"></span>
+      </span>
+    </span>
+    <span style="display:flex;flex-direction:column;line-height:1;">
+      <span style="font-family:Cairo,sans-serif;font-weight:800;font-size:22px;color:#ffffff;">تحقّق</span>
+      <span style="font-size:10px;letter-spacing:0.2em;color:#c9c3ff;text-transform:uppercase;margin-top:4px;">Tahaqqaq</span>
+    </span>
+  </a>
+  <sc-if value="{{ showNav }}" hint-placeholder-val="{{ true }}">
+    <nav style="display:flex;gap:4px;">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="3">
+        <a href="{{ item.href }}" style="padding:8px 16px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;color:{{ item.color }};background:{{ item.bg }};" style-hover="color:#ffffff;">{{ item.label }}</a>
+      </sc-for>
+    </nav>
+  </sc-if>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div role="group" aria-label="Language" style="display:flex;gap:2px;padding:3px;border-radius:999px;border:1px solid rgba(201,195,255,0.3);">
+      <button onClick="{{ setAr }}" style="border:0;cursor:pointer;height:34px;min-width:42px;padding:0 12px;border-radius:999px;font-family:Cairo,sans-serif;font-weight:700;font-size:15px;background:{{ arBg }};color:{{ arFg }};">ع</button>
+      <button onClick="{{ setEn }}" style="border:0;cursor:pointer;height:34px;min-width:42px;padding:0 12px;border-radius:999px;font-family:Cairo,sans-serif;font-weight:700;font-size:13px;letter-spacing:0.04em;background:{{ enBg }};color:{{ enFg }};">EN</button>
+    </div>
+    <sc-if value="{{ mobile }}" hint-placeholder-val="{{ false }}">
+      <button aria-label="{{ menuLbl }}" style="width:44px;height:44px;border-radius:12px;border:1px solid rgba(201,195,255,0.3);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;">
+        <span style="width:18px;height:2px;border-radius:2px;background:#ffffff;"></span>
+        <span style="width:18px;height:2px;border-radius:2px;background:#ffffff;"></span>
+        <span style="width:18px;height:2px;border-radius:2px;background:#ffffff;"></span>
+      </button>
+    </sc-if>
+  </div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:72},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ar&quot;,&quot;en&quot;],&quot;default&quot;:&quot;ar&quot;,&quot;tsType&quot;:&quot;'ar'|'en'&quot;},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;sources&quot;,&quot;recent&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;},&quot;onLang&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(l:string)=&gt;void&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const en = this.props.lang === 'en';
+    const mobile = !!this.props.mobile;
+    const active = this.props.active || 'home';
+    const items = [
+      ['home', en ? 'Verify' : 'تحقّق', 'Home.dc.html'],
+      ['sources', en ? 'Sources & methodology' : 'المصادر والمنهجية', 'Sources.dc.html'],
+      ['recent', en ? 'Recent checks' : 'سجل التحقق', 'Recent.dc.html']
+    ];
+    const fire = l => () => this.props.onLang && this.props.onLang(l);
+    return {
+      dir: en ? 'ltr' : 'rtl', mobile, showNav: !mobile,
+      nav: items.map(([k, label, href]) => ({ label, href, color: k === active ? '#ffffff' : '#c9c3ff', bg: k === active ? 'rgba(124,108,240,0.24)' : 'transparent' })),
+      arBg: en ? 'transparent' : '#ffffff', arFg: en ? '#c9c3ff' : '#0d1035',
+      enBg: en ? '#ffffff' : 'transparent', enFg: en ? '#0d1035' : '#c9c3ff',
+      setAr: fire('ar'), setEn: fire('en'),
+      menuLbl: en ? 'Menu' : 'القائمة'
+    };
+  }
+}
+</script>
+</body>
+</html>

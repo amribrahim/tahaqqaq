@@ -1,0 +1,107 @@
+{
+  "_note": "Curated seed of widely circulated sayings that are NOT in the Six Books, with the scholars' rulings as recorded on dorar.net (الموسوعة الحديثية). Every entry must be reviewed by a specialist before launch. The grade text is shown verbatim.",
+  "items": [
+    {
+      "text_ar": "حب الوطن من الإيمان",
+      "text_en": "Love of the homeland is part of faith.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "الصغاني", "grader_en": "Al-Saghani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "الموضوعات", "source_en": "Al-Mawdu'at", "number": "81"},
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "36"}
+      ]
+    },
+    {
+      "text_ar": "اطلبوا العلم ولو بالصين",
+      "text_en": "Seek knowledge even if it be in China.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "باطل", "grade_en": "False (batil)", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "416"},
+        {"grader_ar": "ابن الجوزي", "grader_en": "Ibn al-Jawzi", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "الموضوعات", "source_en": "Al-Mawdu'at", "number": "1/215"}
+      ]
+    },
+    {
+      "text_ar": "اختلاف أمتي رحمة",
+      "text_en": "The differing of my nation is a mercy.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "لا أصل له", "grade_en": "Has no basis", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "57"}
+      ]
+    },
+    {
+      "text_ar": "من عرف نفسه فقد عرف ربه",
+      "text_en": "Whoever knows himself knows his Lord.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "66"},
+        {"grader_ar": "النووي", "grader_en": "Al-Nawawi", "grade_ar": "ليس بثابت", "grade_en": "Not established", "source_ar": "الفتاوى", "source_en": "Al-Fatawa", "number": ""}
+      ]
+    },
+    {
+      "text_ar": "لولاك لما خلقت الأفلاك",
+      "text_en": "Were it not for you, I would not have created the heavens.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "282"},
+        {"grader_ar": "الصغاني", "grader_en": "Al-Saghani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "الموضوعات", "source_en": "Al-Mawdu'at", "number": "52"}
+      ]
+    },
+    {
+      "text_ar": "الجنة تحت أقدام الأمهات",
+      "text_en": "Paradise lies under the feet of mothers.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "note_ar": "المعنى ثابت بلفظ آخر: «فالزمها فإن الجنة تحت رجليها» (النسائي ٣١٠٤، حسّنه الألباني).",
+      "note_en": "The meaning is established in another wording: 'Stay with her, for Paradise is beneath her feet' (al-Nasa'i 3104, graded hasan by al-Albani).",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "593"}
+      ]
+    },
+    {
+      "text_ar": "أنا مدينة العلم وعلي بابها",
+      "text_en": "I am the city of knowledge and Ali is its gate.",
+      "type_ar": "حديث نبوي", "type_en": "Prophetic hadith",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "2955"}
+      ]
+    },
+    {
+      "text_ar": "كنت كنزًا مخفيًا فأحببت أن أعرف فخلقت الخلق",
+      "text_en": "I was a hidden treasure and I loved to be known, so I created creation.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "ابن تيمية", "grader_en": "Ibn Taymiyyah", "grade_ar": "ليس من كلام النبي ﷺ ولا يُعرف له سند صحيح ولا ضعيف", "grade_en": "Not the Prophet's words; no known chain, sound or weak", "source_ar": "مجموع الفتاوى", "source_en": "Majmu' al-Fatawa", "number": "18/376"}
+      ]
+    },
+    {
+      "text_ar": "ما خاب من استخار ولا ندم من استشار",
+      "text_en": "He who seeks guidance is never let down, and he who consults never regrets.",
+      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "611"}
+      ]
+    },
+    {
+      "text_ar": "من لم يهتم بأمر المسلمين فليس منهم",
+      "text_en": "Whoever is not concerned with the affairs of the Muslims is not one of them.",
+      "type_ar": "حديث نبوي", "type_en": "Prophetic hadith",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "ضعيف", "grade_en": "Weak", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "309"}
+      ]
+    },
+    {
+      "text_ar": "صوموا تصحوا",
+      "text_en": "Fast and you will be healthy.",
+      "type_ar": "حديث نبوي", "type_en": "Prophetic hadith",
+      "grades": [
+        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "ضعيف", "grade_en": "Weak", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "253"}
+      ]
+    },
+    {
+      "text_ar": "الناس نيام فإذا ماتوا انتبهوا",
+      "text_en": "People are asleep; when they die they wake up.",
+      "type_ar": "قول عالم", "type_en": "Scholar's saying",
+      "grades": [
+        {"grader_ar": "العراقي", "grader_en": "Al-Iraqi", "grade_ar": "لم أجد له أصلًا مرفوعًا", "grade_en": "I found no basis for it as a Prophetic saying", "source_ar": "تخريج أحاديث الإحياء", "source_en": "Takhrij Ahadith al-Ihya'", "number": "4/20"}
+      ]
+    }
+  ]
+}

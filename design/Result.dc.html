@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800&amp;family=Tajawal:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#f5f4fb;}a{color:#4f3fd0;}a:hover{color:#7c6cf0;}@keyframes thqspin{to{transform:rotate(360deg)}}</style>
+</helmet>
+<div dir="{{ dir }}" lang="{{ lang }}" data-screen-label="Result" style="container-type:inline-size;width:100%;background:#f5f4fb;font-family:Tajawal,system-ui,sans-serif;color:#14173d;">
+<section style="background-color:#0d1035;background-image:url(data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%2772%27%20height=%2772%27%20viewBox=%270%200%2072%2072%27%3E%3Cg%20fill=%27none%27%20stroke=%27%23c9c3ff%27%20stroke-opacity=%270.07%27%3E%3Crect%20x=%2718%27%20y=%2718%27%20width=%2736%27%20height=%2736%27/%3E%3Crect%20x=%2718%27%20y=%2718%27%20width=%2736%27%20height=%2736%27%20transform=%27rotate%2845%2036%2036%29%27/%3E%3Ccircle%20cx=%2736%27%20cy=%2736%27%20r=%276%27/%3E%3C/g%3E%3C/svg%3E);">
+  <dc-import name="Header" lang="{{ lang }}" active="home" mobile="{{ mobile }}" on-lang="{{ setLang }}" hint-size="100%,72px"></dc-import>
+  <div style="max-width:1200px;margin:0 auto;padding:28px clamp(16px,4cqi,64px) 40px;display:flex;flex-direction:column;gap:20px;box-sizing:border-box;">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <h1 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:clamp(22px,2.2cqi,28px);color:#ffffff;">{{ t.report }}</h1>
+        <span style="font-size:13px;color:#c9c3ff;padding:4px 12px;border:1px solid rgba(201,195,255,0.25);border-radius:999px;">{{ t.time }}</span>
+      </div>
+      <span style="font-size:14px;color:#c9c3ff;">{{ t.note }}</span>
+    </div>
+
+    <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:clamp(20px,2.4cqi,32px);border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(201,195,255,0.2);display:flex;flex-direction:column;gap:28px;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          {{ spinner }}
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:800;font-size:clamp(22px,2.6cqi,30px);color:#ffffff;">{{ t.loadingTitle }}</h2>
+            <p style="margin:0;font-size:15px;line-height:1.6;color:#c9c3ff;">{{ t.loadingSub }}</p>
+          </div>
+        </div>
+        <ol style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(6px,1cqi,12px);">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+            <li style="display:flex;flex-direction:column;gap:10px;min-width:0;">
+              <div style="height:4px;border-radius:99px;background:{{ s.bar }};"></div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <span style="width:26px;height:26px;box-sizing:border-box;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:{{ s.dotBg }};color:{{ s.dotFg }};border:1.5px solid {{ s.dotBd }};">{{ s.mark }}</span>
+                <span style="font-family:Cairo,sans-serif;font-weight:700;font-size:15px;color:{{ s.labelColor }};">{{ s.label }}</span>
+              </div>
+              <span style="font-size:13px;line-height:1.5;color:#c9c3ff;">{{ s.desc }}</span>
+            </li>
+          </sc-for>
+        </ol>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ notLoading }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:20px 28px;align-items:stretch;padding:clamp(20px,2.4cqi,32px);border-radius:20px;background:{{ st.surface }};border:1px solid {{ st.border }};">
+        <div style="flex:999 1 400px;display:flex;gap:20px;align-items:flex-start;min-width:0;">
+          <div style="flex:none;width:56px;height:56px;border-radius:16px;background:{{ st.color }};color:{{ st.glyphColor }};display:grid;place-items:center;font-family:Cairo,sans-serif;font-weight:800;font-size:28px;line-height:1;">{{ st.glyph }}</div>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+            <span style="font-size:13px;font-weight:700;color:{{ st.color }};">{{ t.stateLbl }}</span>
+            <h2 style="margin:0;font-family:Cairo,sans-serif;font-weight:800;font-size:clamp(22px,2.6cqi,32px);line-height:1.35;color:#ffffff;text-wrap:balance;">{{ st.label }}</h2>
+            <p style="margin:0;font-size:16px;line-height:1.7;color:#c9c3ff;text-wrap:pretty;">{{ st.desc }}</p>
+          </div>
+        </div>
+        <div style="flex:1 1 300px;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:18px 20px;border-radius:14px;background:rgba(13,16,53,0.5);border:1px solid rgba(201,195,255,0.12);">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+            <span style="font-size:14px;font-weight:500;color:#c9c3ff;">{{ t.conf }}</span>
+            <span style="font-family:Cairo,sans-serif;font-weight:800;font-size:40px;line-height:1;color:#ffffff;">{{ confTxt }}</span>
+          </div>
+          <div style="position:relative;height:8px;border-radius:99px;background:rgba(255,255,255,0.12);">
+            <div style="height:100%;width:{{ confW }};background:{{ st.color }};border-radius:99px;"></div>
+            <span style="position:absolute;top:-4px;bottom:-4px;inset-inline-start:75%;width:2px;border-radius:2px;background:rgba(255,255,255,0.55);"></span>
+          </div>
+          <span style="font-size:12px;color:#9d97d6;">{{ t.threshold }}</span>
+          <p style="margin:0;font-size:14px;line-height:1.6;color:#e4e1ff;text-wrap:pretty;">{{ reason }}</p>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+</section>
+
+<main style="max-width:1200px;margin:0 auto;padding:32px clamp(16px,4cqi,64px) 64px;display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;box-sizing:border-box;">
+  <div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:24px;">
+
+    <sc-if value="{{ isLoading }}" hint-placeholder-val="{{ false }}">
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(18px,2.2cqi,28px);display:flex;flex-direction:column;gap:12px;">
+        <span style="font-size:13px;font-weight:500;color:#5a5d80;">{{ t.input }}</span>
+        <p dir="rtl" style="margin:0;font-size:22px;line-height:2;font-weight:500;">{{ inputText }}</p>
+      </section>
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;padding:clamp(18px,2.2cqi,28px);display:flex;flex-direction:column;gap:14px;">
+        <div style="width:38%;height:16px;border-radius:8px;background:#ebe9f5;"></div>
+        <div style="width:100%;height:12px;border-radius:6px;background:#f1eff8;"></div>
+        <div style="width:86%;height:12px;border-radius:6px;background:#f1eff8;"></div>
+        <div style="width:64%;height:12px;border-radius:6px;background:#f1eff8;"></div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ showDiff }}" hint-placeholder-val="{{ true }}">
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(18px,2.2cqi,28px);">
+        <header style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;">
+          <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:19px;">{{ t.diffTitle }}</h3>
+          <div style="display:flex;gap:16px;font-size:13px;color:#5a5d80;">
+            <span style="display:flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:#fde4e8;border-bottom:2px solid #e7647a;"></span>{{ t.legDel }}</span>
+            <span style="display:flex;align-items:center;gap:6px;"><span style="width:14px;height:10px;border-radius:3px;background:#d6f8ee;border-bottom:2px solid #3ee6c0;"></span>{{ t.legIns }}</span>
+          </div>
+        </header>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:20px;">
+          <div style="flex:1 1 260px;padding:20px;border-radius:14px;background:#faf9fe;border:1px solid #ebe9f5;">
+            <span style="font-size:13px;font-weight:500;color:#5a5d80;">{{ t.input }}</span>
+            <p dir="rtl" style="margin:10px 0 0;font-size:22px;line-height:2.1;font-weight:500;"><sc-for list="{{ inTok }}" as="k" hint-placeholder-count="3"><span style="background:{{ k.bg }};color:{{ k.fg }};border-bottom:{{ k.bb }};padding:{{ k.pad }};border-radius:4px;">{{ k.t }}</span></sc-for></p>
+          </div>
+          <div style="flex:1 1 260px;padding:20px;border-radius:14px;background:#f3fdf9;border:1px solid #c8f3e6;">
+            <span style="font-size:13px;font-weight:500;color:#087a62;">{{ correctLbl }}</span>
+            <p dir="rtl" style="margin:10px 0 0;font-size:22px;line-height:2.1;font-weight:500;"><sc-for list="{{ outTok }}" as="k" hint-placeholder-count="3"><span style="background:{{ k.bg }};color:{{ k.fg }};border-bottom:{{ k.bb }};padding:{{ k.pad }};border-radius:4px;">{{ k.t }}</span></sc-for></p>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ showTrans }}" hint-placeholder-val="{{ false }}">
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(18px,2.2cqi,28px);display:flex;flex-direction:column;gap:20px;">
+        <header style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;">
+          <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:19px;">{{ t.transTitle }}</h3>
+          <span style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:#fdf0d9;color:#8a5300;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#f2a93b;"></span>{{ t.transFlag }}</span>
+        </header>
+        <div style="padding:20px;border-radius:14px;background:#faf9fe;border:1px solid #ebe9f5;display:flex;flex-direction:column;gap:8px;">
+          <span style="font-size:13px;font-weight:500;color:#5a5d80;">{{ t.original }}</span>
+          <p dir="rtl" style="margin:0;font-size:24px;line-height:1.9;font-weight:500;">{{ arabic }}</p>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;">
+          <div style="flex:1 1 260px;padding:20px;border-radius:14px;background:#fffafb;border:1px solid #f6dde2;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;font-weight:500;color:#a8324a;">{{ t.yours }}</span>
+            <p dir="ltr" style="margin:0;font-size:18px;line-height:1.8;text-align:left;"><sc-for list="{{ userTok }}" as="k" hint-placeholder-count="3"><span style="background:{{ k.bg }};color:{{ k.fg }};border-bottom:{{ k.bb }};padding:{{ k.pad }};border-radius:4px;">{{ k.t }}</span></sc-for></p>
+          </div>
+          <div style="flex:1 1 260px;padding:20px;border-radius:14px;background:#f3fdf9;border:1px solid #c8f3e6;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;font-weight:500;color:#087a62;">{{ t.approved }}</span>
+            <p dir="ltr" style="margin:0;font-size:18px;line-height:1.8;text-align:left;"><sc-for list="{{ apprTok }}" as="k" hint-placeholder-count="3"><span style="background:{{ k.bg }};color:{{ k.fg }};border-bottom:{{ k.bb }};padding:{{ k.pad }};border-radius:4px;">{{ k.t }}</span></sc-for></p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <h4 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;">{{ t.issues }}</h4>
+          <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ issues }}" as="is" hint-placeholder-count="2">
+              <li style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:12px;border:1px solid #ebe9f5;">
+                <span style="flex:none;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700;background:{{ is.bg }};color:{{ is.fg }};">{{ is.sev }}</span>
+                <span style="font-size:15px;line-height:1.7;text-wrap:pretty;">{{ is.text }}</span>
+              </li>
+            </sc-for>
+          </ol>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ isAbstain }}" hint-placeholder-val="{{ false }}">
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(20px,2.6cqi,36px);display:flex;flex-direction:column;gap:22px;">
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <span style="flex:none;width:48px;height:48px;border-radius:50%;background:#f1eff4;border:2px solid #e7647a;color:#a8324a;display:grid;place-items:center;font-family:Cairo,sans-serif;font-weight:800;font-size:22px;">—</span>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:800;font-size:clamp(20px,2.2cqi,24px);">{{ t.absTitle }}</h3>
+            <p style="margin:0;font-size:16px;line-height:1.8;color:#3d4066;text-wrap:pretty;">{{ t.absBody }}</p>
+          </div>
+        </div>
+        <div style="padding:20px;border-radius:14px;background:#f7f6fb;border:1.5px dashed #d8d5e8;display:flex;flex-direction:column;gap:8px;">
+          <span style="font-size:13px;font-weight:500;color:#5a5d80;">{{ t.input }}</span>
+          <p dir="rtl" style="margin:0;font-size:21px;line-height:2;font-weight:500;color:#3d4066;">{{ inputText }}</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <h4 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;">{{ t.absTodo }}</h4>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ absList }}" as="a" hint-placeholder-count="3">
+              <li style="display:flex;gap:10px;align-items:baseline;font-size:15px;line-height:1.7;"><span style="flex:none;width:6px;height:6px;border-radius:50%;background:#7c6cf0;transform:translateY(-2px);"></span>{{ a }}</li>
+            </sc-for>
+          </ul>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;">
+          <button onClick="{{ onReview }}" style="height:52px;padding:0 28px;border:0;border-radius:14px;background:#7c6cf0;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 20px -8px rgba(124,108,240,0.7);" style-hover="background:#6a59e8;">{{ t.review }}</button>
+          <a href="Home.dc.html" style="height:52px;padding:0 24px;border-radius:14px;display:flex;align-items:center;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;color:#4f3fd0;text-decoration:none;" style-hover="background:#f4f2ff;">{{ t.another }}</a>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{ showGrade }}" hint-placeholder-val="{{ true }}">
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(18px,2.2cqi,28px);display:flex;flex-direction:column;gap:18px;">
+        <header style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;">
+          <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:19px;">{{ t.gradeTitle }}</h3>
+          <a href="#" style="height:40px;padding:0 16px;border-radius:10px;border:1.5px solid #d9d5f5;display:flex;align-items:center;gap:8px;font-family:Cairo,sans-serif;font-weight:700;font-size:14px;color:#4f3fd0;text-decoration:none;" style-hover="background:#f4f2ff;border-color:#7c6cf0;">{{ t.view }}<span>↗</span></a>
+        </header>
+        <sc-if value="{{ closest }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:10px;align-items:center;padding:12px 16px;border-radius:12px;background:#fdf0d9;color:#8a5300;font-size:14px;font-weight:500;"><span style="flex:none;width:8px;height:8px;border-radius:50%;background:#f2a93b;"></span>{{ t.closestNote }}</div>
+        </sc-if>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:1px;background:#ebe9f5;border:1px solid #ebe9f5;border-radius:14px;overflow:hidden;">
+          <div style="background:#ffffff;padding:16px 18px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;color:#5a5d80;">{{ t.type }}</span>
+            <span style="align-self:flex-start;padding:4px 12px;border-radius:8px;background:#f1effc;color:#4f3fd0;font-size:14px;font-weight:700;">{{ g.type }}</span>
+          </div>
+          <div style="background:#ffffff;padding:16px 18px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;color:#5a5d80;">{{ t.grade }}</span>
+            <span style="align-self:flex-start;padding:4px 14px;border-radius:8px;background:{{ g.bg }};color:{{ g.fg }};font-family:Cairo,sans-serif;font-size:18px;font-weight:800;">{{ g.grade }}</span>
+          </div>
+          <div style="background:#ffffff;padding:16px 18px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;color:#5a5d80;">{{ t.grader }}</span>
+            <span style="font-size:16px;font-weight:700;line-height:1.5;">{{ g.grader }}</span>
+          </div>
+          <div style="background:#ffffff;padding:16px 18px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;color:#5a5d80;">{{ t.source }}</span>
+            <span style="font-size:16px;font-weight:700;">{{ g.source }}</span>
+          </div>
+          <div style="background:#ffffff;padding:16px 18px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;color:#5a5d80;">{{ t.chapter }}</span>
+            <span style="font-size:16px;font-weight:700;line-height:1.5;">{{ g.chapter }}</span>
+          </div>
+          <div style="background:#ffffff;padding:16px 18px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:13px;color:#5a5d80;">{{ t.number }}</span>
+            <span style="font-family:Cairo,sans-serif;font-size:22px;font-weight:800;">{{ g.num }}</span>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+  </div>
+
+  <aside style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:24px;">
+    <sc-if value="{{ notLoading }}" hint-placeholder-val="{{ true }}">
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(18px,2.2cqi,24px);">
+        <header style="display:flex;flex-direction:column;gap:4px;margin-bottom:8px;">
+          <h3 style="margin:0;font-family:Cairo,sans-serif;font-weight:700;font-size:19px;">{{ t.candTitle }}</h3>
+          <span style="font-size:13px;color:#5a5d80;">{{ t.candSub }}</span>
+        </header>
+        <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;">
+          <sc-for list="{{ cands }}" as="c" hint-placeholder-count="5">
+            <li style="display:flex;gap:12px;padding:14px 0;border-top:1px solid #f0eef8;">
+              <span style="flex:none;width:26px;height:26px;border-radius:50%;background:#f1effc;color:#4f3fd0;display:grid;place-items:center;font-size:13px;font-weight:700;">{{ c.rank }}</span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">
+                <p dir="rtl" style="margin:0;font-size:15px;line-height:1.7;color:#14173d;">{{ c.text }}</p>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                  <span style="display:flex;align-items:center;gap:8px;font-size:13px;color:#5a5d80;">{{ c.src }}<sc-if value="{{ c.top }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 8px;border-radius:999px;background:#dcfaf1;color:#087a62;font-size:11px;font-weight:700;">{{ c.tag }}</span></sc-if></span>
+                  <span style="font-family:Cairo,sans-serif;font-size:15px;font-weight:800;color:{{ c.fg }};">{{ c.pct }}</span>
+                </div>
+                <div style="height:4px;border-radius:99px;background:#f0eef8;"><div style="height:100%;width:{{ c.w }};border-radius:99px;background:{{ c.bar }};"></div></div>
+              </div>
+            </li>
+          </sc-for>
+        </ol>
+        <div style="padding-top:12px;border-top:1px solid #f0eef8;font-size:12px;color:#5a5d80;">{{ t.threshold }}</div>
+      </section>
+
+      <section style="background:#ffffff;border:1px solid #ebe9f5;border-radius:20px;box-shadow:0 1px 2px rgba(13,16,53,0.04),0 12px 32px -16px rgba(13,16,53,0.14);padding:clamp(18px,2.2cqi,24px);display:flex;flex-direction:column;gap:12px;">
+        <h3 style="margin:0 0 4px;font-family:Cairo,sans-serif;font-weight:700;font-size:19px;">{{ t.actions }}</h3>
+        <button onClick="{{ pri.on }}" style="height:52px;border:0;border-radius:14px;background:#7c6cf0;color:#ffffff;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 8px 20px -8px rgba(124,108,240,0.7);" style-hover="background:#6a59e8;">{{ pri.label }}</button>
+        <button onClick="{{ sec.on }}" style="height:52px;border-radius:14px;border:1.5px solid #d9d5f5;background:#ffffff;color:#4f3fd0;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;cursor:pointer;" style-hover="background:#f4f2ff;border-color:#7c6cf0;">{{ sec.label }}</button>
+        <sc-if value="{{ reviewSent }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:12px;background:#dcfaf1;color:#087a62;font-size:14px;font-weight:500;line-height:1.5;"><span style="font-weight:800;">✓</span>{{ t.reviewSent }}</div>
+        </sc-if>
+        <a href="Home.dc.html" style="height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:Cairo,sans-serif;font-weight:700;font-size:16px;color:#4f3fd0;text-decoration:none;" style-hover="background:#f4f2ff;">{{ t.another }}</a>
+      </section>
+    </sc-if>
+  </aside>
+</main>
+<dc-import name="Footer" lang="{{ lang }}" hint-size="100%,140px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;scenario&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;partial&quot;,&quot;translation&quot;,&quot;uncertain&quot;,&quot;abstain&quot;,&quot;loading&quot;],&quot;default&quot;:&quot;partial&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ar&quot;,&quot;en&quot;],&quot;default&quot;:&quot;ar&quot;,&quot;tsType&quot;:&quot;'ar'|'en'&quot;},&quot;mobile&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const UI = {
+  ar: { report:'تقرير التحقق', time:'اليوم · ١٠:٤٢ ص', stateLbl:'حالة النتيجة', conf:'مستوى الثقة', threshold:'حدّ القبول ٧٥٪', diffTitle:'مقارنة الصيغة', input:'النص المُدخل', correct:'الصيغة الصحيحة', closest:'أقرب صيغة في المصادر', legDel:'مختلف في المُدخل', legIns:'لفظ المصدر', gradeTitle:'الحكم والمصدر', type:'النوع', grade:'الدرجة', grader:'المُحكِّم', source:'المصدر', chapter:'الكتاب والباب', number:'الرقم', view:'عرض في المصدر', closestNote:'الحكم أدناه للنص الأقرب، وليس للنص المُدخل.', transTitle:'دقة الترجمة', transFlag:'تحتاج تعديلًا', original:'النص العربي الأصلي', yours:'الترجمة المُدخلة', approved:'الترجمة المعتمدة', issues:'ملاحظات على المعنى', sevHigh:'جوهرية', sevLow:'تحسينية', candTitle:'أقرب النتائج المطابقة', candSub:'حتى ٥ نتائج مرتبة حسب نسبة التطابق', actions:'الإجراءات', copy:'نسخ التقرير', copied:'✓ تم نسخ التقرير', review:'طلب مراجعة بشرية', reviewSent:'أُرسل الطلب. يراجعه مختص خلال ٤٨ ساعة.', another:'تحقق من نص آخر', note:'ننقل أحكام المحدّثين من مصادرها، ولا نُصدر حكمًا آليًا.', loadingTitle:'جارٍ التحقق…', loadingSub:'نطابق النص مع ٩ مصادر معتمدة. يستغرق ذلك عادةً أقل من ١٠ ثوانٍ.', steps:['تطبيع','مطابقة','إسناد','تقرير'], stepDesc:['توحيد الحروف وإزالة التشكيل','البحث في المتون المعتمدة','جلب الحكم والمصدر','إعداد التقرير'], absTitle:'لا يوجد مرجع موثوق لهذا النص', absBody:'بحثنا في جميع المصادر المعتمدة ولم نجد نصًا يطابق المُدخل بدرجة كافية. لذلك لا نُصدر حكمًا، ولا ننسب النص إلى أي مصدر.', absTodo:'ما يمكنك فعله', absList:['اطلب مراجعة بشرية من فريق المختصين.','لا تنشر النص منسوبًا إلى النبي ﷺ حتى يثبت.','النتائج المجاورة نصوص مختلفة، تُعرض للمقارنة فقط.'], accepted:'المطابقة المعتمدة' },
+  en: { report:'Verification report', time:'Today · 10:42 AM', stateLbl:'Result status', conf:'Confidence', threshold:'Acceptance threshold 75%', diffTitle:'Wording comparison', input:'Your text', correct:'Correct wording', closest:'Closest wording in sources', legDel:'Differs in your text', legIns:'Source wording', gradeTitle:'Grading & source', type:'Type', grade:'Grade', grader:'Graded by', source:'Source', chapter:'Book & chapter', number:'Number', view:'View in source', closestNote:'The grading below applies to the closest text, not to your text.', transTitle:'Translation accuracy', transFlag:'Needs correction', original:'Original Arabic', yours:'Your translation', approved:'Approved translation', issues:'Meaning issues', sevHigh:'Major', sevLow:'Minor', candTitle:'Closest matches', candSub:'Up to 5 results, ranked by match', actions:'Actions', copy:'Copy report', copied:'✓ Report copied', review:'Request human review', reviewSent:'Request sent. A specialist will review it within 48 hours.', another:'Check another text', note:'We relay hadith scholars’ gradings from their sources. We never issue automated verdicts.', loadingTitle:'Verifying…', loadingSub:'Matching your text against 9 approved sources. This usually takes under 10 seconds.', steps:['Normalize','Match','Attribute','Report'], stepDesc:['Unify letters, strip diacritics','Search approved texts','Fetch grading & source','Build the report'], absTitle:'No reliable reference for this text', absBody:'We searched every approved source and found no text that matches closely enough. We give no verdict and attribute the text to no source.', absTodo:'What you can do', absList:['Request a human review from our specialists.','Don’t share it as a saying of the Prophet ﷺ until it is verified.','The nearby results are different texts, shown for comparison only.'], accepted:'Accepted match' }
+};
+const ST = {
+  verified:{ ar:'مؤيَّد بمصدر', en:'Confirmed by source', dar:'وُجد النص في مصدر معتمد بصيغة مطابقة.', den:'The text was found in an approved source with matching wording.', color:'#3ee6c0', g:'✓', ge:'✓', gc:'#0d1035', surface:'rgba(62,230,192,0.08)', border:'rgba(62,230,192,0.45)' },
+  partial:{ ar:'مؤيَّد جزئيًا – اختلاف رواية', en:'Partially confirmed – variant wording', dar:'وُجد النص في مصدر معتمد مع اختلاف في بعض الألفاظ عن الرواية.', den:'Found in an approved source, with some words differing from the narration.', color:'#7c6cf0', g:'≈', ge:'≈', gc:'#ffffff', surface:'rgba(124,108,240,0.14)', border:'rgba(124,108,240,0.6)' },
+  uncertain:{ ar:'غير مؤكد', en:'Unconfirmed', dar:'لم يرد بهذا اللفظ في المصادر المعتمدة، ووُجد نص قريب يحتاج إلى تثبّت.', den:'Not found in this wording. A related text exists and needs review.', color:'#f2a93b', g:'؟', ge:'?', gc:'#0d1035', surface:'rgba(242,169,59,0.08)', border:'rgba(242,169,59,0.5)' },
+  abstain:{ ar:'لا مرجع – يُمتنع عن الحكم', en:'No reference – verdict withheld', dar:'لم نجد هذا النص في المصادر المعتمدة، لذلك لا نُصدر أي حكم عليه.', den:'This text was not found in any approved source, so no verdict is given.', color:'#f07a8a', g:'—', ge:'—', gc:'#0d1035', surface:'rgba(255,255,255,0.04)', border:'rgba(240,122,138,0.55)' }
+};
+const GR = {
+  sahih:{ ar:'صحيح', en:'Sahih', fg:'#087a62', bg:'#dcfaf1' },
+  hasan:{ ar:'حسن', en:'Hasan', fg:'#0f6a85', bg:'#ddf2f8' },
+  daif:{ ar:'ضعيف', en:"Da'if", fg:'#8a5300', bg:'#fdf0d9' },
+  mawdu:{ ar:'موضوع', en:"Mawdu'", fg:'#a8324a', bg:'#fde4e8' }
+};
+const HADITH = { ar:'حديث نبوي', en:'Prophetic hadith' };
+const SC = {
+  partial:{ state:'partial', conf:86, kind:'diff',
+    reason:{ ar:'المعنى مطابق، مع اختلاف لفظين عن رواية صحيح البخاري (١).', en:'Meaning matches; two words differ from Sahih al-Bukhari 1.' },
+    inTok:[['إنما الأعمال '],['بالنية','d'],['، '],['ولكل','d'],[' امرئ ما نوى']],
+    outTok:[['إنما الأعمال '],['بالنيات','i'],['، '],['وإنما لكل','i'],[' امرئ ما نوى']],
+    g:{ type:HADITH, grade:'sahih', grader:{ ar:'متفق عليه — البخاري (١) ومسلم (١٩٠٧)', en:'Agreed upon — al-Bukhari (1), Muslim (1907)' }, source:{ ar:'صحيح البخاري', en:'Sahih al-Bukhari' }, chapter:{ ar:'كتاب بدء الوحي · باب كيف كان بدء الوحي', en:'Revelation · How the revelation began' }, num:{ ar:'١', en:'1' } },
+    cands:[
+      ['إنما الأعمال بالنيات، وإنما لكل امرئ ما نوى…', { ar:'صحيح البخاري · ١', en:'Sahih al-Bukhari · 1' }, 86],
+      ['الأعمال بالنية، ولكل امرئ ما نوى…', { ar:'صحيح البخاري · ٥٤', en:'Sahih al-Bukhari · 54' }, 84],
+      ['إنما الأعمال بالنية، وإنما لامرئ ما نوى…', { ar:'صحيح مسلم · ١٩٠٧', en:'Sahih Muslim · 1907' }, 81],
+      ['إنما الأعمال بالنيات، وإنما لكل امرئ ما نوى…', { ar:'سنن أبي داود · ٢٢٠١', en:'Sunan Abi Dawud · 2201' }, 80],
+      ['إنما الأعمال بالنية، وإنما لامرئ ما نوى…', { ar:'سنن النسائي · ٧٥', en:'Sunan al-Nasa’i · 75' }, 78]
+    ] },
+  translation:{ state:'verified', conf:94, kind:'trans',
+    reason:{ ar:'النص العربي مطابق لصحيح البخاري (١٣)، والملاحظة على الترجمة فقط.', en:'The Arabic matches Sahih al-Bukhari 13. The issue is in the translation only.' },
+    arabic:'لا يُؤمِنُ أحدُكم حتى يُحِبَّ لأخيه ما يُحِبُّ لنفسه',
+    userTok:[['None of you '],['is a Muslim','d'],[' until he loves for his brother what he loves for himself.']],
+    apprTok:[['None of you '],['truly believes','i'],[' until he loves for his brother what he loves for himself.']],
+    issues:[
+      { sev:'high', ar:'ترجمة «لا يؤمن» بـ “is a Muslim” تنفي أصل الإسلام، والحديث ينفي كمال الإيمان لا أصله.', en:'Rendering «لا يؤمن» as “is a Muslim” denies Islam itself. The hadith negates the completeness of faith, not its existence.' },
+      { sev:'low', ar:'«لأخيه» تُحمل عند الشرّاح على الأخوّة في الدين، ويُستحسن بيان ذلك في الحاشية.', en:'Commentators read «لأخيه» as brotherhood in faith. A footnote is recommended.' }
+    ],
+    g:{ type:HADITH, grade:'sahih', grader:{ ar:'متفق عليه — البخاري (١٣) ومسلم (٤٥)', en:'Agreed upon — al-Bukhari (13), Muslim (45)' }, source:{ ar:'صحيح البخاري', en:'Sahih al-Bukhari' }, chapter:{ ar:'كتاب الإيمان · باب من الإيمان أن يحب لأخيه ما يحب لنفسه', en:'Faith · Loving for one’s brother what one loves for oneself' }, num:{ ar:'١٣', en:'13' } },
+    cands:[
+      ['لا يؤمن أحدكم حتى يحب لأخيه ما يحب لنفسه', { ar:'صحيح البخاري · ١٣', en:'Sahih al-Bukhari · 13' }, 94],
+      ['لا يؤمن أحدكم حتى يحب لأخيه — أو قال: لجاره — ما يحب لنفسه', { ar:'صحيح مسلم · ٤٥', en:'Sahih Muslim · 45' }, 91],
+      ['لا يؤمن أحدكم حتى يحب لأخيه ما يحب لنفسه من الخير', { ar:'سنن النسائي · ٥٠١٦', en:'Sunan al-Nasa’i · 5016' }, 89],
+      ['لا يؤمن أحدكم حتى يحب لأخيه ما يحب لنفسه', { ar:'جامع الترمذي · ٢٥١٥', en:'Jami‘ al-Tirmidhi · 2515' }, 88],
+      ['لا يؤمن أحدكم حتى يحب لأخيه ما يحب لنفسه', { ar:'سنن ابن ماجه · ٦٦', en:'Sunan Ibn Majah · 66' }, 87]
+    ] },
+  uncertain:{ state:'uncertain', conf:58, kind:'diff', closest:true,
+    reason:{ ar:'لا يوجد نص بهذا اللفظ. أقرب نص يختلف في اللفظ ويقاربه في المعنى.', en:'No text has this wording. The closest differs in wording but is near in meaning.' },
+    inTok:[['النظافة','d'],[' '],['من','d'],[' الإيمان']],
+    outTok:[['الطُّهور','i'],[' '],['شطر','i'],[' الإيمان']],
+    g:{ type:HADITH, grade:'sahih', grader:{ ar:'رواه مسلم في صحيحه', en:'Narrated by Muslim in his Sahih' }, source:{ ar:'صحيح مسلم', en:'Sahih Muslim' }, chapter:{ ar:'كتاب الطهارة · باب فضل الوضوء', en:'Purification · Virtue of ablution' }, num:{ ar:'٢٢٣', en:'223' } },
+    cands:[
+      ['الطُّهور شطر الإيمان، والحمد لله تملأ الميزان…', { ar:'صحيح مسلم · ٢٢٣', en:'Sahih Muslim · 223' }, 58],
+      ['إسباغ الوضوء شطر الإيمان…', { ar:'سنن ابن ماجه · ٢٨٠', en:'Sunan Ibn Majah · 280' }, 47],
+      ['الطُّهور شطر الإيمان…', { ar:'جامع الترمذي · ٣٥١٧', en:'Jami‘ al-Tirmidhi · 3517' }, 46]
+    ] },
+  abstain:{ state:'abstain', conf:22, kind:'abstain',
+    reason:{ ar:'أعلى تطابق ٢٢٪، وهو أقل من حدّ القبول.', en:'Highest match is 22%, below the acceptance threshold.' },
+    inputText:'من قرأ هذا الدعاء ونشره بين عشرة أشخاص فُرّج همّه في يومه',
+    cands:[
+      ['من نفّس عن مؤمن كربة من كرب الدنيا، نفّس الله عنه كربة من كرب يوم القيامة…', { ar:'صحيح مسلم · ٢٦٩٩', en:'Sahih Muslim · 2699' }, 22],
+      ['من دلّ على خير فله مثل أجر فاعله', { ar:'صحيح مسلم · ١٨٩٣', en:'Sahih Muslim · 1893' }, 19],
+      ['ما أصاب أحدًا قطّ همّ ولا حزن فقال: اللهم إني عبدك…', { ar:'مسند أحمد · ٣٧١٢', en:'Musnad Ahmad · 3712' }, 16]
+    ] },
+  loading:{ kind:'loading', inputText:'إنما الأعمال بالنية، ولكل امرئ ما نوى' }
+};
+
+class Component extends DCLogic {
+  state = { lang: null, copied: false, reviewSent: false };
+
+  renderVals() {
+    const lang = this.state.lang || this.props.lang || 'ar';
+    const en = lang === 'en';
+    const t = UI[lang];
+    const key = SC[this.props.scenario] ? this.props.scenario : 'partial';
+    const sc = SC[key];
+    const L = v => (v && typeof v === 'object' && !Array.isArray(v) && 'ar' in v) ? v[lang] : v;
+    const num = n => en ? String(n) : String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    const pct = n => num(n) + (en ? '%' : '٪');
+    const isLoading = sc.kind === 'loading';
+    const s = ST[sc.state] || ST.partial;
+    const st = { label: s[lang], desc: en ? s.den : s.dar, color: s.color, glyph: en ? s.ge : s.g, glyphColor: s.gc, surface: s.surface, border: s.border };
+    const tok = arr => (arr || []).map(([text, k]) =>
+      k === 'd' ? { t: text, bg: '#fde4e8', fg: '#a8324a', bb: '2px solid #e7647a', pad: '0 4px' } :
+      k === 'i' ? { t: text, bg: '#d6f8ee', fg: '#076a55', bb: '2px solid #3ee6c0', pad: '0 4px' } :
+      { t: text, bg: 'transparent', fg: 'inherit', bb: '0', pad: '0' });
+    const gr = sc.g ? GR[sc.g.grade] : GR.sahih;
+    const g = sc.g ? { type: L(sc.g.type), grade: gr[lang], fg: gr.fg, bg: gr.bg, grader: L(sc.g.grader), source: L(sc.g.source), chapter: L(sc.g.chapter), num: L(sc.g.num) } : {};
+    const cands = (sc.cands || []).map(([text, src, p], i) => ({
+      rank: num(i + 1), text, src: L(src), pct: pct(p), w: p + '%',
+      top: i === 0 && p >= 75, tag: t.accepted,
+      bar: p >= 75 ? '#7c6cf0' : '#c4c1d6', fg: p >= 75 ? '#4f3fd0' : '#5a5d80'
+    }));
+    const cur = 1;
+    const steps = t.steps.map((label, i) => {
+      const done = i < cur, now = i === cur;
+      return {
+        label, desc: t.stepDesc[i], mark: done ? '✓' : num(i + 1),
+        bar: done ? '#3ee6c0' : now ? '#7c6cf0' : 'rgba(255,255,255,0.12)',
+        dotBg: done ? '#3ee6c0' : 'transparent', dotFg: done ? '#0d1035' : now ? '#ffffff' : '#c9c3ff',
+        dotBd: done ? '#3ee6c0' : now ? '#7c6cf0' : 'rgba(201,195,255,0.35)',
+        labelColor: done || now ? '#ffffff' : '#c9c3ff'
+      };
+    });
+    const isAbstain = sc.kind === 'abstain';
+    const copy = { label: this.state.copied ? t.copied : t.copy, on: () => this.copyReport(st, t) };
+    const review = { label: t.review, on: () => this.setState({ reviewSent: true }) };
+    return {
+      lang, dir: en ? 'ltr' : 'rtl', mobile: !!this.props.mobile, t, st,
+      setLang: l => this.setState({ lang: l }),
+      isLoading, notLoading: !isLoading,
+      confTxt: pct(sc.conf || 0), confW: (sc.conf || 0) + '%', reason: L(sc.reason),
+      showDiff: sc.kind === 'diff', showTrans: sc.kind === 'trans', isAbstain,
+      showGrade: !!sc.g, closest: !!sc.closest,
+      correctLbl: sc.closest ? t.closest : t.correct,
+      inTok: tok(sc.inTok), outTok: tok(sc.outTok), userTok: tok(sc.userTok), apprTok: tok(sc.apprTok),
+      arabic: sc.arabic, inputText: sc.inputText,
+      issues: (sc.issues || []).map(x => ({ text: x[lang], sev: x.sev === 'high' ? t.sevHigh : t.sevLow, bg: x.sev === 'high' ? '#fde4e8' : '#f1eff4', fg: x.sev === 'high' ? '#a8324a' : '#5a5d80' })),
+      absList: t.absList, g, cands, steps,
+      pri: isAbstain ? review : copy, sec: isAbstain ? copy : review,
+      onReview: review.on, reviewSent: this.state.reviewSent,
+      spinner: React.createElement('span', { style: { flex: 'none', display: 'inline-block', width: 44, height: 44, boxSizing: 'border-box', borderRadius: '50%', border: '3px solid rgba(201,195,255,0.2)', borderTopColor: '#3ee6c0', animation: 'thqspin 0.9s linear infinite' } })
+    };
+  }
+
+  copyReport(st, t) {
+    try { navigator.clipboard && navigator.clipboard.writeText(t.report + ' — ' + st.label).catch(() => {}); } catch (e) {}
+    this.setState({ copied: true });
+    clearTimeout(this._ct);
+    this._ct = setTimeout(() => this.setState({ copied: false }), 2000);
+  }
+  componentWillUnmount() { clearTimeout(this._ct); }
+}
+</script>
+</body>
+</html>
