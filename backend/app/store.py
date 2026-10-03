@@ -13,7 +13,7 @@ import numpy as np
 from rapidfuzz import fuzz
 
 from .config import get_settings
-from .records import GlossaryTerm, Record
+from .records import GlossaryTerm, Record, is_cross_reference
 
 
 class Store(Protocol):
@@ -21,8 +21,39 @@ class Store(Protocol):
     def exact_search(self, norm_query: str, lang: str, kinds: list[str] | None, limit: int) -> list[Record]: ...
     def vector_search(self, vec: np.ndarray, lang: str, kinds: list[str] | None, limit: int) -> list[Record]: ...
     def lexical_search(self, norm_query: str, lang: str, kinds: list[str] | None, limit: int) -> list[Record]: ...
+    def narrations(self, rec: Record, limit: int = 10) -> list[tuple[Record, int]]: ...
     def glossary(self) -> list[GlossaryTerm]: ...
     def counts(self) -> dict[str, int]: ...
+
+
+# Order of the books when the same text is narrated in several of them
+BOOK_ORDER = {"bukhari": 0, "muslim": 1, "abudawud": 2, "tirmidhi": 3, "nasai": 4, "ibnmajah": 5}
+
+
+def _probes(matn_norm: str) -> list[str]:
+    """Opening, middle and closing words: a shorter narration may carry only part of a longer one."""
+    w = matn_norm.split()
+    if len(w) <= 14:
+        return [" ".join(w)]
+    mid = max(0, len(w) // 2 - 7)
+    return list(dict.fromkeys([" ".join(w[:14]), " ".join(w[mid:mid + 14]), " ".join(w[-14:])]))
+
+
+def rank_narrations(rec: Record, cands: list[Record], limit: int) -> list[tuple[Record, int]]:
+    """Keep the records that carry the same text as `rec` (other books, or the same book under another number),
+    with a 0-100 similarity of their wording; most similar first, then by book order and number."""
+    core = rec.matn_norm[:400]
+    out: list[tuple[Record, int]] = []
+    seen: set[int] = {rec.id}
+    for c in cands:
+        if c.id in seen or c.kind != "hadith" or not c.matn_norm or is_cross_reference(c.matn_norm):
+            continue
+        seen.add(c.id)
+        sim = int(round(fuzz.token_set_ratio(core, c.matn_norm[:400])))
+        if sim >= 80:
+            out.append((c, sim))
+    out.sort(key=lambda x: (-x[1], BOOK_ORDER.get(x[0].collection, 9), len(x[0].number), x[0].number))
+    return out[:limit]
 
 
 class PgStore:
@@ -83,6 +114,22 @@ class PgStore:
             conn.execute("SET pg_trgm.word_similarity_threshold = 0.35")
             rows = conn.execute(sql, {"q": q, "kinds": kinds, "limit": limit}).fetchall()
         return [Record.from_row(r) for r in rows]
+
+    def narrations(self, rec, limit=10):
+        """The same text in other books or under other numbers (trigram probe on the opening words, then rescored)."""
+        if rec.kind != "hadith" or not rec.matn_norm:
+            return []
+        sql = """
+            SELECT *, word_similarity(%(q)s, matn_norm) AS lexical
+            FROM texts WHERE kind = 'hadith' AND id <> %(id)s AND %(q)s <%% matn_norm
+            ORDER BY lexical DESC LIMIT 30
+        """
+        rows = []
+        with self._db.get_conn() as conn:
+            conn.execute("SET pg_trgm.word_similarity_threshold = 0.6")
+            for q in _probes(rec.matn_norm):
+                rows += conn.execute(sql, {"q": q, "id": rec.id}).fetchall()
+        return rank_narrations(rec, [Record.from_row(r) for r in rows], limit)
 
     def glossary(self):
         with self._db.get_conn() as conn:
@@ -174,6 +221,14 @@ class MemoryStore:
                 scored.append(rr)
         scored.sort(key=lambda r: -r.lexical)
         return scored[:limit]
+
+    def narrations(self, rec, limit=10):
+        if rec.kind != "hadith" or not rec.matn_norm:
+            return []
+        probes = _probes(rec.matn_norm)
+        cands = [r for r in self.records if r.kind == "hadith" and r.id != rec.id and r.matn_norm
+                 and max(fuzz.partial_ratio(p, r.matn_norm) for p in probes) >= 60]
+        return rank_narrations(rec, cands, limit)
 
     def glossary(self):
         return list(self._glossary)

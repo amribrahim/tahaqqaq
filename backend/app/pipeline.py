@@ -17,9 +17,17 @@ from .diff import diff_tokens
 from .fetch_url import pick_quote
 from .grades import is_unreliable
 from .normalize import detect_language, detect_script_language, isnad_matn, to_arabic_digits
-from .quotes import quote_candidates
+from .quotes import is_marked, quote_candidates, substantive
 from .records import Record
-from .schemas import CandidateOut, GradeOut, SegmentOut, SourceOut, TranslationOut, VerifyResponse
+from .schemas import (
+    CandidateOut,
+    GradeOut,
+    NarrationOut,
+    SegmentOut,
+    SourceOut,
+    TranslationOut,
+    VerifyResponse,
+)
 from .store import get_store
 from .translation import glossary_notes, quoted_part, translation_card
 
@@ -172,7 +180,7 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
     if len(text) > 220 or via != "text" or has_inner_quote:
         # AI middle step: certain-only OCR fixes + the quoted segments, each validated against the input
         extraction = llm.extract_segments(text) if explain and (via != "text" or len(text) > 220) else None
-        ai_spans = [(sg["text"], sg["type"]) for sg in (extraction or {}).get("segments", [])]
+        ai_spans = [(sg["text"], sg["type"]) for sg in (extraction or {}).get("segments", []) if substantive(sg["text"])]
         merged: list[tuple[str, str, str]] = [(t, ty, "ai") for t, ty in ai_spans]
         if isnad and not any(_same_span(isnad, m[0]) for m in merged):
             merged.insert(0, (isnad, "hadith", "rules"))
@@ -181,7 +189,9 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
                 merged.append((sp, "other", "rules"))
         if ai_spans and len(merged) > 8:
             merged = merged[:8]
-        focus, others, seg_results = _best_quote(text, lang_in, merged)
+        # a short typed text is itself a candidate: a fragment only replaces it when it is clearly the quote
+        whole = text if via == "text" and len(text) <= 400 else None
+        focus, others, seg_results = _best_quote(text, lang_in, merged, whole=whole)
         focus = focus or pick_quote(text)
     query = classify.strip_attribution(focus) or focus
     # the attribution ("قال رسول الله") may sit outside the extracted span: look at both
@@ -199,6 +209,7 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
             if not base["extracted_text"]:
                 base["extracted_text"] = text
     cands = matcher.search(query, lang=lang_in, kinds=None, limit=5)
+    match_check = _check_match(query, cands) if lang_in == "en" else None
     if extraction:
         base["extraction_model"] = extraction.get("model")
         if extraction.get("cleaned_text") and extraction["cleaned_text"] != text:
@@ -230,8 +241,11 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
     if rec is not None and rec.grades and state in ("verified", "partial") and is_unreliable(rec.grades[0].get("grade_ar", "")):
         match_level, state = state, "unreliable"
     resp = VerifyResponse(**base, state=state, confidence=conf, match_level=match_level, reason_ar="", reason_en="",
-                          candidates=_candidates_out(cands, settings.threshold_partial), timings_ms=timings)
+                          candidates=_candidates_out(cands, settings.threshold_partial), timings_ms=timings, match_check=match_check)
     resp.reason_ar, resp.reason_en = _reason(state, conf, rec, lang_in)
+    if match_check and top is not None and top.get("ai_confirmed") and state in ("partial", "unreliable"):
+        resp.reason_ar += " وقارن نموذج لغوي النصين فوجدهما الرواية نفسها بلفظ مختلف؛ راجع النص المطابق قبل النشر."
+        resp.reason_en += " A language model compared both texts and found the same report in other words; check the matched text before publishing."
     if state == "unreliable" and rec is not None:
         g0 = rec.grades[0]
         resp.reason_ar = (f"النص مطابق لما في {rec.book_ar} ({to_arabic_digits(rec.number)}) بنسبة {to_arabic_digits(str(conf))}٪، "
@@ -258,6 +272,8 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
     resp.grades = _grades_out(rec)
     resp.grade = resp.grades[0] if resp.grades else None
     resp.closest_only = state == "uncertain"
+    if rec.kind == "hadith" and state in ("verified", "partial", "unreliable"):
+        resp.narrations = _narrations_out(store.narrations(rec))
 
     if rec.kind == "quran" and (attributed or state in ("verified", "partial")):
         if attributed:
@@ -280,6 +296,55 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
     return resp
 
 
+# Retrieve-then-verify for English and machine-translated input: wording legitimately differs from the published
+# translation, so meaning carries much of the score. A model checks whether the top records are the same report.
+# It confirms (raise to "partial", the ruling still comes verbatim from the record) or rejects (cap at "closest only").
+CHECK_MIN_SEMANTIC = 60.0   # scaled 0-100 (≈ cosine 0.64 on the English scale)
+CHECK_MIN_LEXICAL = 25.0
+CHECK_REJECT_CAP = 60       # a rejected record can at most be shown as the closest text (uncertain)
+STRONG_JUDGES = ("groq/", "anthropic/")   # only these may raise a record; a lighter fallback model may only reject
+
+
+def _check_match(query: str, cands: list[dict]) -> dict | None:
+    if not cands or not llm.get_client().enabled:
+        return None
+    eligible = [c for c in cands[:3] if c["stage"] != "exact" and c["confidence"] < get_settings().threshold_verified
+                and c["semantic"] >= CHECK_MIN_SEMANTIC and c["lexical"] >= CHECK_MIN_LEXICAL]
+    if not eligible:
+        return None
+    res = llm.check_match(query, [{"kind": c["record"].kind, "text_en": c["record"].text_en, "text_ar": c["record"].matn_ar}
+                                  for c in eligible])
+    if not res:
+        return None
+    partial = get_settings().threshold_partial
+    strong = res["model"].startswith(STRONG_JUDGES)
+    for i, c in enumerate(eligible, 1):
+        same = res["verdicts"].get(i)
+        if same is True and (not strong or c["record"].kind == "quran"):
+            same = None   # a verse must match on wording alone; a light model's "same" does not raise anything
+        if same is True and c["confidence"] < partial:
+            c["confidence"], c["ai_confirmed"] = partial, True
+        elif same is True:
+            c["ai_confirmed"] = True
+        elif same is False and c["confidence"] >= partial:
+            c["confidence"], c["ai_rejected"] = min(c["confidence"], CHECK_REJECT_CAP), True
+    order = {id(c): k for k, c in enumerate(cands)}
+    cands.sort(key=lambda c: (-c["confidence"], not c.get("ai_confirmed", False), order[id(c)]))
+    top = cands[0]
+    outcome = "confirmed" if top.get("ai_confirmed") else "rejected" if any(c.get("ai_rejected") for c in eligible) else "kept"
+    return {"model": res["model"], "outcome": outcome, "checked": len(eligible)}
+
+
+def _narrations_out(found: list[tuple[Record, int]]) -> list[NarrationOut]:
+    out = []
+    for r, sim in found:
+        g = r.grades[0] if r.grades else {}
+        out.append(NarrationOut(collection=r.collection, book_ar=r.book_ar, book_en=r.book_en, number=r.number,
+                                grade_ar=g.get("grade_ar", ""), grade_en=g.get("grade_en", ""), grader_ar=g.get("grader_ar", ""),
+                                grader_en=g.get("grader_en", ""), similarity=sim, source_url=r.source_url))
+    return out
+
+
 def _same_span(a: str, b: str) -> bool:
     """Same quotation once attribution phrases/trailers and normalisation are removed (or one contains the other)."""
     from rapidfuzz import fuzz
@@ -292,10 +357,15 @@ def _same_span(a: str, b: str) -> bool:
     return fuzz.ratio(ka, kb) >= 85 or (min(len(ka), len(kb)) >= 15 and (ka in kb or kb in ka))
 
 
-def _best_quote(text: str, lang_in: str, spans: list[tuple[str, str, str]] | None = None
+SPAN_MARGIN = 10   # an unmarked fragment must beat the whole short text by this much to replace it
+
+
+def _best_quote(text: str, lang_in: str, spans: list[tuple[str, str, str]] | None = None, whole: str | None = None
                 ) -> tuple[str | None, list[dict], list[tuple[str, str, str, dict | None]]]:
     """Verify each quoted/attributed span (AI-extracted first, then rule-based); return the best span,
-    the other spans' top matches, and every span with its own match."""
+    the other spans' top matches, and every span with its own match.
+    With `whole` (a short typed text), the text itself competes: a fragment wins only when it is presented as a
+    quotation (quote marks, attribution) and scores at least as high, or scores SPAN_MARGIN points higher."""
     if spans is None:
         spans = [(sp, "other", "rules") for sp in quote_candidates(text)]
     if not spans:
@@ -307,6 +377,13 @@ def _best_quote(text: str, lang_in: str, spans: list[tuple[str, str, str]] | Non
         results.append((found[0]["confidence"] if found else 0, span, ty, origin, found[0] if found else None))
     results.sort(key=lambda x: -x[0])
     best = results[0][1]
+    if whole is not None:
+        q = classify.strip_attribution(whole) or whole
+        found = matcher.search(q, lang=detect_language(whole), kinds=None, limit=1)
+        whole_conf = found[0]["confidence"] if found else 0
+        top_conf = results[0][0]
+        if not ((is_marked(text, best) and top_conf >= whole_conf) or top_conf >= whole_conf + SPAN_MARGIN):
+            best = whole
     # one entry per matched source record (the highest-scoring span wins); unmatched spans keep their own entry
     kept: list[tuple[int, str, str, str, dict | None]] = []
     seen_rec: set[tuple[str, str]] = set()
@@ -337,7 +414,9 @@ def _explain(resp: VerifyResponse, rec: Record | None, lang_ui: str, timings: di
         "state": resp.state, "confidence": resp.confidence, "input": resp.input_text,
         "matched_text": (rec.matn_ar if rec else None),
         "ruling": (resp.grade.model_dump() if resp.grade else None),
-        "source": ({"book": rec.book_ar, "number": rec.number, "chapter": rec.chapter_ar, "type": rec.type_ar} if rec else None),
+        # curated sayings carry an internal list number; the reference number is the ruling's (e.g. السلسلة الضعيفة 416)
+        "source": ({"book": rec.book_ar, "number": (resp.grade.number if rec.collection == "seed" and resp.grade and resp.grade.number else rec.number),
+                    "chapter": rec.chapter_ar, "type": rec.type_ar} if rec else None),
         "quran_note": resp.quran_note, "translation_issues": ([i.get("text_ar") for i in resp.translation.issues] if resp.translation else None),
     }
     t = time.perf_counter()

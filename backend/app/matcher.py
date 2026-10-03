@@ -21,7 +21,7 @@ from .chunking import windows
 from .config import get_settings
 from .embeddings import get_embedder
 from .normalize import normalize_ar, normalize_latin
-from .records import Record
+from .records import Record, is_cross_reference
 from .store import get_store
 
 TRIGRAM_MIN = 0.60      # stage 2: pg_trgm word_similarity
@@ -39,6 +39,25 @@ _STOP_EN = set("the a an of to in and or is are was were be been for on at by wi
 def _content_words(q: str, lang: str) -> list[str]:
     stop = _STOP_EN if lang == "en" else _STOP_AR
     return [w for w in q.split() if len(w) >= 3 and w not in stop]
+
+
+SHORT_QUOTE_WORDS = 4   # an Arabic quote this short must contain every one of its content words to be confirmed
+
+
+def _short_quote_missing_word(q: str, doc: str, lang: str) -> bool:
+    """A short Arabic quote (≤ SHORT_QUOTE_WORDS content words) with a content word absent from the record:
+    «خير الأمور أوسطها» is not «… وشر الأمور محدثاتها». Such a record can only be the closest text."""
+    if lang == "en":
+        return False   # English translations legitimately vary in wording
+    words = _content_words(q, lang)
+    if not 1 <= len(words) <= SHORT_QUOTE_WORDS:
+        return False
+    dwords = doc.split()
+    for w in words:
+        thr = 70 if len(w) <= 6 else 80
+        if w not in dwords and not any(fuzz.ratio(w, x) >= thr for x in dwords):
+            return True
+    return False
 
 
 def _lexical(q: str, doc: str, lang: str = "ar") -> float:
@@ -84,7 +103,7 @@ def _semantic(cos: float, lang: str = "ar") -> float:
     return float(max(0.0, min(100.0, (cos - 0.30) / 0.70 * 100.0)))
 
 
-def _stage(r: Record, lex: float, score: int, lang: str) -> tuple[str, int]:
+def _stage(r: Record, lex: float, score: int, lang: str, short_miss: bool = False) -> tuple[str, int]:
     """Admit the record through the cascade and clamp the score into that stage's band."""
     if r.stage == "exact":
         return "exact", max(score, 90)
@@ -93,6 +112,8 @@ def _stage(r: Record, lex: float, score: int, lang: str) -> tuple[str, int]:
         lexical_ok = lex >= LEX_WITH_TRIGRAM or score >= 75  # translations legitimately vary in wording
     else:
         lexical_ok = (r.lexical >= TRIGRAM_MIN and lex >= LEX_WITH_TRIGRAM) or lex >= LEX_STRONG
+    if lexical_ok and short_miss:
+        return "semantic", min(score, 74)   # demote only: a short quote missing a word is at most the closest text
     if lexical_ok:
         return "trigram", min(max(score, 75), 100)
     if cos >= COSINE_MIN and lex >= LEX_FOR_SEMANTIC and r.lexical >= TRIGRAM_FOR_SEMANTIC:
@@ -150,11 +171,14 @@ def search(text: str, lang: str = "ar", kinds: list[str] | None = None, limit: i
         sims = emb.embed(flat) @ vec
         for r, (a, n) in zip(missing, spans, strict=True):
             r.semantic = float(sims[a : a + n].max())
+    # cross-references («بمثله», «فذكر نحوه») carry no text of their own
+    for rid in [i for i, r in by_id.items() if r.kind == "hadith" and is_cross_reference(r.matn_norm)]:
+        del by_id[rid]
     for r in by_id.values():
         lex = _lexical(norm, docs[r.id], lang)
         sem = _semantic(r.semantic, lang)
         score = confidence(lex, sem, lang)
-        stage, conf = _stage(r, lex, score, lang)
+        stage, conf = _stage(r, lex, score, lang, _short_quote_missing_word(norm, docs[r.id], lang))
         r.stage = stage
         cands.append({"record": r, "lexical": lex, "semantic": sem, "confidence": conf, "stage": stage})
     # order: cascade stage, then confidence; ties: Qur'an, the Sahihayn, the curated seed, the Sunan

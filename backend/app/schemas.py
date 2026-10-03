@@ -46,6 +46,20 @@ class SourceOut(BaseModel):
     note_en: str = ""
 
 
+class NarrationOut(BaseModel):
+    """The same text recorded in another book or under another number."""
+    collection: str
+    book_ar: str
+    book_en: str
+    number: str
+    grade_ar: str = ""
+    grade_en: str = ""
+    grader_ar: str = ""
+    grader_en: str = ""
+    similarity: int
+    source_url: str = ""
+
+
 class CandidateOut(BaseModel):
     rank: int
     collection: str = ""
@@ -107,6 +121,9 @@ class VerifyResponse(BaseModel):
     glossary_terms: list[dict[str, Any]] = []
     quran_note: dict[str, str] | None = None  # {"ar":..., "en":...} when an ayah was quoted as hadith
     candidates: list[CandidateOut] = []
+    narrations: list[NarrationOut] = []
+    # English / machine-translated input: a model compared the top records with the input (same report or not)
+    match_check: dict | None = None  # {"model", "outcome": "confirmed" | "rejected" | "kept", "checked"}
     segments: list[SegmentOut] = []     # AI/rule-extracted quotations with their matches (long text, link, image)
     cleaned_text: str = ""              # AI-corrected OCR/page text (certain fixes only), when it differs
     machine_translation: dict[str, str] | None = None  # {"language","english","model"}: non-Arabic/English input, for matching only

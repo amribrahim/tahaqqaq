@@ -63,6 +63,19 @@ def test_rulings_for_ranks_the_compilers_own_entry_first():
     assert len(info["cards"]) <= 4
 
 
+def test_repeated_entries_on_the_page_are_shown_once():
+    page = FIX["search"]
+    chunks = page.split('<div class="border-bottom py-4')
+    doubled = chunks[0] + "".join('<div class="border-bottom py-4' + c for c in chunks[1:] * 2)  # every card twice
+    once = parse_cards(page)
+    assert len(parse_cards(doubled)) == len(once)
+    keys = [(c["scholar"], c["book"], c["number"], c["text"]) for c in once]
+    assert len(keys) == len(set(keys))
+    c = DorarClient(transport=httpx.MockTransport(lambda r: httpx.Response(200, text=doubled)), cache=False)
+    shown = c.rulings_for(BUKHARI_1, "صحيح البخاري", "1")["cards"]
+    assert len({(x["scholar"], x["book"], x["number"]) for x in shown}) == len(shown)
+
+
 def test_sharh_and_tafseer_lookups():
     c = DorarClient(transport=_transport(), cache=False)
     sh = c.sharh_for(BUKHARI_1, "صحيح البخاري", "1")

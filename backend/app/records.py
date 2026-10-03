@@ -58,6 +58,17 @@ class Record:
         )
 
 
+# Words that make up a cross-reference such as «بمثله» or «فذكر نحوه» ("with the same wording as the previous one"):
+# such a record has no text of its own and must never be the match for a user's quote.
+_REF_WORDS = {"بمثله", "مثله", "بنحوه", "نحوه", "فذكر", "ذكر", "بهذا", "هذا", "الاسناد", "الحديث", "حديث", "حديثه",
+              "حديثهم", "بمثل", "مثل", "بنحو", "نحو", "بمعناه", "معناه", "ذلك", "في", "وذكر", "بمثلها", "مثلها", "نحوها"}
+
+
+def is_cross_reference(matn_norm: str) -> bool:
+    words = matn_norm.split()
+    return bool(words) and len(words) <= 4 and all(w in _REF_WORDS for w in words)
+
+
 @dataclass
 class GlossaryTerm:
     term_ar: str

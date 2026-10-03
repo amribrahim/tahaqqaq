@@ -69,7 +69,18 @@ def parse_cards(page: str) -> list[dict]:
         }
         if card["text"] and card["grade"]:
             cards.append(card)
-    return cards
+    return _dedupe(cards)
+
+
+def _dedupe(cards: list[dict]) -> list[dict]:
+    """Dorar search pages repeat some entries; keep one per scholar + book + number + text."""
+    seen, out = set(), []
+    for c in cards:
+        k = (c.get("scholar", ""), c.get("book", ""), c.get("number", "").split("/")[-1].strip(), normalize_ar(c.get("text", "")))
+        if k not in seen:
+            seen.add(k)
+            out.append(c)
+    return out
 
 
 def parse_explain(page: str) -> dict:
@@ -188,7 +199,7 @@ class DorarClient:
             sim = fuzz.partial_ratio(normalize_ar(c["text"]), key) if c["text"] else 0
             return (-(same_book and same_num), -same_book, -sim)
 
-        relevant = [c for c in cards if fuzz.partial_ratio(normalize_ar(c["text"]), key) >= 70] or cards[:3]
+        relevant = [c for c in _dedupe(cards) if fuzz.partial_ratio(normalize_ar(c["text"]), key) >= 70] or _dedupe(cards)[:3]
         relevant.sort(key=rank)
         best = relevant[0] if relevant else None
         return {"cards": relevant[:4], "best": best, "search_url": self.search_url(matn),

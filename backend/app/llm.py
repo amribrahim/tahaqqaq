@@ -22,10 +22,19 @@ log = logging.getLogger(__name__)
 SYSTEM = """You write short explanations for a hadith-verification tool used by preachers and content creators.
 Hard rules:
 - You NEVER grade a text yourself and never change, soften or add a ruling. The ruling and its source are given to you as facts; relay them as-is and attribute them to the named scholar/source.
-- Do not quote text that is not in the input. Do not add additional hadiths, numbers or references.
+- Say ONLY what the facts say: where the text was found (book and number), the ruling and who gave it, and what the reader should do. No commentary on the text's meaning, topic, importance or virtues, no praise, no general statements about Islam.
+- Do not quote text that is not in the input. Do not add hadiths, numbers, dates or references that are not in the facts.
 - Write in the requested language (Arabic = fusha, no diacritics needed). 2-4 sentences, plain and respectful. No headings, no bullet lists.
 - If the state is "abstain" or "referral", explain why the tool gives no verdict and what the user should do; never suggest a verdict.
 Return JSON: {"explanation": "<text>"}"""
+
+FACTCHECK_SYSTEM = """You check a short explanation written by a hadith-verification tool against the facts it was given.
+Flag ONLY statements that the facts do not support: an invented or changed ruling, grade, scholar, book, number or narration;
+any claim about the text's meaning, topic, importance or virtues; anything that contradicts the facts.
+Do NOT flag: relaying the given state, ruling and source (in any language or transliteration), saying the ruling is quoted
+from the source, advising the reader to rely on the attribution, to cite or check the source, or to ask qualified scholars,
+and explaining why the tool gives no verdict.
+Return JSON: {"supported": true or false, "problems": ["<short description>", ...]}"""
 
 # Script families used to verify that an answer really is in the requested language
 _SCRIPTS: dict[str, str] = {
@@ -175,11 +184,14 @@ class LLMClient:
 
     # -- core call --------------------------------------------------------------------------------
     def complete(self, system: str, user: list[dict] | str, *, json_mode: bool = False, need_vision: bool = False,
-                 max_tokens: int = 1024) -> tuple[str, str] | None:
-        """Return (text, "provider/model") from the first provider that answers, else None."""
+                 max_tokens: int = 1024, prefer: tuple[str, ...] = ()) -> tuple[str, str] | None:
+        """Return (text, "provider/model") from the first provider that answers, else None.
+        `prefer` moves the named providers to the front (e.g. a stronger model for a judgement task)."""
         now = time.time()
         started = now
-        for name in self.chain():
+        chain = self.chain()
+        chain = [n for n in prefer if n in chain] + [n for n in chain if n not in prefer]
+        for name in chain:
             p = PROVIDERS[name]
             if need_vision and not p.vision:
                 continue
@@ -215,6 +227,8 @@ class LLMClient:
         }
         if json_mode:
             body["response_format"] = {"type": "json_object"}
+        if "gpt-oss" in body["model"]:
+            body["reasoning_effort"] = "low"   # reasoning models: keep the hidden reasoning short so the answer fits
         headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
         if p.name == "openrouter":
             headers["HTTP-Referer"] = "https://github.com/tahqaq"
@@ -319,11 +333,156 @@ def explain(payload: dict, lang: str = "ar", mode: str = "brief", source_text: s
         except ValueError:
             text = text.strip().strip("`").removeprefix("json").strip()
         text = text.strip()
-        if text and script_matches(text, lang):
+        if not text or not script_matches(text, lang):
+            log.warning("llm answer not in %s (attempt %s, %s); retrying", language, attempt + 1, model)
+            user = f"Your previous answer was NOT in {language}. Answer again, in {language} only.\n" + user
+            continue
+        problems = [] if extended else check_brief(text, payload) or fact_check(text, payload)
+        if not problems:
             return text, model
-        log.warning("llm answer not in %s (attempt %s, %s); retrying", language, attempt + 1, model)
-        user = f"Your previous answer was NOT in {language}. Answer again, in {language} only.\n" + user
+        log.warning("brief explanation failed the fact check (attempt %s, %s): %s", attempt + 1, model, problems)
+        user = ("Your previous answer had these problems: " + "; ".join(problems)
+                + ". Rewrite it using ONLY the facts, with no commentary.\n" + user)
+    if not extended:
+        fallback = template_brief(payload, lang)
+        if fallback:
+            return fallback, "template (fact check)"
     return None
+
+
+# -- match check: is a retrieved record the same report as the user's text? ------------------------
+MATCHCHECK_SYSTEM = """You compare a text that a user wants to verify with records found by a search engine (hadith
+records with their English translation, or Qur'an verses). For each candidate decide whether it is the SAME report as
+the user's text.
+SAME means: the candidate contains the user's central statement or event - the same saying of the Prophet or the same
+incident - even if worded differently, translated, shortened, or narrated by another Companion.
+NOT the same: a candidate that only shares the topic (prayer, hajj, wrath, migration, fire ...), a few words, a general
+idea, or a different incident - even when it gives the same ruling; a Qur'an verse when the user's text is a hadith
+narrative or a saying that is not that verse.
+When unsure, answer false. You never judge authenticity; you only compare the texts.
+Return JSON: {"candidates": [{"n": <candidate number>, "why": "<at most 12 words>", "same": true or false}]}"""
+
+
+def check_match(user_text: str, candidates: list[dict]) -> dict | None:
+    """{"verdicts": {n: bool}, "model": str} for candidates numbered from 1, or None when no provider answered."""
+    client = get_client()
+    if not client.enabled or not candidates:
+        return None
+    items = [{"n": i, "kind": c.get("kind", "hadith"), "text_en": (c.get("text_en") or "")[:700], "text_ar": (c.get("text_ar") or "")[:500]}
+             for i, c in enumerate(candidates, 1)]
+    out = client.complete(MATCHCHECK_SYSTEM, json.dumps({"user_text": user_text[:1500], "candidates": items}, ensure_ascii=False),
+                          json_mode=True, max_tokens=700, prefer=("groq", "anthropic"))
+    if not out:
+        return None
+    try:
+        parsed = json.loads(out[0])
+        rows = parsed.get("candidates", []) if isinstance(parsed, dict) else []
+        verdicts = {int(r["n"]): bool(r["same"]) for r in rows if isinstance(r, dict) and "n" in r and "same" in r}
+    except (ValueError, TypeError, KeyError):
+        return None
+    return {"verdicts": verdicts, "model": out[1]} if verdicts else None
+
+
+# -- fact checks for the brief explanation ---------------------------------------------------------
+_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+_STRONG = {"صحيح", "حسن", "sahih", "authentic", "hasan"}
+_WEAK = {"ضعيف", "موضوع", "منكر", "مكذوب", "باطل", "weak", "daif", "da'if", "fabricated", "mawdu", "forged", "baseless"}
+_BOOK_PHRASES = ("صحيح البخاري", "صحيح مسلم", "صحيح الجامع", "صحيح ابن حبان", "صحيح ابن خزيمة", "صحيح الترغيب",
+                 "صحيح أبي داود", "صحيح الترمذي", "صحيح النسائي", "صحيح ابن ماجه", "ضعيف الجامع", "ضعيف أبي داود",
+                 "ضعيف الترمذي", "ضعيف النسائي", "ضعيف ابن ماجه", "sahih al-bukhari", "sahih muslim", "sahih bukhari")
+
+
+def _words(text: str) -> set[str]:
+    import re
+
+    low = text.lower()
+    for b in _BOOK_PHRASES:        # «صحيح البخاري» is a book title, not a grade
+        low = low.replace(b, " ")
+    return {w.strip("'’") for w in re.findall(r"[\w'’]+", low)} | {w[2:] for w in re.findall(r"\w+", low) if w.startswith("ال")}
+
+
+def _grade_class(grade: str) -> str | None:
+    w = _words(grade)
+    if w & _WEAK:
+        return "weak"
+    if w & _STRONG:
+        return "strong"
+    return None
+
+
+def check_brief(text: str, facts: dict) -> list[str]:
+    """Rule checks: no grade that contradicts the recorded ruling, no verdict when the tool abstains, no invented numbers."""
+    import re
+
+    problems: list[str] = []
+    ruling = facts.get("ruling") or {}
+    words = _words(text)
+    fact_class = _grade_class(f"{ruling.get('grade_ar', '')} {ruling.get('grade_en', '')}") if ruling else None
+    if fact_class == "strong" and words & _WEAK:
+        problems.append("it calls the text weak or fabricated, but the recorded ruling is " + ruling.get("grade_en", ""))
+    if fact_class == "weak" and words & _STRONG:
+        problems.append("it calls the text authentic, but the recorded ruling is " + ruling.get("grade_en", ""))
+    if facts.get("state") in ("abstain", "referral") and words & (_STRONG | _WEAK):
+        problems.append("it states a grade although the tool gives no verdict")
+    allowed = set(re.findall(r"\d+", json.dumps(facts, ensure_ascii=False).translate(_DIGITS)))
+    invented = [n for n in re.findall(r"\d+", text.translate(_DIGITS)) if n not in allowed]
+    if invented:
+        problems.append("it mentions numbers that are not in the facts: " + ", ".join(invented[:5]))
+    return problems
+
+
+def fact_check(text: str, facts: dict) -> list[str]:
+    """Second pass by a model: flag claims the facts do not support (meaning, virtues, invented references).
+    Runs only when there is a ruling or source to check against; an unavailable checker never blocks the answer."""
+    if not (facts.get("ruling") or facts.get("source")):
+        return []
+    out = get_client().complete(FACTCHECK_SYSTEM, f"Facts: {json.dumps(facts, ensure_ascii=False)}\nExplanation: {text}",
+                                json_mode=True, max_tokens=300)
+    if not out:
+        return []
+    try:
+        verdict = json.loads(out[0])
+    except ValueError:
+        return []
+    if isinstance(verdict, dict) and verdict.get("supported") is False:
+        return [str(p) for p in (verdict.get("problems") or ["unsupported claim"])][:4]
+    return []
+
+
+def template_brief(facts: dict, lang: str) -> str | None:
+    """Fixed wording built only from the facts, used when the model's text fails the checks (Arabic and English)."""
+    if lang not in ("ar", "en"):
+        return None
+    ar = lang == "ar"
+    state = facts.get("state")
+    g = facts.get("ruling") or {}
+    src = facts.get("source") or {}
+    book = (g.get("source_ar") if ar else g.get("source_en")) or src.get("book") or ""
+    number = g.get("number") or src.get("number") or ""
+    grade = g.get("grade_ar") if ar else g.get("grade_en")
+    grader = g.get("grader_ar") if ar else g.get("grader_en")
+    where = (f"{book} برقم {number}" if number else book) if ar else (f"{book}, number {number}" if number else book)
+    if state == "referral":
+        return ("هذا سؤال شخصي يحتاج إلى فتوى، والأداة لا تُفتي. نوصي بسؤال عالم موثوق." if ar else
+                "This is a personal question that needs a fatwa, and the tool does not issue fatwas. Please ask a qualified scholar.")
+    if state == "abstain":
+        return ("لم نجد هذا النص في المصادر المعتمدة لدينا، لذلك نمتنع عن إصدار أي حكم. لا تنشره على أنه حديث حتى يتحقق منه أهل العلم." if ar else
+                "This text was not found in our approved sources, so the tool gives no verdict. Do not publish it as a hadith until scholars have verified it.")
+    if state == "uncertain":
+        return ("لم نجد تطابقًا كافيًا، والنص المعروض أقرب نص فقط، فلا يُنسب حكمه إلى ما أدخلته. راجع المصدر أو اطلب مراجعة مختص." if ar else
+                "No sufficient match was found. The text shown is only the closest one, so its ruling does not apply to your input. Check the source or request a specialist review.")
+    if not grade or not book:
+        return ("وُجد هذا النص في المصدر المعتمد الموضح أعلاه، والتفاصيل منقولة منه كما هي." if ar else
+                "This text was found in the approved source shown above, and the details are quoted from it as recorded.")
+    by = (f" ({grader})" if grader else "")
+    if state == "unreliable":
+        return (f"وُجد هذا النص في {where}، وحكمه: {grade}{by}، كما ورد في المصدر. لذلك لا يُنشر على أنه حديث ثابت." if ar else
+                f"This text is recorded in {where} with the ruling: {grade}{by}, as stated in the source. It should not be published as an established hadith.")
+    if state == "partial":
+        return (f"وُجد هذا النص في {where} بلفظ يختلف قليلًا عمّا أدخلته، وحكمه: {grade}{by}. يُستحسن نشره بلفظ المصدر الموضح أعلاه." if ar else
+                f"This text was found in {where} with slightly different wording, and its ruling is: {grade}{by}. Publish it in the source's wording shown above.")
+    return (f"وُجد هذا النص في {where}، وحكمه: {grade}{by}، والحكم منقول من المصدر كما هو. اذكر المصدر عند النشر." if ar else
+            f"This text was found in {where}, and its ruling is: {grade}{by}, quoted from the source as recorded. Cite the source when you publish it.")
 
 
 def extract_segments(text: str) -> dict | None:

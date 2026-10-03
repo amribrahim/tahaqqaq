@@ -153,3 +153,63 @@ def test_extract_segments_rejects_a_rewritten_cleaned_text(monkeypatch):
     monkeypatch.setattr(llm_mod, "_client", LLMClient(_settings(), transport=transport))
     out = llm_mod.extract_segments(page)
     assert out and out["cleaned_text"] == "" and len(out["segments"]) == 1
+
+
+FACTS = {"state": "verified", "confidence": 93,
+         "ruling": {"grader_ar": "البخاري", "grader_en": "Al-Bukhari", "grade_ar": "صحيح", "grade_en": "Sahih",
+                    "source_ar": "صحيح البخاري", "source_en": "Sahih al-Bukhari", "number": "1"},
+         "source": {"book": "صحيح البخاري", "number": "1"}}
+
+
+def test_brief_explanation_rule_checks():
+    from app.llm import check_brief
+
+    assert check_brief("ورد هذا الحديث في صحيح البخاري برقم ١، وحكمه صحيح.", FACTS) == []
+    assert check_brief("This is a weak narration found in Sahih al-Bukhari.", FACTS)            # contradicts the ruling
+    assert check_brief("ورد في صحيح البخاري برقم ٧٥.", FACTS)                                     # invented number
+    assert check_brief("لم نجده، وهو حديث موضوع.", {"state": "abstain"})                         # a verdict while abstaining
+    weak = {"state": "unreliable", "ruling": {"grade_ar": "موضوع", "grade_en": "Fabricated"}}
+    assert check_brief("Recorded in Sahih Muslim? No; scholars graded it fabricated.", weak) == []  # book title is not a grade
+
+
+def test_unsupported_claim_is_rewritten_then_replaced_by_the_template(monkeypatch):
+    import json as _json
+
+    from app import llm as llm_mod
+
+    poetry = '{"explanation": "ورد في صحيح البخاري، وهو من الأصول العظيمة في الشعر والدين."}'
+    flagged = '{"supported": false, "problems": ["claims the hadith is a foundation of poetry"]}'
+    answers = iter([poetry, flagged, poetry, flagged])
+    seen: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(_json.loads(request.content)["messages"][1]["content"])
+        return httpx.Response(200, json={"choices": [{"message": {"content": next(answers)}}]})
+
+    monkeypatch.setattr(llm_mod, "_client", LLMClient(_settings(), transport=httpx.MockTransport(handler)))
+    text, model = llm_mod.explain(FACTS, "ar")
+    assert model == "template (fact check)" and "الشعر" not in text
+    assert "صحيح البخاري برقم 1" in text and "صحيح" in text
+    assert "previous answer had these problems" in seen[2]                 # the rewrite was asked with the reason
+
+
+def test_supported_brief_explanation_passes_the_model_check(monkeypatch):
+    from app import llm as llm_mod
+
+    good = '{"explanation": "ورد هذا النص في صحيح البخاري برقم ١، وحكمه صحيح كما نقله البخاري."}'
+    answers = iter([good, '{"supported": true, "problems": []}'])
+    transport = httpx.MockTransport(lambda r: httpx.Response(200, json={"choices": [{"message": {"content": next(answers)}}]}))
+    monkeypatch.setattr(llm_mod, "_client", LLMClient(_settings(), transport=transport))
+    text, model = llm_mod.explain(FACTS, "ar")
+    assert text.startswith("ورد هذا النص") and model.startswith("gemini/")
+
+
+def test_templates_cover_every_state():
+    from app.llm import check_brief, template_brief
+
+    for state in ("verified", "partial", "unreliable", "uncertain", "abstain", "referral"):
+        for lang in ("ar", "en"):
+            facts = {**FACTS, "state": state} if state not in ("abstain", "referral") else {"state": state}
+            t = template_brief(facts, lang)
+            assert t and check_brief(t, facts) == []
+    assert template_brief(FACTS, "tr") is None
