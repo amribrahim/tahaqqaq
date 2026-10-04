@@ -79,6 +79,7 @@ flowchart LR
 | OCR fallback | OpenCV (deskew, binarise, upscale) and Tesseract `ara+eng` with tessdata_best | Works without any model |
 | Link reading | trafilatura → readability-lxml → densest text block; fxtwitter JSON for X posts; a sunnah.com page parser | Extracts the article text from a page |
 | Speech to text | Whisper large-v3 on Groq (same key as the text models) | Arabic and English voice input for the assistant, with confidence data per segment |
+| Text to speech | Piper (self-hosted, MIT) with Arabic and English voices; Groq Orpheus optional | Sanad's voice with no quota; correct Arabic vowels through automatic diacritisation |
 | LLM access | One OpenAI-compatible HTTP client with a provider chain (Gemini, Groq, OpenRouter; Anthropic optional) | Free tiers, automatic fallback on rate limits |
 | Reverse proxy | Caddy 2 | Automatic HTTPS certificates |
 | Containers | Docker Compose (dev and prod files) | One command to run the stack |
@@ -316,7 +317,7 @@ from the record.
 
 ## 11. AI components and how they are controlled
 
-There are **no autonomous agents**. The pipeline is deterministic code that calls a model for nine narrow, bounded tasks.
+There are **no autonomous agents**. The pipeline is deterministic code that calls a model for ten narrow, bounded tasks.
 Each call has a fixed prompt, returns JSON, is validated by code, and has a non-AI fallback or simply turns off.
 **No model ever produces or changes a ruling.**
 
@@ -330,6 +331,7 @@ Each call has a fixed prompt, returns JSON, is validated by code, and has a non-
 | **Grounded explainer** | Extended explanation, on request | Facts + retrieved شرح/tafsir → summary | Source text is the only input; source link shown; no source → no text; language checked by script | Not shown |
 | **Assistant classifier** | Assistant message the rules cannot place | Message → verify, report, tool or other | Only classifies; the action is code. A "verify" pointer must be text found literally in the message | Out-of-scope reply |
 | **Assistant answerer** | Assistant question about the tool or the open report | Curated sections or report facts → 2–4 sentences | No numbers outside the sources; no contradicting grade; otherwise the curated text or the report's own wording | Curated text or report wording |
+| **Voice** (Groq Orpheus, or self-hosted Piper) | Spoken replies and the voice call | Sentence → speech | Speaks only text already shown on screen; a style instruction is not read aloud | Device voice |
 | **Speech transcriber** (Whisper) | Voice input in the assistant | Audio → transcript, Arabic or English | Refused on silence, low confidence, repetition, other languages; transcript confirmed by the user before verifying | Typing only |
 
 **Provider chain** (`app/llm.py`): one OpenAI-compatible client. The default order is Gemini (`gemini-flash-lite-latest`),
@@ -344,7 +346,10 @@ Rules:
 
 ## 11a. The assistant
 
-A floating button at the bottom right of every page opens a chat panel. Its scope is deliberately limited to three
+A floating button at the bottom right of every page, «اسأل سند» ("Ask Sanad"), opens the assistant. Its name is
+**Sanad (سند)**, both "support" and the hadith term for a chain of narrators. On the first open of a session it greets
+aloud: «السلام عليكم، أنا سند… كيف حالك؟». It answers small talk such as «كيف حالك؟», «الحمد لله بخير», «اسمي أحمد»
+and «من أنت؟» with fixed replies. Small talk is never sent to verification. Its scope is deliberately limited to three
 things: verify a hadith typed or spoken, explain the report open on the page, and answer questions about the tool.
 Anything else, including general religious questions, gets a fixed reply. Personal fatwa and legal-ruling questions
 are referred to scholars, and requests to write a hadith are refused. The code is `backend/app/assistant.py`.
@@ -376,7 +381,39 @@ Groq. Rules applied, each with a clear message instead of a guess:
 The transcript is always shown with "Is this what you said?" and is verified only after the user confirms or edits it.
 No hint prompt is sent, because in tests Whisper echoed a prompt back on silence. Audio is not stored.
 
-**Limits:** 30 assistant messages and 20 recordings per user per 10 minutes, kept in memory.
+**Spoken conversation** («تحدث مع سند», `frontend/components/assistant/VoiceCall.tsx`, `frontend/lib/voice.ts`):
+
+1. سند says «تفضل، أنا أستمع إليك» and listens. The recording stops by itself 1.3 s after you stop speaking, or ends
+   the turn if nobody spoke for 9 s.
+2. Whisper transcribes the recording. `POST /api/assistant` with `route_only` says what kind of message it is.
+3. If it is a hadith to verify, سند reads it back: «سمعتك تقول: … هل أتحقق منه؟». It listens for «نعم» or «لا»; the
+   on-screen buttons also work. A «لا», silence or anything unclear means nothing is verified, and it asks you to repeat.
+4. The verdict is spoken sentence by sentence, then it listens again. After two silent turns it ends the call politely.
+
+The microphone is closed while سند speaks, so it never hears itself. Ending the call or closing the panel stops
+everything.
+
+**Voice** (`backend/app/tts.py`, `POST /api/tts`): one sentence per request, so playback starts while the next sentence
+is generated. Repeated phrases are cached in memory. Providers in order:
+
+1. Groq Orpheus Saudi Arabic or English, once voices are configured and the model terms accepted in the Groq console.
+2. **Piper, self-hosted on the server.** It uses the Arabic voice `ar_JO-kareem-medium`, the English voice
+   `en_US-ryan-medium` and automatic Arabic diacritisation. It takes about 0.2 to 0.9 s per sentence on the server's CPU,
+   with no quota and no key. This is the default voice.
+3. Gemini TTS, off by default. Its free tier allows 10 requests a day, so a conversation exhausted it, and the voice
+   switched to the device's mid-reply.
+4. Otherwise the device's own voice.
+
+Before speaking, numbers are read as Arabic words: «برقم 1907a» becomes «برقم ألف وتسعمئة وسبعة». API keys travel in
+headers, never in URLs, so they cannot appear in access logs.
+
+Spoken replies are on by default, with a mute button remembered on the device.
+
+**Misheard attributions:** speech-to-text sometimes garbles the opening, for example «قال رسول الله» heard as
+«ورحمة الله». Anything before «صلى الله عليه وسلم» within the first six words is therefore treated as the attribution
+and removed before matching. Without this, «إنما الأعمال بالنيات» fell one point short of "partial".
+
+**Limits:** 30 assistant messages, 40 recordings and 120 spoken sentences per user per 10 minutes, kept in memory.
 
 **Voice benchmark** (`backend/eval/voice/`, synthetic voices from macOS, run against real Whisper and the live API):
 
@@ -402,6 +439,7 @@ a labels file and run the same way.
 | GET | `/api/dorar` | Rulings from الدرر for a matched hadith: cards, best entry, search URL |
 | GET | `/api/sources` | The approved sources list |
 | POST | `/api/assistant` | The assistant: `{message, lang, report?}` → reply, kind, and the full report for verifications |
+| POST | `/api/tts` | One sentence → natural speech (WAV); 503 lets the browser use the device voice |
 | POST | `/api/stt` | Audio (multipart) → transcript, language, duration, confidence; or a `stt_*` error with a message |
 | POST | `/api/review` | Ask for a human review (forwarded to a webhook when configured; nothing stored) |
 
@@ -443,12 +481,12 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 143 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 154 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
 | Browser tests (Playwright, Chrome), Arabic and English | 57 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
 | Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages | 10 | `npx playwright test e2e/a11y.spec.ts` |
 | Phone-size tests (Pixel 7, iPhone 13 size), touch flow, no sideways scroll | 4 | `npx playwright test e2e/mobile.spec.ts` |
-| Assistant: verification in chat, scope, report questions, voice confirm/error/silence, keyboard, accessibility | 10 | `npx playwright test e2e/assistant.spec.ts` |
+| Assistant: verification in chat, scope, report questions, voice confirm/error/silence, spoken call with yes and no, spoken greeting, keyboard, accessibility | 14 | `npx playwright test e2e/assistant.spec.ts` |
 
 **Benchmarks** (`backend/eval/`, run against a live API):
 
