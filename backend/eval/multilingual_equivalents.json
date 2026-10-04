@@ -14,7 +14,8 @@
     "muslim 1042c"
   ],
   "bukhari 6220": [
-    "ibnmajah 3226"
+    "ibnmajah 3226",
+    "ibnmajah 3227"
   ],
   "muslim 1192a": [
     "bukhari 267",
@@ -24,7 +25,8 @@
     "muslim 1536p"
   ],
   "muslim 701": [
-    "bukhari 400"
+    "bukhari 400",
+    "nasai 744"
   ],
   "bukhari 3078": [
     "bukhari 4305"
@@ -39,5 +41,8 @@
   ],
   "bukhari 6471": [
     "nasai 1644"
+  ],
+  "bukhari 4615": [
+    "bukhari 5075"
   ]
 }

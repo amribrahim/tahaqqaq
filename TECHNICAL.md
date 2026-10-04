@@ -1,0 +1,452 @@
+# Tahaqqaq (تحقّق) — technical documentation
+
+This document explains how the system is built and how it works, end to end: the technology stack, the infrastructure,
+where every piece of data comes from, how a verification runs, where AI is used and how it is controlled, and how
+quality is measured. It is written for engineers, reviewers and judges who want to understand or rebuild the system.
+
+For what the product does and how to run it, see [README.md](README.md) / [README.ar.md](README.ar.md).
+
+## Contents
+
+1. [Purpose and the one rule](#1-purpose-and-the-one-rule)
+2. [Architecture at a glance](#2-architecture-at-a-glance)
+3. [Technology stack](#3-technology-stack)
+4. [Infrastructure and deployment](#4-infrastructure-and-deployment)
+5. [Data: sources and how each one is obtained](#5-data-sources-and-how-each-one-is-obtained)
+6. [Database](#6-database)
+7. [Ingestion](#7-ingestion)
+8. [A verification, step by step](#8-a-verification-step-by-step)
+9. [Retrieval cascade and scoring](#9-retrieval-cascade-and-scoring)
+10. [RAG: the extended explanation](#10-rag-the-extended-explanation)
+11. [AI components and how they are controlled](#11-ai-components-and-how-they-are-controlled)
+12. [API reference](#12-api-reference)
+13. [Frontend](#13-frontend)
+14. [Quality: tests and benchmarks](#14-quality-tests-and-benchmarks)
+15. [Security and privacy](#15-security-and-privacy)
+16. [Configuration reference](#16-configuration-reference)
+17. [Known limits](#17-known-limits)
+18. [Repository layout](#18-repository-layout)
+
+---
+
+## 1. Purpose and the one rule
+
+People share sayings attributed to the Prophet ﷺ without checking them. Tahaqqaq takes a text, a screenshot or a link,
+finds the saying in approved sources, and reports **the ruling that scholars recorded for it, verbatim**, with the
+source, number and links.
+
+The one rule that shapes the whole design: **the tool never issues a ruling of its own.** No model grades a hadith.
+A ruling is shown only when it exists in the data next to a matched source record ("لا يُنسب حديث دون مصدر وحكم
+معتمد في البيانات"). When there is no reliable match, the tool abstains and says so.
+
+## 2. Architecture at a glance
+
+```mermaid
+flowchart LR
+  U[Browser] -->|static pages| CF[Cloudflare Pages<br/>Next.js static export]
+  U -->|HTTPS JSON / SSE| CA[Caddy<br/>TLS, Let's Encrypt]
+  subgraph VM[Oracle Cloud VM · Always Free · Arm 2 OCPU / 12 GB · docker compose]
+    CA --> API[FastAPI pipeline]
+    API --> PG[(PostgreSQL 16<br/>pgvector + pg_trgm)]
+    API --> EMB[fastembed MiniLM<br/>local, CPU]
+    API --> OCR[OpenCV + Tesseract<br/>OCR fallback]
+  end
+  API -->|rulings, sharh, tafsir| DORAR[dorar.net<br/>cached in source_cache]
+  API -->|bounded calls, JSON| LLM[LLM provider chain<br/>Gemini → Groq → OpenRouter]
+  GH[GitHub Actions] -->|CI, then deploy over SSH| VM
+  GH -->|wrangler| CF
+```
+
+- The **frontend** is a static site. It holds no secrets and talks only to the API.
+- The **API** runs the whole verification pipeline. The database holds the searchable corpus. Embeddings are computed
+  on the server's CPU, with no external embedding service.
+- **الدرر السنية** (dorar.net) is fetched live for rulings, شرح and tafsir, and cached in the database.
+- **LLMs** are optional helpers in clearly bounded steps (section 11). Without any provider configured, every
+  verification feature still works except the explanations, model-based image transcription and other-language input.
+
+## 3. Technology stack
+
+| Layer | Technology | Why |
+|---|---|---|
+| Frontend | Next.js 16 (App Router, static export), React 19, TypeScript, Tailwind CSS 4, shadcn/ui primitives | Static pages are free to host on a CDN and fast everywhere |
+| i18n | next-intl, Arabic (RTL, default) and English (LTR) | Arabic-first product with a full English mode |
+| Fonts | Cairo (headings) and Tajawal (text) via next/font | Good Arabic shaping in the browser, the PDF and the share image |
+| API | Python 3.12, FastAPI, Pydantic v2, Uvicorn | Typed request/response models, streaming progress (SSE) |
+| Database | PostgreSQL 16 with pgvector (HNSW) and pg_trgm (GIN) | One store for exact, fuzzy and semantic search |
+| Embeddings | fastembed (ONNX) `paraphrase-multilingual-MiniLM-L12-v2`, 384 dimensions | Runs on CPU, multilingual (Arabic and English), no API cost |
+| Fuzzy matching | rapidfuzz | Word-level and character-level similarity for rescoring |
+| OCR fallback | OpenCV (deskew, binarise, upscale) and Tesseract `ara+eng` with tessdata_best | Works without any model |
+| Link reading | trafilatura → readability-lxml → densest text block; fxtwitter JSON for X posts; a sunnah.com page parser | Extracts the article text from a page |
+| LLM access | One OpenAI-compatible HTTP client with a provider chain (Gemini, Groq, OpenRouter; Anthropic optional) | Free tiers, automatic fallback on rate limits |
+| Reverse proxy | Caddy 2 | Automatic HTTPS certificates |
+| Containers | Docker Compose (dev and prod files) | One command to run the stack |
+| CI/CD | GitHub Actions (CI, deploy, uptime) and Wrangler for Cloudflare Pages | Every push is tested, then deployed |
+| Tests | pytest, Playwright with installed Chrome, axe-core | Unit, integration, browser, accessibility and phone tests |
+
+## 4. Infrastructure and deployment
+
+**Hosting (all free tiers):**
+
+| Part | Where | Notes |
+|---|---|---|
+| Frontend | Cloudflare Pages, project `tahaqqaq` → https://tahaqqaq.pages.dev | Static export (`frontend/out`), built in GitHub Actions |
+| API + database | Oracle Cloud Always Free VM: VM.Standard.A1.Flex, 2 OCPU / 12 GB RAM, Oracle Linux 9 (aarch64) | `docker-compose.prod.yml`: `db`, `api`, `caddy` |
+| HTTPS for the API | Caddy with a Let's Encrypt certificate for `<ip-with-dashes>.sslip.io` | sslip.io maps the hostname to the IP; no domain purchase needed |
+
+**Production compose** (`docker-compose.prod.yml`):
+
+- `db`: `pgvector/pgvector:pg16`, tuned for 12 GB (`shared_buffers=2GB`, `effective_cache_size=6GB`,
+  `maintenance_work_mem=512MB`), `shm_size: 1gb` because parallel HNSW index builds need more than Docker's 64 MB.
+  Not published on any port.
+- `api`: built from `backend/Dockerfile`. It listens on `127.0.0.1:8000` only, for health checks on the machine.
+- `caddy`: publishes 80/443 and reverse-proxies to `api:8000` (`deploy/Caddyfile`). It streams Server-Sent Events
+  unbuffered, which the progress stream needs.
+- Secrets and settings live in `/opt/tahaqqaq/.env` on the server (`chmod 600`), never in git: model keys,
+  `POSTGRES_PASSWORD`, `CORS_ORIGINS`, `API_HOST`.
+
+**Network:** the Oracle security list allows 22 (SSH), 80 and 443. The VM firewall (firewalld) allows the same.
+Postgres is never reachable from outside.
+
+**CI/CD** (`.github/workflows/`):
+
+| Workflow | Trigger | What it does |
+|---|---|---|
+| `ci.yml` | every push and pull request | Backend: ruff lint and the unit tests. Frontend: lint, type-check and the production build. |
+| `deploy.yml` | after CI succeeds on `main`, or by hand | 1) SSH to the VM, `git reset --hard <sha>`, `docker compose up -d --build`, wait for `/health`, print logs on failure. 2) Build the static site with `NEXT_PUBLIC_API_URL` and publish it with Wrangler as the production branch. |
+| `uptime.yml` | every 30 minutes | Calls `/health` (database connected), runs a real verification and loads the site. A failure is e-mailed by GitHub. |
+
+Repository settings for deployment: secrets `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`,
+`CLOUDFLARE_API_TOKEN` (Pages edit), `CLOUDFLARE_ACCOUNT_ID`; variables `DEPLOY_ENABLED=true`, `CF_PAGES_PROJECT`,
+`API_URL`.
+
+**Backups:** `deploy/backup.sh` runs nightly from cron on the VM. It runs `pg_dump -Fc`, about 400 MB in about 75 seconds,
+and keeps the newest 7 dumps in `/opt/tahaqqaq/backups`. The corpus can also be rebuilt from the public sources with
+the ingestion scripts. The dump saves that time and keeps the الدرر cache.
+
+**First-time setup of a server** (done once): install Docker, clone the repo to `/opt/tahaqqaq`, write `.env`, restore
+the database from a `pg_dump` of a local ingest (`pg_restore` into the `db` container), build the HNSW indexes, start
+the stack. After that, every push deploys automatically.
+
+## 5. Data: sources and how each one is obtained
+
+The challenge's reference table defines the approved content for each field. The table below lists every dataset the
+system uses, where it comes from and what it is used for.
+
+| Data | Source | Licence / status | How it is obtained | What is stored | Used for |
+|---|---|---|---|---|---|
+| The Six Books: Arabic text, matn, English translation, editors' grades | **hadith-api** dataset by fawazahmed0 (derived from sunnah.com) | CC0 | `ingest/ingest_hadith.py` downloads the JSON editions | 34,153 records in `texts` (kind `hadith`), grades **verbatim** in `grades` | The searchable matching index |
+| Rulings of Sahih al-Bukhari and Sahih Muslim | The compiler's inclusion, as الدرر records it («المحدث: البخاري · المصدر: صحيح البخاري · صحيح») | — | Set at ingestion for the two Sahihs | In `grades` | The ruling shown for Sahihayn matches |
+| Scholars' rulings and شرح of the matched hadith | **الموسوعة الحديثية — dorar.net/hadith** (approved) | Public website | `app/dorar.py`: `/hadith/search` result cards and `/hadith/explain/{id}` pages, fetched live and parsed | `source_cache` rows, keyed by query | The rulings card and the extended explanation |
+| Qur'an text | **Madinah Mushaf** Uthmani script (King Fahd Complex standard) via the Quran.com v4 API | Public API | `ingest/ingest_quran.py` | 6,236 verses (kind `quran`) | Detecting a verse quoted as a hadith, correcting misquoted verses |
+| Qur'an English translation and links | **Hilali & Khan** («The Noble Qur'an», King Fahd Complex edition) via the QuranEnc API; **quranpedia.net** links | Public API / website | `ingest/quran_kfgqpc.py` | `text_en`, `source_url` | Showing a verse in English, the source link |
+| Tafsir | **موسوعة التفسير — dorar.net/tafseer** (approved) | Public website | `app/dorar.py`: the section of the surah that covers the verse | `source_cache` | The extended explanation of a verse |
+| Glossary of terms of art | Seed list of 10 terms (`ingest/seeds/glossary.csv`), enriched from **الجمهرة — islamic-content.com** (approved) | Public website | `ingest/ingest_glossary.py`, `ingest/enrich_glossary.py` | `glossary`; 5 of 10 terms carry the الجمهرة text and link | Translation notes («Taqwa» is not "fear») |
+| Circulated sayings outside the Six Books | Curated seed (`ingest/seeds/rulings_seed.json`): 12 sayings with rulings quoted from السلسلة الضعيفة, الموضوعات and similar works, as shown on الدرر | — | `ingest/ingest_seed_rulings.py` | 12 records (kind `seed`) | Flagging famous fabricated or weak sayings with their ruling |
+
+**What is never stored:** user input. Texts, images and links are processed in memory and dropped after the response.
+The recent-checks list lives in the browser's `sessionStorage` only.
+
+**Not used:** المكتبة الشاملة, and dorar.net/aqeeda. The tool answers no creed questions, and personal religious
+questions are referred to scholars.
+
+## 6. Database
+
+PostgreSQL 16 with two extensions: `vector` (pgvector) and `pg_trgm`. Schema in `backend/app/db.py`.
+
+| Table | Rows | Purpose |
+|---|---|---|
+| `texts` | 40,401 | One row per hadith, verse or seed saying: `kind`, `collection`, `number`, `book_*`, `chapter_*`, `text_ar` (with isnad), `matn_ar` (the saying), `matn_norm` (matching key), `text_en`, `text_en_norm`, `grades` (JSONB, verbatim), `source_url`, `alt_url`, `meta` |
+| `chunks` | 219,418 | Short word-window embeddings: `text_id`, `lang` (`ar`/`en`), `pos`, `embedding vector(384)` |
+| `glossary` | 10 | Terms of art with meanings, literal renderings to avoid, notes and source URL |
+| `source_cache` | grows | Fetched الدرر pages: `key`, `source`, `url`, `payload` (JSONB), `fetched_at` |
+| `ingest_meta` | few | Ingestion bookkeeping |
+
+**Indexes:** HNSW (`vector_cosine_ops`) on `chunks.embedding`, one partial index for Arabic and one for English;
+GIN trigram indexes on `texts.matn_norm` and `texts.text_en_norm`; `(collection, number)` unique.
+
+**Why short windows:** MiniLM embeds long Arabic passages poorly, and users quote fragments. Each text is embedded as
+overlapping word windows (`app/chunking.py`), and a text's semantic score is its best window.
+
+## 7. Ingestion
+
+All steps are idempotent Python modules (`backend/ingest/`), run once with `docker compose run --rm ingest`
+(about 40 minutes) or one by one:
+
+1. `ingest_hadith`: the Six Books from hadith-api. It extracts the matn from the full text, keeps the published English
+   translation and the grades verbatim.
+2. `ingest_quran`: Uthmani text and surah/ayah numbers.
+3. `quran_kfgqpc`: the Hilali & Khan translation and quranpedia links.
+4. `ingest_seed_rulings`: curated circulated sayings with their quoted rulings.
+5. `ingest_glossary` and `enrich_glossary`: terms, then الجمهرة definitions and links.
+6. `renormalize`: recompute `matn_norm` with the current normaliser and re-embed changed Arabic windows.
+7. `reembed_en`: recompute the English matching key and English windows.
+
+**Normalisation** (`app/normalize.py`, `normalize_ar`) is the single function used for stored keys and for queries:
+NFKC, remove tashkeel and tatweel, unify alef forms (آ أ إ ٱ → ا), ى → ي, ة → ه, ؤ → و, ئ → ي, Persian kaf and ya →
+Arabic, Arabic-Indic digits → ASCII, drop punctuation and symbols, strip lead-ins such as «قال رسول الله ﷺ». English
+uses `normalize_latin` (lowercase, ASCII letters, digits and apostrophes).
+
+## 8. A verification, step by step
+
+Entry points: `POST /api/verify` (JSON) and `POST /api/verify/stream` (the same pipeline with live progress events,
+used by the site). The code is `backend/app/pipeline.py::run`.
+
+1. **Input.** One of three modes:
+   - Text: up to 2,000 characters.
+   - Image: PNG or JPG up to 10 MB, sent first to `POST /api/ocr`. A vision model transcribes it, with OpenCV and
+     Tesseract as the fallback. Junk lines are dropped and wrapped lines rejoined. The user reviews the text before
+     verifying.
+   - Link: X posts through the fxtwitter JSON API, sunnah.com pages by a dedicated parser, other pages through
+     trafilatura.
+2. **Language.** Arabic and English are matched directly. Any other language (detected by script, or by Latin-script
+   language markers) is translated to English **for matching only** by a model. The report labels this and never grades
+   that translation.
+3. **Guards.**
+   - A personal fatwa question returns `referral` and stops.
+   - A request to *write* a hadith returns `abstain`, with no retrieval and no model call.
+4. **Finding the quote.** A paste may contain commentary, an attribution, a whole post or page. Candidate spans come from:
+   - **rules** (`app/quotes.py`): text in «» "" “”, or after an attribution such as «قال رسول الله ﷺ» or "the Prophet
+     said". English parentheses are ignored, because they hold asides like "(peace be upon him)". Spans made only of
+     honorifics («صلى الله عليه وسلم», "PBUH") or source notes ("(Sahih Muslim 55)", «رواه البخاري») are dropped.
+   - an **isnad parser** that cuts the chain of narrators off a full hadith.
+   - the **AI extractor**, for long texts, images and links. Each span it returns must appear literally in the input.
+
+   Each span is verified. For a short typed text, the whole text competes too. A fragment replaces it only when it is
+   presented as a quotation and scores at least as high, or when it scores at least 10 points higher.
+5. **Retrieval and scoring** (section 9): exact or substring, then trigram, then semantic, else abstain.
+6. **Match check, for English and translated input** (section 11, the match checker). A strong model compares the input
+   with the top records: same report or not. It can confirm, which raises a record to partial at most, or reject, which
+   caps it at closest text only. An English match that rests on meaning rather than shared wording (lexical below 70)
+   **must** be confirmed. Without a strong model's confirmation, because it said no, was unavailable or was
+   rate-limited, it is shown only as the closest text.
+7. **State.** Thresholds on the 0–100 confidence: `verified` ≥ 90, `partial` ≥ 75, `uncertain` ≥ 50 (shown as the
+   closest text only, not an attribution), below 50 `abstain`. Two rules on top:
+   - a Sunan record without a recorded grade is at most `uncertain`, since there is no attribution without a ruling;
+   - a matched record whose ruling is weak or fabricated becomes `unreliable`. It is red and never shows a green check.
+8. **Attribution.** The ruling is read verbatim from the record (`grades`), with grader, book, number and links.
+   Added to it:
+   - **Narrations:** the same text in other books or under other numbers, each with its own recorded ruling. Found by
+     trigram probes at the start, middle and end of the text, then rescored. Cross-reference records («بمثله») are
+     excluded.
+   - A **word diff** against the correct wording, for Arabic input.
+   - A **translation-accuracy card**, for English input against the published translation.
+   - **Glossary notes** for terms that must not be translated literally.
+9. **الدرر rulings.** The site asks `GET /api/dorar` for the matched hadith. The API searches الدرر by the matched text,
+   ranks the compiler's own entry first, drops repeated entries and returns the rulings verbatim. Results are cached.
+10. **Explanation.** It is labelled «شرح مولَّد بالذكاء الاصطناعي» (AI-generated explanation) and kept visually separate.
+    It comes in two modes:
+    - **Brief:** it words the fixed facts and is fact-checked (section 11).
+    - **Extended:** RAG over the الدرر شرح or tafsir (section 10).
+
+    It is available in 25 languages on request.
+
+The response (`VerifyResponse` in `app/schemas.py`) carries the state, confidence, reason in Arabic and English,
+source, grades, narrations, candidates, segments, diff, translation card, glossary notes, the machine translation (if
+any), the match check (if any), the explanation and per-step timings.
+
+## 9. Retrieval cascade and scoring
+
+`backend/app/matcher.py::search`. Candidates come from three searches, are merged and then **rescored with both signals**:
+
+| Signal | How |
+|---|---|
+| Exact | The normalised query equals a stored key or is contained in it (≥ 15 characters) |
+| Trigram | `pg_trgm` `word_similarity(query, key)`, threshold 0.35 for candidates |
+| Semantic | pgvector cosine to the best embedded window (HNSW), top 120 windows grouped by text |
+| Lexical (rescoring) | 0.5 × character similarity of the best-aligned window + 0.5 × share of the query's content words found in it (rapidfuzz) |
+
+**Confidence:** Arabic = 0.75 × lexical + 0.25 × semantic, because the source wording decides. English = 0.5 × lexical
++ 0.5 × semantic, because translations legitimately differ.
+
+**Cascade (English):** admitted when wording and meaning agree (lexical ≥ 70 and scaled meaning ≥ 60), or when the
+combined score reaches 75 on meaning alone. The meaning-only case is marked and needs the match checker's confirmation
+(section 8, step 6).
+
+**Cascade (Arabic):**
+
+1. **Exact:** score at least 90.
+2. **Trigram:** `word_similarity ≥ 0.60` and lexical ≥ 70, or lexical ≥ 80. Score 75–100.
+3. **Semantic:** cosine ≥ 0.80 and lexical ≥ 45 and trigram ≥ 0.55. Score 50–74, closest text only.
+4. Otherwise **abstain**, score below 50.
+
+Extra rules:
+
+- **Short quotes:** an Arabic quote of four content words or fewer must contain every one of them. «خير الأمور أوسطها»
+  is not «… وشر الأمور محدثاتها», so such a record is at most the closest text.
+- **Cross-references:** records whose whole text is a reference such as «بمثله» or «فذكر نحوه» are never a match.
+- **English on meaning alone:** an English record admitted by score (meaning) rather than by wording (lexical below 70)
+  is marked `meaning_only`. The pipeline shows it as an attribution only if a strong model confirms it is the same report.
+- **Ties:** the Qur'an, then the Sahihayn, then the curated seed, then the Sunan.
+
+**Embedding model choice, measured:** multilingual-e5-large (1024 dimensions, ten times larger) was evaluated against
+MiniLM on the English side of the multilingual set. Recall of the labelled record: top 1 was 3% for e5 against 8% for
+MiniLM, top 5 was 25% against 26%, and top 10 was 33% for both. It brought no gain, so MiniLM stays. The comparison
+scripts are `backend/eval/embed_candidate.py` and `backend/eval/compare_embeddings.py`.
+
+## 10. RAG: the extended explanation
+
+Yes, the system uses retrieval-augmented generation, in a constrained form, for the **extended explanation**:
+
+1. **Retrieve.** For a hadith, `app/dorar.py` finds the matched hadith on الدرر and fetches its شرح page from the
+   الموسوعة الحديثية. For a verse, it fetches the section of موسوعة التفسير that covers it. Both are cached in
+   `source_cache`.
+2. **Generate.** The model receives only the facts (state, ruling, source) and the retrieved source text. The prompt
+   (`GROUNDED_SYSTEM`) says to summarise *only* that text, in the requested language.
+3. **Show.** The summary appears with a link to the exact source page.
+4. **No source, no text.** If الدرر has no شرح or tafsir for the item, the API returns `reason: "no_source"` and the
+   site says so. Nothing is generated from the model's general knowledge.
+
+The retrieval of the *ruling* is not generative at all. It is search over the corpus, and the ruling is read verbatim
+from the record.
+
+## 11. AI components and how they are controlled
+
+There are **no autonomous agents**. The pipeline is deterministic code that calls a model for six narrow, bounded tasks.
+Each call has a fixed prompt, returns JSON, is validated by code, and has a non-AI fallback or simply turns off.
+**No model ever produces or changes a ruling.**
+
+| Component | When it runs | Input → output | Guard | Without a model |
+|---|---|---|---|---|
+| **Transcriber** (vision) | Image input | Image → the text as written | Validated as an image before upload; whole transcription shown for user review; Tesseract fallback | Tesseract + OpenCV |
+| **Extractor** | Long text, image or link | Text → cleaned text + quoted segments with type | Every segment must exist **literally** in the input; a rewritten "cleaned text" is discarded; honorific/reference spans are dropped | Rule-based spans |
+| **Translator** | Input not in Arabic or English | Text → English, for matching only | Labelled in the report; never graded as the user's translation | Abstain with a clear reason |
+| **Match checker** | English or translated input, top three non-exact records | Input + records → same report or not, for each | Only a strong model (Groq `gpt-oss-120b`, or Anthropic) may **raise** a record, to partial at most; any model may **reject**; a Qur'an verse is never raised; "when unsure, false"; a match resting on meaning alone needs this confirmation | Wording-based matches stand; meaning-only matches are shown as the closest text |
+| **Brief explainer** + **fact checker** | Every report, if enabled | Facts → 2–4 sentences in the chosen language | Code checks: no grade contradicting the record, no verdict when abstaining, no number absent from the facts. A second model pass flags claims the facts do not support (meaning, virtues, invented references). One rewrite with the problems listed, then a fixed template built only from the facts | Not shown |
+| **Grounded explainer** | Extended explanation, on request | Facts + retrieved شرح/tafsir → summary | Source text is the only input; source link shown; no source → no text; language checked by script | Not shown |
+
+**Provider chain** (`app/llm.py`): one OpenAI-compatible client. The default order is Gemini (`gemini-flash-lite-latest`),
+then Groq (`openai/gpt-oss-120b`), then OpenRouter (`google/gemma-4-26b-a4b-it:free`), and optionally Anthropic.
+Rules:
+
+- A provider that rate-limits or fails (408, 409, 425, 429, 5xx) cools down for 45 seconds, and the next one is tried.
+- Each call has a 20-second total budget.
+- The match checker prefers Groq.
+- Reasoning models get `reasoning_effort: low`.
+- Answers in the wrong language are retried once, then dropped.
+
+## 12. API reference
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/health` | Status, database connection, corpus counts, embedder, LLM chain, OCR availability |
+| POST | `/api/verify` | Verify `{text \| url, lang, via, explain}` and return the full report |
+| POST | `/api/verify/stream` | The same, as Server-Sent Events: `progress` steps, then `result` |
+| POST | `/api/ocr` | Image (multipart) → transcribed text for review |
+| POST | `/api/explain` | Brief or extended explanation of an existing report, in any listed language |
+| GET | `/api/explain/languages` | The 25 explanation languages |
+| GET | `/api/dorar` | Rulings from الدرر for a matched hadith: cards, best entry, search URL |
+| GET | `/api/sources` | The approved sources list |
+| POST | `/api/review` | Ask for a human review (forwarded to a webhook when configured; nothing stored) |
+
+Errors use `{detail: {code, message}}`, for example `too_long` (413), `image_too_large` (413), `ocr_failed` (415/422),
+`url_unreachable` (422).
+
+## 13. Frontend
+
+Next.js App Router, statically exported (`frontend/out`), with four screens:
+
+- **Verify** (`/`): text, image or link input, with example chips.
+- **Result** (`/result/?id=`): status banner, then these cards:
+  - extracted text and machine translation;
+  - segments;
+  - word diff, translation accuracy and glossary notes;
+  - grade and source, الدرر rulings, narrations;
+  - AI explanation, closest matches and actions.
+- **Sources and methodology** (`/sources/`): every approved source and its role.
+- **Recent checks** (`/recent/`): this browser session only.
+
+Details:
+
+- **Languages:** Arabic RTL by default, English LTR. The choice is kept in `localStorage`.
+- **PDF export:** the browser's print-to-PDF with a dedicated print layout (A4). The browser draws Arabic correctly and
+  keeps the text selectable, which JavaScript PDF libraries often fail at. A disclaimer footer is added.
+- **Share image:** a 1080 × 1350 PNG drawn on a canvas with the page's fonts. It shows the state, the input, the recorded
+  ruling and its source, the disclaimer and the site address. Phones use the system share sheet; computers download it.
+- **Accessibility:** skip link, focus rings, live regions for progress and results, meter roles, colour contrast that
+  passes WCAG AA (audited with axe-core).
+- **Storage:** reports and history in `sessionStorage`, preferences in `localStorage`. Nothing about the user's texts
+  leaves the browser except the verification request itself.
+
+## 14. Quality: tests and benchmarks
+
+**Tests:**
+
+| Suite | Count | Command |
+|---|---|---|
+| Backend unit tests (offline, real saved fixtures) | 113 | `cd backend && .venv/bin/pytest -q` |
+| Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
+| Browser tests (Playwright, Chrome), Arabic and English | 57 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
+| Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages | 10 | `npx playwright test e2e/a11y.spec.ts` |
+| Phone-size tests (Pixel 7, iPhone 13 size), touch flow, no sideways scroll | 4 | `npx playwright test e2e/mobile.spec.ts` |
+
+**Benchmarks** (`backend/eval/`, run against a live API):
+
+| Set | What it is | Result |
+|---|---|---|
+| Labelled corpus set (`benchmark.jsonl`, 98 inputs, fixed seed) | Exact and variant quotes of Sahihayn hadiths, fabricated/weak seeds, exact and misquoted verses, invented texts, fatwa questions | 98% strict, **100% same hadith**, 0 attributions to another hadith, 6/6 invented texts abstain, median latency ~0.3 s |
+| Circulated texts (`circulated.jsonl`, 50 sayings, 46 scored) | Sayings that circulate on social media; labels decided from الدرر rulings, quoted per item | Authentic 21/21 confirmed; weak/fabricated/not hadith 22/25 flagged or abstained, 3 closest text only; **0 dangerous errors** |
+| Multilingual paraphrases (`multilingual.jsonl`, 90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | 31% confirmed the right hadith; 56 abstained or closest text only; 3 of 90 attributed to another hadith (different incident, same topic). Measured with the model check available |
+
+"Same hadith" means the returned record is the labelled one, or the labelled record appears among the returned
+record's narrations, or it is a parallel narration listed in `multilingual_equivalents.json` after manual review.
+
+## 15. Security and privacy
+
+- No user input is stored on the server. No accounts, no analytics.
+- The database is not exposed, and the API is reached only through Caddy over HTTPS.
+- CORS allows only the site's origin and localhost.
+- Input limits: 2,000 characters, images up to 10 MB in PNG or JPG only, and the bytes are validated as an image before
+  anything is sent to a model.
+- Secrets live in the server's `.env` and in GitHub Actions secrets, never in the repository.
+- Model calls carry only the text needed for the step.
+- Rulings are quoted, never generated, and the UI says so on every result and in every PDF and share image.
+
+## 16. Configuration reference
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://tahqaq:tahqaq@localhost:5432/tahqaq` | Database |
+| `EMBEDDER` / `EMBED_MODEL` | `local` / MiniLM-L12 | Embedding backend and model (`openai` and `hash` exist for small hosts and tests) |
+| `LLM_PROVIDER` / `LLM_FALLBACKS` | `none` / empty | Provider chain, for example `gemini` and `groq,openrouter` |
+| `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY` | empty | Provider keys |
+| `LLM_MODEL`, `LLM_TIMEOUT` | empty, 15 s | Override the primary model; per-request timeout |
+| `CORS_ORIGINS` | `http://localhost:3000` | Allowed browser origins |
+| `REVIEW_WEBHOOK_URL` | empty | Where human-review requests are forwarded |
+| `API_HOST` (prod) | — | Hostname Caddy serves and certifies |
+| `POSTGRES_PASSWORD` (prod) | — | Database password |
+| `NEXT_PUBLIC_API_URL` (frontend build) | `http://localhost:8000` | API address baked into the static site |
+
+Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertain` 50) are in `app/config.py`.
+
+## 17. Known limits
+
+- The searchable corpus is the Six Books, the Qur'an and a small curated list. A saying found only in other collections
+  is not matched. The tool abstains, and the الدرر link lets the user search further.
+- Loosely paraphrased input in other languages often abstains. This is by design: precision before recall.
+- The curated list of circulated sayings and the parallel-narration review were made by the developer from الدرر
+  rulings, not by a hadith specialist. A specialist review is the next step before a public launch.
+- Instagram, Facebook, YouTube and TikTok links cannot be read. Paste the text or a screenshot instead.
+- The API address is tied to the VM's public IP through sslip.io. A reserved IP, or a domain with a Cloudflare Tunnel,
+  removes that dependency.
+- Free model tiers rate-limit under load. The provider chain and the non-AI fallbacks keep verification working.
+
+## 18. Repository layout
+
+```
+backend/
+  app/          FastAPI app: pipeline, matcher, store, normalize, quotes, dorar, llm, ocr, fetch_url, schemas
+  ingest/       idempotent ingestion steps and seeds
+  eval/         benchmark sets, generators and runners (corpus, circulated, multilingual, embeddings)
+  tests/        unit tests and integration tests (TAHQAQ_STACK=1)
+frontend/
+  app/          pages: verify, result, sources, recent
+  components/   home and result cards, header, footer, banner
+  lib/          API client, i18n, storage, session, share image, tokens
+  e2e/          Playwright: matrix, accessibility, phones
+  messages/     ar.json, en.json
+deploy/         Caddyfile, backup script
+design/         the exported UI design (source of truth for layout, colours and copy)
+docker-compose.yml        development stack (db, api, web, ingest, fixtures)
+docker-compose.prod.yml   production stack (db, api, caddy)
+.github/workflows/        ci, deploy, uptime
+```
