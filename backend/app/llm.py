@@ -135,6 +135,10 @@ class Provider:
 PROVIDERS: dict[str, Provider] = {
     "gemini": Provider("gemini", "https://generativelanguage.googleapis.com/v1beta/openai", "gemini_api_key",
                        "gemini-flash-lite-latest", vision=True, json_mode=True),  # lite: answers in ~2 s; flash-latest often exceeds the timeout
+    # the same Gemini key, another model with its own free daily quota: takes over images and text when the first
+    # model's quota is used up (it read a vocalised sunnah.com screenshot word for word in tests)
+    "gemini-backup": Provider("gemini-backup", "https://generativelanguage.googleapis.com/v1beta/openai", "gemini_api_key",
+                              "gemini-3.1-flash-lite", vision=True, json_mode=True),
     "groq": Provider("groq", "https://api.groq.com/openai/v1", "groq_api_key",
                      "openai/gpt-oss-120b", vision=False, json_mode=True),
     # the same Groq key, a smaller model with its own free quota: the last fallback when the others are used up
@@ -173,6 +177,8 @@ class LLMClient:
             p = PROVIDERS.get(n)
             if p and getattr(self.s, p.key_attr, "") and n not in out:
                 out.append(n)
+        if "gemini" in out and "gemini-backup" not in out:
+            out.insert(out.index("gemini") + 1, "gemini-backup")
         if "groq" in out and "groq-lite" not in out:
             out.append("groq-lite")
         return out

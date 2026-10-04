@@ -339,7 +339,9 @@ Each call has a fixed prompt, returns JSON, is validated by code, and has a non-
 
 **Provider chain** (`app/llm.py`): one OpenAI-compatible client. The default order is Gemini (`gemini-flash-lite-latest`),
 then Groq (`openai/gpt-oss-120b`), then OpenRouter (`google/gemma-4-26b-a4b-it:free`), and optionally Anthropic. With a
-Groq key, Groq's smaller `openai/gpt-oss-20b` is added as the last fallback: it has its own free quota. It is not a
+Gemini key, `gemini-3.1-flash-lite` follows the first Gemini model: it has its own free quota and reads images, so
+screenshots are still read by a model when the first quota is used up (Tesseract was the next reader before, and it
+garbles vocalised Arabic). With a Groq key, Groq's smaller `openai/gpt-oss-20b` is added as the last fallback: it has its own free quota. It is not a
 strong judge, so it can never raise a match. It never writes an Arabic or English brief either: in a test it called
 al-Bukhari «الراوي» (narrator) instead of the compiler. There, the fixed wording built from the facts is used. Rules:
 
@@ -354,6 +356,7 @@ al-Bukhari «الراوي» (narrator) instead of the compiler. There, the fixed
 | Service | Free limit | Used by | Roughly allows per day |
 |---|---|---|---|
 | Gemini `flash-lite` | 500 requests a day | Brief explanations, translation for matching, assistant answers, OCR reading | 500 model answers |
+| Gemini `3.1-flash-lite` (backup) | Its own daily quota | The same tasks, when the first Gemini quota is used up; reads images | a second pool of answers |
 | Groq `gpt-oss-120b` | 1,000 requests and 200,000 tokens a day, 8,000 tokens a minute | Match checker (preferred), fallback for the rest | ~250 match checks (600 to 1,500 tokens each) |
 | Groq `gpt-oss-20b` | 1,000 requests a day, 8,000 tokens a minute, its own daily tokens | Last fallback | a few hundred answers |
 | Groq Whisper `large-v3` | 2,000 requests a day | Assistant voice input | 2,000 spoken turns |
@@ -532,7 +535,7 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 177 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 178 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
 | Browser tests (Playwright, Chrome), Arabic and English | 58 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
 | Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages, and the review dialog | 12 | `npx playwright test e2e/a11y.spec.ts` |

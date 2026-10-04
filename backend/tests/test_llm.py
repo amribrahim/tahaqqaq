@@ -32,7 +32,7 @@ def _transport(statuses: dict[str, int], answer: str = '{"explanation": "شرح"
 
 def test_chain_only_lists_configured_providers():
     c = LLMClient(_settings(groq_api_key=""))
-    assert c.chain() == ["gemini", "openrouter"]
+    assert c.chain() == ["gemini", "gemini-backup", "openrouter"]
     assert LLMClient(_settings(llm_provider="none", gemini_api_key="", groq_api_key="", openrouter_api_key="")).enabled is False
 
 
@@ -49,7 +49,7 @@ def test_falls_back_on_rate_limit_and_server_errors():
     text, model = out
     assert json.loads(text)["explanation"] == "شرح"
     assert model.startswith("openrouter/")
-    assert [h.split(".")[0] for h in calls] == ["generativelanguage", "api", "openrouter"]
+    assert [h.split(".")[0] for h in calls] == ["generativelanguage", "generativelanguage", "api", "openrouter"]
     # the rate-limited providers are skipped (cooldown) on the next call
     calls.clear()
     c.complete("sys", "user")
@@ -216,7 +216,7 @@ def test_templates_cover_every_state():
 
 
 def test_groq_key_adds_the_lite_model_as_the_last_fallback():
-    assert LLMClient(_settings()).chain() == ["gemini", "groq", "openrouter", "groq-lite"]
+    assert LLMClient(_settings()).chain() == ["gemini", "gemini-backup", "groq", "openrouter", "groq-lite"]
     assert "groq-lite" not in LLMClient(_settings(llm_fallbacks="openrouter")).chain()   # Groq left out on purpose
 
     def handler(request: httpx.Request) -> httpx.Response:   # every quota used up except the lite model's
@@ -269,3 +269,14 @@ def test_light_model_never_writes_an_arabic_or_english_brief(monkeypatch):
     monkeypatch.setattr(llm_mod, "fact_check", lambda text, payload: [])
     out = llm_mod.explain(facts, "fr")
     assert out is not None and out[1] == "groq-lite/openai/gpt-oss-20b"
+
+
+def test_images_go_to_the_backup_gemini_model_when_the_first_is_used_up():
+    def handler(request: httpx.Request) -> httpx.Response:
+        model = json.loads(request.content).get("model")
+        if model == "gemini-3.1-flash-lite":
+            return httpx.Response(200, json={"choices": [{"message": {"content": "حدثنا الحميدي"}}]})
+        return httpx.Response(429, json={})
+
+    out = LLMClient(_settings(), transport=httpx.MockTransport(handler)).complete("sys", [{"type": "text", "text": "x"}], need_vision=True)
+    assert out == ("حدثنا الحميدي", "gemini-backup/gemini-3.1-flash-lite")

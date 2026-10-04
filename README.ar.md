@@ -77,7 +77,7 @@ open http://localhost:3000
 ## الاختبارات
 
 ```bash
-cd backend && .venv/bin/pytest -q                                  # ١٧٧ اختبار وحدة (بدون شبكة، ببيانات حقيقية محفوظة)
+cd backend && .venv/bin/pytest -q                                  # ١٧٨ اختبار وحدة (بدون شبكة، ببيانات حقيقية محفوظة)
 docker compose --profile qa up -d db api web fixtures
 cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # ٣٧ فحصًا على البيئة الكاملة
 cd frontend && npx playwright test                                 # ٨٩ اختبار متصفح: ٥٨ سيناريو بالعربية والإنجليزية، و١٥ للمساعد،

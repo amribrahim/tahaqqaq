@@ -77,7 +77,7 @@ Re-runnable ingestion steps: `ingest.ingest_hadith`, `ingest.ingest_quran`, `ing
 ## Tests
 
 ```bash
-cd backend && .venv/bin/pytest -q                                  # 177 unit tests (offline, real fixtures)
+cd backend && .venv/bin/pytest -q                                  # 178 unit tests (offline, real fixtures)
 docker compose --profile qa up -d db api web fixtures
 cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # 37 checks against the running stack
 cd frontend && npx playwright test                                 # 89 browser tests: 58 scenarios in Arabic and English, 15 assistant
