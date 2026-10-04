@@ -91,6 +91,20 @@ export function AssistantWidget() {
     }
   };
 
+  /** Start over: empty conversation, nothing pending, and «سند» greets again. */
+  const newConversation = () => {
+    if (rec === "recording") stopRecording(true);
+    speaker.current?.hush();
+    setMsgs([]); save([]);
+    setPending(null); setHeardRaw(null); setInput("");
+    if (speak) {
+      speaker.current = speaker.current ?? new VoiceEngine();
+      speaker.current.startPlayback();
+      void speaker.current.speak(t("welcome"), lang);
+    }
+    requestAnimationFrame(() => field.current?.focus());
+  };
+
   const close = () => {
     if (rec === "recording") stopRecording(true);
     speaker.current?.hush();
@@ -193,14 +207,20 @@ export function AssistantWidget() {
           <header style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#0d1035", color: "#fff" }}>
             <span aria-hidden="true" style={{ width: 34, height: 34, borderRadius: 10, background: "#3ee6c0", color: "#0d1035", display: "grid", placeItems: "center", fontWeight: 800 }}>✓</span>
             <div style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: 1 }}>
-              <strong className="font-cairo" style={{ fontSize: 16 }}>{t("title")} <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "rgba(124,108,240,0.35)", marginInlineStart: 6 }}>{t("aiLabel")}</span></strong>
+              <strong className="font-cairo" style={{ fontSize: 16 }}>{t("title")} <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "rgba(124,108,240,0.35)", marginInlineStart: 6, whiteSpace: "nowrap" }}>{t("aiLabel")}</span></strong>
               <span style={{ fontSize: 12, color: "#c9c3ff" }}>{t("subtitle")}</span>
             </div>
+            {!calling && (
+              <button type="button" onClick={newConversation} aria-label={t("newChat")} title={t("newChat")} data-testid="assistant-new"
+                style={{ background: "transparent", color: "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer", fontSize: 18, flex: "none" }}>
+                <span aria-hidden="true">↺</span>
+              </button>
+            )}
             <button type="button" onClick={() => { const v = !speak; setSpeak(v); try { localStorage.setItem(VOICE_PREF, v ? "1" : "0"); } catch {} if (!v) speaker.current?.hush(); }}
               aria-pressed={speak} aria-label={speak ? t("speakOff") : t("speakOn")} title={speak ? t("speakOff") : t("speakOn")} data-testid="assistant-speak"
-              style={{ background: speak ? "#3ee6c0" : "transparent", color: speak ? "#0d1035" : "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer" }}>🔊</button>
+              style={{ flex: "none", background: speak ? "#3ee6c0" : "transparent", color: speak ? "#0d1035" : "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer" }}>{speak ? "🔊" : "🔇"}</button>
             <button type="button" onClick={close} aria-label={t("close")} data-testid="assistant-close"
-              style={{ background: "transparent", color: "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer", fontSize: 18 }}>×</button>
+              style={{ flex: "none", background: "transparent", color: "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer", fontSize: 18 }}>×</button>
           </header>
 
           <div style={{ display: calling ? "contents" : "block", padding: calling ? 0 : "10px 14px 0", background: "#f6f5fb" }}>
@@ -261,7 +281,7 @@ export function AssistantWidget() {
               {rec === "recording" ? t("recording", { s: seconds }) : t("voiceNote")}
             </span>
             {msgs.length > 0 && (
-              <button type="button" onClick={() => { setMsgs([]); save([]); }} style={{ alignSelf: "flex-start", background: "none", border: 0, color: "#4f3fd0", fontSize: 12, cursor: "pointer", padding: 0 }}>{t("clear")}</button>
+              <button type="button" onClick={newConversation} data-testid="assistant-clear" style={{ alignSelf: "flex-start", background: "none", border: 0, color: "#4f3fd0", fontSize: 12, cursor: "pointer", padding: 0 }}>{t("newChat")}</button>
             )}
           </form>
           </>}

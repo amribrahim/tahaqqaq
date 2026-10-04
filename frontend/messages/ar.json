@@ -305,6 +305,7 @@
     "phase_confirming": "قل نعم أو لا",
     "phase_speaking": "أتحدث…",
     "phase_idle": "",
-    "asHeard": "كما سُمع قبل تصحيح الإملاء"
+    "asHeard": "كما سُمع قبل تصحيح الإملاء",
+    "newChat": "محادثة جديدة"
   }
 }

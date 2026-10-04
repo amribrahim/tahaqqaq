@@ -227,3 +227,25 @@ test("Sanad greets aloud on the first open of a session, once", async ({ page })
   expect(spoken.length).toBe(n);                                   // no second greeting in the same session
   await expect(await ask(page, "كيف حالك؟")).toContainText("بخير");
 });
+
+test("New conversation empties the chat and Sanad greets again", async ({ page }) => {
+  const spoken: string[] = [];
+  await page.route("**/api/tts", async (route) => {
+    spoken.push(JSON.parse(route.request().postData() || "{}").text);
+    await route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ detail: { code: "tts_unavailable" } }) });
+  });
+  await openAssistant(page, "ar", "/", true);
+  await expect.poll(() => spoken.join(" "), { timeout: 20_000 }).toContain("نتحقق منه");
+  await ask(page, "كيف حالك؟");
+  expect(await page.getByTestId("assistant-user").count()).toBe(1);
+  const before = spoken.filter((x) => x.includes("أنا سند")).length;
+  await page.getByTestId("assistant-new").click();
+  await expect(page.getByTestId("assistant-user")).toHaveCount(0);
+  await expect(page.getByTestId("assistant-bot")).toHaveCount(0);
+  await expect(page.getByTestId("assistant-log")).toContainText("أنا سند");          // the welcome is back
+  await expect(page.getByTestId("assistant-input")).toBeFocused();
+  await expect.poll(() => spoken.filter((x) => x.includes("أنا سند")).length, { timeout: 20_000 }).toBeGreaterThan(before);
+  await page.reload();
+  await page.getByTestId("assistant-open").click();
+  await expect(page.getByTestId("assistant-user")).toHaveCount(0);                    // the cleared chat stays cleared
+});

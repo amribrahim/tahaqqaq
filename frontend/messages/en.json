@@ -305,6 +305,7 @@
     "phase_confirming": "Say yes or no",
     "phase_speaking": "Speaking…",
     "phase_idle": "",
-    "asHeard": "As heard, before spelling correction"
+    "asHeard": "As heard, before spelling correction",
+    "newChat": "New conversation"
   }
 }
