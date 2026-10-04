@@ -19,6 +19,7 @@ For what the product does and how to run it, see [README.md](README.md) / [READM
 9. [Retrieval cascade and scoring](#9-retrieval-cascade-and-scoring)
 10. [RAG: the extended explanation](#10-rag-the-extended-explanation)
 11. [AI components and how they are controlled](#11-ai-components-and-how-they-are-controlled)
+    - [11a. The assistant](#11a-the-assistant)
 12. [API reference](#12-api-reference)
 13. [Frontend](#13-frontend)
 14. [Quality: tests and benchmarks](#14-quality-tests-and-benchmarks)
@@ -77,6 +78,7 @@ flowchart LR
 | Fuzzy matching | rapidfuzz | Word-level and character-level similarity for rescoring |
 | OCR fallback | OpenCV (deskew, binarise, upscale) and Tesseract `ara+eng` with tessdata_best | Works without any model |
 | Link reading | trafilatura → readability-lxml → densest text block; fxtwitter JSON for X posts; a sunnah.com page parser | Extracts the article text from a page |
+| Speech to text | Whisper large-v3 on Groq (same key as the text models) | Arabic and English voice input for the assistant, with confidence data per segment |
 | LLM access | One OpenAI-compatible HTTP client with a provider chain (Gemini, Groq, OpenRouter; Anthropic optional) | Free tiers, automatic fallback on rate limits |
 | Reverse proxy | Caddy 2 | Automatic HTTPS certificates |
 | Containers | Docker Compose (dev and prod files) | One command to run the stack |
@@ -141,7 +143,20 @@ system uses, where it comes from and what it is used for.
 | Qur'an English translation and links | **Hilali & Khan** («The Noble Qur'an», King Fahd Complex edition) via the QuranEnc API; **quranpedia.net** links | Public API / website | `ingest/quran_kfgqpc.py` | `text_en`, `source_url` | Showing a verse in English, the source link |
 | Tafsir | **موسوعة التفسير — dorar.net/tafseer** (approved) | Public website | `app/dorar.py`: the section of the surah that covers the verse | `source_cache` | The extended explanation of a verse |
 | Glossary of terms of art | Seed list of 10 terms (`ingest/seeds/glossary.csv`), enriched from **الجمهرة — islamic-content.com** (approved) | Public website | `ingest/ingest_glossary.py`, `ingest/enrich_glossary.py` | `glossary`; 5 of 10 terms carry the الجمهرة text and link | Translation notes («Taqwa» is not "fear») |
-| Circulated sayings outside the Six Books | Curated seed (`ingest/seeds/rulings_seed.json`): 12 sayings with rulings quoted from السلسلة الضعيفة, الموضوعات and similar works, as shown on الدرر | — | `ingest/ingest_seed_rulings.py` | 12 records (kind `seed`) | Flagging famous fabricated or weak sayings with their ruling |
+| Circulated sayings outside the Six Books | Curated seed (`ingest/seeds/rulings_seed.json`): 68 sayings, each with rulings quoted verbatim from الدرر. 12 were entered by hand; 56 were added by `ingest/build_seed_from_dorar.py` (see below) | — | `ingest/ingest_seed_rulings.py` | 68 records (kind `seed`) | Flagging famous fabricated or weak sayings with their ruling |
+
+**How the curated sayings are grown** (`ingest/build_seed_from_dorar.py`): the developer lists candidate sayings that
+circulate as hadiths (`ingest/seeds/circulated_candidates.txt`). For each one the script searches الدرر and keeps it
+only when:
+
+1. a matching entry records a weak, fabricated or baseless ruling, and
+2. no entry records an authentic one. This is checked on the saying itself and on variant wordings, using الدرر's
+   own authentic-only filter (`d[]=1`) as well as the plain search.
+
+Contested sayings stay out. For example «استعينوا على قضاء حوائجكم بالكتمان» was rejected because الألباني graded a
+variant «جيد». Every decision, with the quoted rulings, is written to `ingest/seeds/seed_review.md` for a specialist's
+review. Of 142 candidates, 56 were added. Every saying's first ruling must resolve to a weak state, and a unit test
+enforces it.
 
 **What is never stored:** user input. Texts, images and links are processed in memory and dropped after the response.
 The recent-checks list lives in the browser's `sessionStorage` only.
@@ -155,7 +170,7 @@ PostgreSQL 16 with two extensions: `vector` (pgvector) and `pg_trgm`. Schema in 
 
 | Table | Rows | Purpose |
 |---|---|---|
-| `texts` | 40,401 | One row per hadith, verse or seed saying: `kind`, `collection`, `number`, `book_*`, `chapter_*`, `text_ar` (with isnad), `matn_ar` (the saying), `matn_norm` (matching key), `text_en`, `text_en_norm`, `grades` (JSONB, verbatim), `source_url`, `alt_url`, `meta` |
+| `texts` | 40,457 | One row per hadith, verse or seed saying: `kind`, `collection`, `number`, `book_*`, `chapter_*`, `text_ar` (with isnad), `matn_ar` (the saying), `matn_norm` (matching key), `text_en`, `text_en_norm`, `grades` (JSONB, verbatim), `source_url`, `alt_url`, `meta` |
 | `chunks` | 219,418 | Short word-window embeddings: `text_id`, `lang` (`ar`/`en`), `pos`, `embedding vector(384)` |
 | `glossary` | 10 | Terms of art with meanings, literal renderings to avoid, notes and source URL |
 | `source_cache` | grows | Fetched الدرر pages: `key`, `source`, `url`, `payload` (JSONB), `fetched_at` |
@@ -301,7 +316,7 @@ from the record.
 
 ## 11. AI components and how they are controlled
 
-There are **no autonomous agents**. The pipeline is deterministic code that calls a model for six narrow, bounded tasks.
+There are **no autonomous agents**. The pipeline is deterministic code that calls a model for nine narrow, bounded tasks.
 Each call has a fixed prompt, returns JSON, is validated by code, and has a non-AI fallback or simply turns off.
 **No model ever produces or changes a ruling.**
 
@@ -313,6 +328,9 @@ Each call has a fixed prompt, returns JSON, is validated by code, and has a non-
 | **Match checker** | English or translated input, top three non-exact records | Input + records → same report or not, for each | Only a strong model (Groq `gpt-oss-120b`, or Anthropic) may **raise** a record, to partial at most; any model may **reject**; a Qur'an verse is never raised; "when unsure, false"; a match resting on meaning alone needs this confirmation | Wording-based matches stand; meaning-only matches are shown as the closest text |
 | **Brief explainer** + **fact checker** | Every report, if enabled | Facts → 2–4 sentences in the chosen language | Code checks: no grade contradicting the record, no verdict when abstaining, no number absent from the facts. A second model pass flags claims the facts do not support (meaning, virtues, invented references). One rewrite with the problems listed, then a fixed template built only from the facts | Not shown |
 | **Grounded explainer** | Extended explanation, on request | Facts + retrieved شرح/tafsir → summary | Source text is the only input; source link shown; no source → no text; language checked by script | Not shown |
+| **Assistant classifier** | Assistant message the rules cannot place | Message → verify, report, tool or other | Only classifies; the action is code. A "verify" pointer must be text found literally in the message | Out-of-scope reply |
+| **Assistant answerer** | Assistant question about the tool or the open report | Curated sections or report facts → 2–4 sentences | No numbers outside the sources; no contradicting grade; otherwise the curated text or the report's own wording | Curated text or report wording |
+| **Speech transcriber** (Whisper) | Voice input in the assistant | Audio → transcript, Arabic or English | Refused on silence, low confidence, repetition, other languages; transcript confirmed by the user before verifying | Typing only |
 
 **Provider chain** (`app/llm.py`): one OpenAI-compatible client. The default order is Gemini (`gemini-flash-lite-latest`),
 then Groq (`openai/gpt-oss-120b`), then OpenRouter (`google/gemma-4-26b-a4b-it:free`), and optionally Anthropic.
@@ -323,6 +341,53 @@ Rules:
 - The match checker prefers Groq.
 - Reasoning models get `reasoning_effort: low`.
 - Answers in the wrong language are retried once, then dropped.
+
+## 11a. The assistant
+
+A floating button at the bottom right of every page opens a chat panel. Its scope is deliberately limited to three
+things: verify a hadith typed or spoken, explain the report open on the page, and answer questions about the tool.
+Anything else, including general religious questions, gets a fixed reply. Personal fatwa and legal-ruling questions
+are referred to scholars, and requests to write a hadith are refused. The code is `backend/app/assistant.py`.
+
+**Routing** is deterministic first. Attribution phrases, quote marks, or a verify request that names a hadith go to
+verification. A legal question such as «ما حكم …» or «هل يجوز …» goes to referral. Questions about the open report go to
+the report responder, and questions with tool vocabulary go to the knowledge base. A model is asked only to *classify*
+an ambiguous message. If it says "verify", the text it points to must appear literally in the message.
+
+**Responders:**
+
+| Kind | Source of the answer | Guard |
+|---|---|---|
+| Verify | The verification pipeline's report | The reply is built by code from the report: state, verbatim ruling, source, number. No model writes it. The report is stored in the browser and linked as the full report |
+| Report question | The open report's facts and the state definitions | Model answer checked by code: no contradicting grade, no number absent from the facts. Otherwise the report's own wording is returned |
+| Tool question | `backend/app/assistant_kb.md`, 13 curated sections in Arabic and English | Hybrid retrieval: best of three embeddings per section, plus a boost for section keywords. Below a minimum score the assistant says it only answers about verification and the tool. A model answer may not add numbers absent from the sections; otherwise the curated paragraph is returned as is |
+
+**Voice** (`backend/app/stt.py`, `POST /api/stt`): the browser records up to 60 seconds and Whisper transcribes on
+Groq. Rules applied, each with a clear message instead of a guess:
+
+| Case | Rule | Code |
+|---|---|---|
+| Silence | In the browser: less than 0.5 s of audible sound while recording, so nothing is uploaded. On the server: every segment more likely silent than 0.6, a recording shorter than 1 s, or a phrase Whisper is known to invent on silence | `stt_no_speech` |
+| Guessing | Mean log-probability below −1.0, or repetitive output with a compression ratio above 2.4 | `stt_unclear` |
+| Language | Anything other than Arabic or English | `stt_language` |
+| Length | Over 60 s or 5 MB | `stt_too_long` |
+| Service | No key, rate limit or outage | `stt_unavailable` |
+
+The transcript is always shown with "Is this what you said?" and is verified only after the user confirms or edits it.
+No hint prompt is sent, because in tests Whisper echoed a prompt back on silence. Audio is not stored.
+
+**Limits:** 30 assistant messages and 20 recordings per user per 10 minutes, kept in memory.
+
+**Voice benchmark** (`backend/eval/voice/`, synthetic voices from macOS, run against real Whisper and the live API):
+
+| Set | Right hadith | Median word error rate |
+|---|---|---|
+| Arabic: 20 authentic hadiths read aloud | 20 of 20 | 10% |
+| English: 10 published translations read aloud | 9 of 10 | 5% |
+| Silence, French, noise | 3 of 3 refused with the right message | — |
+
+The one English miss was a record whose text is only a stub. Real recordings can be added under `qa/voice/real/` with
+a labels file and run the same way.
 
 ## 12. API reference
 
@@ -336,6 +401,8 @@ Rules:
 | GET | `/api/explain/languages` | The 25 explanation languages |
 | GET | `/api/dorar` | Rulings from الدرر for a matched hadith: cards, best entry, search URL |
 | GET | `/api/sources` | The approved sources list |
+| POST | `/api/assistant` | The assistant: `{message, lang, report?}` → reply, kind, and the full report for verifications |
+| POST | `/api/stt` | Audio (multipart) → transcript, language, duration, confidence; or a `stt_*` error with a message |
 | POST | `/api/review` | Ask for a human review (forwarded to a webhook when configured; nothing stored) |
 
 Errors use `{detail: {code, message}}`, for example `too_long` (413), `image_too_large` (413), `ocr_failed` (415/422),
@@ -362,6 +429,9 @@ Details:
   keeps the text selectable, which JavaScript PDF libraries often fail at. A disclaimer footer is added.
 - **Share image:** a 1080 × 1350 PNG drawn on a canvas with the page's fonts. It shows the state, the input, the recorded
   ruling and its source, the disclaimer and the site address. Phones use the system share sheet; computers download it.
+- **Assistant widget:** a floating button at the bottom right opens the chat panel on every page. It supports text,
+  voice with a confirmation step, reading replies aloud with the device's voice, and Escape to close. The conversation
+  is kept in `sessionStorage` only.
 - **Accessibility:** skip link, focus rings, live regions for progress and results, meter roles, colour contrast that
   passes WCAG AA (audited with axe-core).
 - **Storage:** reports and history in `sessionStorage`, preferences in `localStorage`. Nothing about the user's texts
@@ -373,11 +443,12 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 113 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 143 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
 | Browser tests (Playwright, Chrome), Arabic and English | 57 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
 | Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages | 10 | `npx playwright test e2e/a11y.spec.ts` |
 | Phone-size tests (Pixel 7, iPhone 13 size), touch flow, no sideways scroll | 4 | `npx playwright test e2e/mobile.spec.ts` |
+| Assistant: verification in chat, scope, report questions, voice confirm/error/silence, keyboard, accessibility | 10 | `npx playwright test e2e/assistant.spec.ts` |
 
 **Benchmarks** (`backend/eval/`, run against a live API):
 
@@ -385,6 +456,7 @@ Details:
 |---|---|---|
 | Labelled corpus set (`benchmark.jsonl`, 98 inputs, fixed seed) | Exact and variant quotes of Sahihayn hadiths, fabricated/weak seeds, exact and misquoted verses, invented texts, fatwa questions | 98% strict, **100% same hadith**, 0 attributions to another hadith, 6/6 invented texts abstain, median latency ~0.3 s |
 | Circulated texts (`circulated.jsonl`, 50 sayings, 46 scored) | Sayings that circulate on social media; labels decided from الدرر rulings, quoted per item | Authentic 21/21 confirmed; weak/fabricated/not hadith 22/25 flagged or abstained, 3 closest text only; **0 dangerous errors** |
+| Voice (`eval/voice/`, 33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic 20/20 right hadith, English 9/10; median word error rate 10% Arabic, 5% English; 3/3 refusals correct |
 | Multilingual paraphrases (`multilingual.jsonl`, 90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | 31% confirmed the right hadith; 56 abstained or closest text only; 3 of 90 attributed to another hadith (different incident, same topic). Measured with the model check available |
 
 "Same hadith" means the returned record is the labelled one, or the labelled record appears among the returned
@@ -428,13 +500,16 @@ Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertai
 - Instagram, Facebook, YouTube and TikTok links cannot be read. Paste the text or a screenshot instead.
 - The API address is tied to the VM's public IP through sslip.io. A reserved IP, or a domain with a Cloudflare Tunnel,
   removes that dependency.
+- Voice is accepted in Arabic and English only, and the voice benchmark uses synthetic voices. Real recordings in noisy
+  places will do worse; the confidence rules then refuse rather than guess.
 - Free model tiers rate-limit under load. The provider chain and the non-AI fallbacks keep verification working.
 
 ## 18. Repository layout
 
 ```
 backend/
-  app/          FastAPI app: pipeline, matcher, store, normalize, quotes, dorar, llm, ocr, fetch_url, schemas
+  app/          FastAPI app: pipeline, matcher, store, normalize, quotes, dorar, llm, ocr, fetch_url, schemas,
+                assistant (+ assistant_kb.md), stt, ratelimit
   ingest/       idempotent ingestion steps and seeds
   eval/         benchmark sets, generators and runners (corpus, circulated, multilingual, embeddings)
   tests/        unit tests and integration tests (TAHQAQ_STACK=1)

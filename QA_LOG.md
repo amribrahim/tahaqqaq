@@ -99,3 +99,16 @@ Format: `scenario — what was wrong — what changed`. Decisions taken without 
 - **Lint:** five "setState in effect" errors were fixed with `useSyncExternalStore` and state created from storage. CI now runs the frontend lint and lints the eval scripts.
 - **English precision rules (from the multilingual review):** a wording match must also agree in meaning (meaning score at least 60), because generic English words appear everywhere. A match that rests on meaning alone is attributed only when a strong model confirms it is the same report; otherwise it is the closest text. The three remaining attributions to another hadith (a garbled input, a zakat story, an Urdu story matched to a verse) now abstain.
 - **Verification:** 113 unit tests, 37 integration checks, 71 browser tests (57 scenarios, 10 accessibility, 4 phones). Two browser runs failed while the machine slept and the free model quota was exhausted; both passed on rerun.
+
+## Assistant and curated sayings round
+
+- **Curated sayings 12 → 68:** `ingest/build_seed_from_dorar.py` labels each candidate from الدرر. Found and fixed while building it:
+  - Weak rulings that contain the word «صحيح» only in negation («ليس له إسناد ثابت», «معناه صحيح لكن…») were read as authentic. A negation-aware reader fixed that.
+  - «استعينوا على قضاء حوائجكم بالكتمان» would have been added as weak although الألباني graded a variant «جيد». Authentic rulings on variant wordings are now searched through الدرر's own authentic-only filter, and they block a saying.
+  - Narrator descriptions such as «رجاله رجال الصحيح» are treated as neutral, not as a ruling.
+- **Green state for a curated saying:** «النظافة من الإيمان» showed "confirmed" next to «ليس بصحيح». The weak-ruling detector now reads «ليس بصحيح», «ليس بحديث», «لم يثبت», «غير محفوظ», «ضعف» and similar, and a test checks every curated saying.
+- **Assistant routing:** «هل يصح حديث …» was routed to fatwa because the fatwa pattern reads «هل يصح» as "is it permissible". A message that names a hadith with a text to check now goes to verification. Explicit legal questions such as «ما حكم …» and «هل يجوز …» go to referral.
+- **Knowledge-base retrieval:** «ما مصادر الأداة؟» retrieved the general "what the tool does" section. Section keywords, separate Arabic and English embeddings and a keyword boost fixed it.
+- **Voice on silence:** with a hint prompt, Whisper echoed the prompt back on silent audio with moderate confidence. The prompt was removed, and the browser now refuses recordings with less than half a second of audible sound before anything is uploaded.
+- **Browser microphone in tests:** Chrome's fake microphone hangs on this Mac, so the tests provide a generated audio stream through `getUserMedia`.
+- **Voice benchmark:** Arabic 20/20 recordings led to the right hadith, with a median word error rate of 10%. English 9/10, median 5%. Silence, French and noise were 3/3 refused. The benchmark first hit the assistant's own per-user limit after 20 recordings. Running directly against the API, it now uses a distinct client address per item; behind Caddy that address comes from the real client.

@@ -10,6 +10,7 @@ Verify a hadith before you publish it. Built for the **AI Challenge Serving Isla
 - **Input:** text (Arabic and English are matched directly; any other language is machine-translated to English *for matching only* and labelled as such), a **screenshot** of a post (vision-model transcription with Tesseract/OpenCV fallback), or a **link** (public articles, sunnah.com pages, X posts).
 - **Result states:** مؤيَّد بمصدر (confirmed) · مؤيَّد جزئيًا – اختلاف رواية (variant wording) · غير مؤكد (closest text only) · وُجد النص وحكمه موضوع/ضعيف (found, fabricated/weak) · لا مرجع – يُمتنع (abstain) · إحالة (personal fatwa question → referred to scholars).
 - **Report:** the ruling *verbatim* with grader, book, number and links; **every scholar's ruling from الدرر السنية** for the matched hadith; **the same report in other books** (its narrations), each with its own recorded ruling; a word-level diff against the correct wording; translation accuracy for English input; glossary notes for terms that must not be translated literally.
+- **Assistant:** a chat button at the bottom right of every page. Type or **say** a hadith in Arabic or English and it is verified with the same engine; ask about the open report or about the tool. It stays in scope, never issues a ruling, refers fatwa questions, shows the voice transcript for confirmation before verifying, and says so plainly when it could not hear clearly.
 - **Share and keep:** export the report as a **PDF** (Arabic or English), or as an **image to share** that carries the recorded ruling, its source and the disclaimer, ready to post as a correction.
 - **AI explanation:** brief, or extended (شرح موسّع) in 25 languages. The extended text is **summarised only from the hadith's شرح or the verse's tafsir at الدرر السنية**; when none exists, nothing is shown.
 
@@ -28,7 +29,7 @@ The challenge's reference table lists the approved content per field. The app is
 
 **Where the searchable texts come from (stated plainly):** the Six Books texts, their published English translations and the editors' grades are indexed from the open **hadith-api** dataset (CC0, derived from sunnah.com). It is the matching index; the approved reference for rulings is الدرر السنية, shown next to every hadith result. The Qur'an text is the Madinah Mushaf Uthmani text (fetched through the Quran.com API).
 
-**What the database holds (the retrieval corpus):** 34,153 hadiths · 6,236 verses · 12 circulated sayings with their rulings · 10 glossary terms · a growing `source_cache` of الدرر rulings, شروح and tafsir sections. User input is never stored.
+**What the database holds (the retrieval corpus):** 34,153 hadiths · 6,236 verses · 68 circulated sayings with rulings quoted from الدرر (grown by `ingest/build_seed_from_dorar.py`, which keeps only sayings with no authentic ruling on any wording) · 10 glossary terms · a growing `source_cache` of الدرر rulings, شروح and tafsir sections. User input is never stored.
 
 ## Is it RAG?
 
@@ -43,6 +44,8 @@ Yes, constrained:
 | Match check | For English or translated input, a model compares the input with the top records: same report or not | Only a strong model may confirm, and only up to "partial"; any model may reject (→ closest text only); a Qur'an verse is never raised; a match that rests on meaning rather than shared wording is attributed only when confirmed |
 | Images, links, long text | Vision transcription; extraction of quoted segments | Every segment must exist literally in the input |
 | Other languages | Machine translation to English, for matching only | Labelled in the report; never graded as the user's translation |
+| Assistant | Classifies ambiguous messages; answers questions about the tool from a curated knowledge base, and about the open report from its facts | Verification replies are built by code from the report; answers may not add numbers or contradict a ruling, otherwise the curated text is returned |
+| Voice | Whisper transcription, Arabic and English | Refused on silence, low confidence or other languages; the transcript is confirmed by the user before verifying |
 
 LLM providers: Gemini → Groq → OpenRouter (free tiers) or Claude, behind one OpenAI-compatible client with automatic fallback (`LLM_PROVIDER`, `LLM_FALLBACKS`). Without a provider every verification feature still works except the explanation, image transcription by a model (Tesseract is used) and other-language input.
 
@@ -54,6 +57,7 @@ Three benchmarks in [`backend/eval`](backend/eval), run against the live API:
 |---|---|---|
 | Corpus set (98 inputs, fixed seed) | Exact and variant quotes of Sahihayn hadiths, fabricated/weak sayings, exact and misquoted verses, invented texts, fatwa questions | **100%** right hadith (98% the exact labelled number); **0** attributions to another hadith; **6/6** invented texts abstain; median latency ~0.3 s |
 | Circulated texts (50 sayings, 46 scored) | Sayings that circulate on social media as hadiths; each label decided from الدرر السنية rulings, quoted per item | Authentic: **21/21** confirmed. Weak, fabricated or not a hadith: **22/25** flagged with their ruling or abstained, 3 shown only as the closest text. **0 dangerous errors** (nothing fabricated shown as authentic, nothing authentic shown as weak) |
+| Voice in the assistant (33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic **20/20** right hadith, English **9/10**; median word error rate 10% Arabic, 5% English; silence, French and noise all refused with a clear message |
 | Multilingual paraphrases (90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | **31%** confirmed the right hadith (French 28%, Indonesian 39%, Urdu 33%, Turkish 33%, English 22%); 56 abstained or shown only as the closest text; **3 of 90** attributed to another hadith, each a different incident on the same topic. Measured with the free model check available; when its quota is exhausted, matches on meaning alone fall back to the closest text |
 
 "Right hadith" counts the labelled record, a record whose narrations include it, or a parallel narration confirmed by hand review ([`multilingual_equivalents.json`](backend/eval/multilingual_equivalents.json)). The embedding model was also tested against a ten-times-larger one (multilingual-e5-large); it gave no gain, so the small model stays ([TECHNICAL.md §9](TECHNICAL.md#9-retrieval-cascade-and-scoring)).
@@ -72,11 +76,11 @@ Re-runnable ingestion steps: `ingest.ingest_hadith`, `ingest.ingest_quran`, `ing
 ## Tests
 
 ```bash
-cd backend && .venv/bin/pytest -q                                  # 113 unit tests (offline, real fixtures)
+cd backend && .venv/bin/pytest -q                                  # 143 unit tests (offline, real fixtures)
 docker compose --profile qa up -d db api web fixtures
 cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # 37 checks against the running stack
-cd frontend && npx playwright test                                 # 71 browser tests: 57 scenarios in Arabic and English,
-                                                                   # 10 accessibility audits (axe-core, WCAG 2.1 AA), 4 phone-size runs
+cd frontend && npx playwright test                                 # 81 browser tests: 57 scenarios in Arabic and English, 10 assistant
+                                                                   # tests, 10 accessibility audits (axe-core, WCAG 2.1 AA), 4 phone-size runs
 ```
 
 Every failure found and fixed is recorded in [`QA_LOG.md`](QA_LOG.md). Test fixtures, screenshots and the benchmark report are generated into a local `qa/` folder, which is not published.
