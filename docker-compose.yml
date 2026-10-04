@@ -20,7 +20,8 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgresql://tahqaq:tahqaq@db:5432/tahqaq
-      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000
+      CORS_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://web:3000
+      FRONTEND_URL: http://web:3000   # the review PDF prints the result page from the web container
       FASTEMBED_CACHE_PATH: /root/.cache/fastembed
     ports:
       - "8000:8000"

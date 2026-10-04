@@ -133,3 +133,6 @@ Format: `scenario — what was wrong — what changed`. Decisions taken without 
   - TECHNICAL.md now lists every free quota and what each action costs.
   - Lesson: benchmarks need their own keys.
 - **Human-review form (user request):** the review button now asks for a name and email. The server renders its own report as a PDF (WeasyPrint, Amiri font, right to left in Arabic). The request then goes to the team's inbox through the Web3Forms contact form. Web3Forms' free plan accepts browser submissions only and has no attachments (both are paid features), so the message carries a private PDF link, kept 14 days. Only reports the server produced are rendered, so a PDF cannot carry a verdict the tool did not give. Tests mock the form, so no real emails are sent.
+- **Review form follow-up (user report):**
+  - The dialog opened at the right edge, not the centre. The CSS reset sets every margin to 0, which removes the `margin: auto` that centres a modal dialog. Restored.
+  - The emailed PDF looked different from the export PDF, because it came from a separate template. The server now prints the site's own result page with a headless Chromium, in the person's time zone, so it is the same document as the export button. Removing the template also means the name and email no longer reach the API: they go to the contact form only.

@@ -12,7 +12,7 @@ Verify a hadith before you publish it. Built for the **AI Challenge Serving Isla
 - **Report:** the ruling *verbatim* with grader, book, number and links; **every scholar's ruling from الدرر السنية** for the matched hadith; **the same report in other books** (its narrations), each with its own recorded ruling; a word-level diff against the correct wording; translation accuracy for English input; glossary notes for terms that must not be translated literally.
 - **Sanad (سند), the assistant:** a button at the bottom right of every page. Sanad greets you aloud, makes small talk and talks with you: press «تحدث مع سند», say a hadith, confirm what it heard with «نعم», and hear the verdict in a natural voice. You can also type. Type or **say** a hadith in Arabic or English and it is verified with the same engine; ask about the open report or about the tool. It stays in scope, never issues a ruling, refers fatwa questions, shows the voice transcript for confirmation before verifying, and says so plainly when it could not hear clearly.
 - **Share and keep:** export the report as a **PDF** (Arabic or English), or as an **image to share** that carries the recorded ruling, its source and the disclaimer, ready to post as a correction.
-- **Human review request:** the person leaves a name and email; the server renders its own report as a PDF, and the request reaches the review team's inbox through a contact form with the PDF link.
+- **Human review request:** the person leaves a name and email; the server prints the same PDF as the export button, from its own report, and the request reaches the review team's inbox through a contact form with the PDF link.
 - **AI explanation:** brief, or extended (شرح موسّع) in 25 languages. The extended text is **summarised only from the hadith's شرح or the verse's tafsir at الدرر السنية**; when none exists, nothing is shown.
 
 ## Sources, and what each one is used for
@@ -77,7 +77,7 @@ Re-runnable ingestion steps: `ingest.ingest_hadith`, `ingest.ingest_quran`, `ing
 ## Tests
 
 ```bash
-cd backend && .venv/bin/pytest -q                                  # 178 unit tests (offline, real fixtures)
+cd backend && .venv/bin/pytest -q                                  # 177 unit tests (offline, real fixtures)
 docker compose --profile qa up -d db api web fixtures
 cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # 37 checks against the running stack
 cd frontend && npx playwright test                                 # 89 browser tests: 58 scenarios in Arabic and English, 15 assistant

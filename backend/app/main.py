@@ -227,8 +227,10 @@ def review(req: ReviewRequest) -> dict:
 
 @app.post("/api/review/pdf")
 def review_pdf_create(req: ReviewPdfRequest, request: Request) -> dict:
-    """The report as a PDF for a human-review request, kept for RETAIN_DAYS behind an unguessable link. Only reports
-    this server produced are rendered: the one just shown (kept in memory), otherwise the text is verified again."""
+    """The report as a PDF for a human-review request (the result page printed, the same document as its "export PDF"
+    button), kept for RETAIN_DAYS behind an unguessable link. Only reports this server produced are printed: the one just
+    shown (kept in memory), otherwise the text is verified again. The name and email never reach the server: the
+    browser sends them to the contact form."""
     ratelimit.check(request, "review-pdf", limit=10, window_s=600, lang=req.lang)
     report = review_pdf.recall(req.report_id)
     if report is None:
@@ -239,7 +241,7 @@ def review_pdf_create(req: ReviewPdfRequest, request: Request) -> dict:
             log.exception("review pdf: verify failed")
             raise HTTPException(503, {"code": "sources_unreachable", "message": str(e)}) from e
     try:
-        pdf = review_pdf.render_pdf(report, req.lang, req.name.strip(), req.email.strip())
+        pdf = review_pdf.render_pdf(report, req.lang, req.tz)
         token = review_pdf.save(pdf, report["id"])
     except Exception as e:
         log.exception("review pdf failed")

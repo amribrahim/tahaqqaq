@@ -2,10 +2,10 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
 
-# Tesseract with Arabic + English language packs for OCR; Pango and the Amiri font for the review-report PDF
+# Tesseract with Arabic + English language packs for OCR; Chromium prints the result page as the review PDF
 RUN apt-get update && apt-get install -y --no-install-recommends \
       tesseract-ocr tesseract-ocr-ara tesseract-ocr-eng libpq5 curl libglib2.0-0 \
-      libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-hosny-amiri fonts-dejavu-core \
+      chromium fonts-hosny-amiri fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 # Higher-accuracy LSTM models (tessdata_best) replace the fast ones shipped by Debian
 RUN d=$(dirname "$(find / -name ara.traineddata 2>/dev/null | head -1)") \

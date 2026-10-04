@@ -146,8 +146,7 @@ class ReviewPdfRequest(BaseModel):
     report_id: str = Field(default="", max_length=64)
     text: str = Field(default="", max_length=4000)   # used only when the report is no longer in memory
     lang: Literal["ar", "en"] = "ar"
-    name: str = Field(min_length=1, max_length=120)
-    email: str = Field(max_length=200, pattern=r"^[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+$")
+    tz: str = Field(default="", max_length=64)        # the person's time zone, so the printed time is theirs
 
 
 class HealthOut(BaseModel):

@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     tts_piper_voice_ar: str = "ar_JO-kareem-medium"
     tts_piper_voice_en: str = "en_US-ryan-medium"
     cors_origins: str = "http://localhost:3000"
+    # the review PDF is the site's own result page printed by a headless Chromium
+    frontend_url: str = "https://tahaqqaq.pages.dev"
+    pdf_chromium_path: str = ""        # default: /usr/bin/chromium when present (Docker), else the installed Chrome
 
     max_input_chars: int = 2000
     max_image_bytes: int = 10 * 1024 * 1024

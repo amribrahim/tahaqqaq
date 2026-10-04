@@ -122,12 +122,13 @@ export async function requestReview(report: Report, note = ""): Promise<{ accept
   return res.json();
 }
 
-/** The report as a PDF for a review request: the server renders the report it produced (never one sent by the
- *  browser) and keeps it behind a private link for `retain_days`. */
-export async function createReviewPdf(report: Report, lang: string, name: string, email: string): Promise<{ token: string; path: string; retain_days: number; report_id: string; state: State; confidence: number }> {
+/** The report as a PDF for a review request: the server prints the result page with the report it produced (never
+ *  one sent by the browser), the same document as "export PDF", and keeps it behind a private link for `retain_days`.
+ *  The name and email are not sent to the server: they go to the contact form only. */
+export async function createReviewPdf(report: Report, lang: string): Promise<{ token: string; path: string; retain_days: number; report_id: string; state: State; confidence: number }> {
   const res = await fetch(`${API}/api/review/pdf`, {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ report_id: report.server_id || report.id, text: report.input_text, lang, name, email }),
+    body: JSON.stringify({ report_id: report.server_id || report.id, text: report.input_text, lang, tz: Intl.DateTimeFormat().resolvedOptions().timeZone }),
   });
   if (!res.ok) throw await errorOf(res);
   return res.json();

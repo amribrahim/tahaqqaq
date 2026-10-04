@@ -486,7 +486,7 @@ a labels file and run the same way.
 | POST | `/api/tts` | One sentence → natural speech (WAV); 503 lets the browser use the device voice |
 | POST | `/api/stt` | Audio (multipart) → transcript, language, duration, confidence; or a `stt_*` error with a message |
 | POST | `/api/review` | Ask for a human review (forwarded to a webhook when configured; nothing stored) |
-| POST | `/api/review/pdf` | `{report_id, text, lang, name, email}` → the report as a PDF behind a private link, kept 14 days. Only reports this server produced are rendered: the one just shown (kept in memory), otherwise the text is verified again. 10 per 10 minutes per visitor |
+| POST | `/api/review/pdf` | `{report_id, text, lang, tz}` → the result page printed as a PDF (the same document as the export button) behind a private link, kept 14 days. Only reports this server produced are printed: the one just shown (kept in memory), otherwise the text is verified again. 10 per 10 minutes per visitor |
 | GET | `/api/review/pdf/{token}` | The review PDF (`noindex`, not cached); 404 once expired |
 
 Errors use `{detail: {code, message}}`, for example `too_long` (413), `image_too_large` (413), `ocr_failed` (415/422),
@@ -511,10 +511,11 @@ Details:
 - **Languages:** Arabic RTL by default, English LTR. The choice is kept in `localStorage`.
 - **PDF export:** the browser's print-to-PDF with a dedicated print layout (A4). The browser draws Arabic correctly and
   keeps the text selectable, which JavaScript PDF libraries often fail at. A disclaimer footer is added.
-- **Human review:** the review button opens a dialog for name and email. The server renders the report as a PDF
-  (WeasyPrint with the Amiri font, right to left in Arabic). The browser then sends the request to the team's inbox
-  through a Web3Forms contact form, with the PDF link. The free Web3Forms plan accepts browser submissions only and has
-  no attachments, hence the link. The form key is public by design: it can only send to the form's owner.
+- **Human review:** the review button opens a dialog for name and email. The server makes the PDF by printing the
+  site's own result page with a headless Chromium, so it is the same document as the export button. The browser then
+  sends the request to the team's inbox through a Web3Forms contact form, with the PDF link. The name and email go to
+  the form only, never to the API. The free Web3Forms plan accepts browser submissions only and has no attachments,
+  hence the link. The form key is public by design: it can only send to the form's owner.
 - **Share image:** a 1080 × 1350 PNG drawn on a canvas with the page's fonts. It shows the state, the input, the recorded
   ruling and its source, the disclaimer and the site address. Phones use the system share sheet; computers download it.
 - **Assistant widget:** a floating button at the bottom right opens the chat panel on every page. It supports text,
@@ -531,7 +532,7 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 178 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 177 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
 | Browser tests (Playwright, Chrome), Arabic and English | 58 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
 | Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages, and the review dialog | 12 | `npx playwright test e2e/a11y.spec.ts` |

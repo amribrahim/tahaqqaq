@@ -7,9 +7,9 @@ import { useLang } from "@/lib/i18n";
 
 const EMAIL = /^[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+$/;
 
-/** Human-review request: the person leaves a name and email, the server renders the report it produced as a PDF
- *  (kept for a limited time behind a private link), and the request goes to the review team through the contact form
- *  with that link. Native <dialog>: focus stays inside, Esc closes. */
+/** Human-review request: the person leaves a name and email, the server prints the result page as a PDF (the same
+ *  document as "export PDF", kept for a limited time behind a private link), and the request goes to the review team
+ *  through the contact form with that link. Native <dialog>: focus stays inside, Esc closes. */
 export function ReviewDialog({ report, open, onClose, onSent }: { report: Report; open: boolean; onClose: () => void; onSent: (pdfUrl: string) => void }) {
   const t = useTranslations("result");
   const s = useTranslations("states");
@@ -34,7 +34,7 @@ export function ReviewDialog({ report, open, onClose, onSent }: { report: Report
     if (!name.trim() || !EMAIL.test(email.trim())) { setError(t("reviewErrInvalid")); return; }
     setBusy(true); setError("");
     try {
-      const pdf = await createReviewPdf(report, lang, name.trim(), email.trim());
+      const pdf = await createReviewPdf(report, lang);
       const pdfUrl = `${API}${pdf.path}`;
       const grade = report.grade ? report.grade.grade_ar : "";
       const src = report.source ? `${report.source.book_ar} ${report.source.number}` : "—";
