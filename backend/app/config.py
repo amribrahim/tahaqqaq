@@ -31,6 +31,14 @@ class Settings(BaseSettings):
     cerebras_api_key: str = ""
 
     review_webhook_url: str = ""
+    # assistant voice (text to speech): Groq Orpheus voices are used when set (model terms accepted in the Groq console)
+    tts_groq_voice_ar: str = ""
+    tts_groq_voice_en: str = ""
+    tts_gemini_voice: str = "Charon"   # a calm male voice for «سند»
+    tts_gemini: bool = False           # Gemini TTS free tier allows only 10 requests a day: off by default
+    tts_piper_dir: str = ""            # folder with the Piper voices (Docker: /opt/piper; local: ~/.cache/piper)
+    tts_piper_voice_ar: str = "ar_JO-kareem-medium"
+    tts_piper_voice_en: str = "en_US-ryan-medium"
     cors_origins: str = "http://localhost:3000"
 
     max_input_chars: int = 2000

@@ -150,3 +150,101 @@ def test_stt_endpoint_returns_a_clear_error(monkeypatch):
     r = client.post("/api/stt", files={"audio": ("a.webm", b"x" * 10, "audio/webm")}, data={"lang": "ar"})
     assert r.status_code == 422 and r.json()["detail"]["code"] == "stt_language"
     assert "العربية والإنجليزية" in r.json()["detail"]["message"]
+
+
+# -- voice conversation: route-only, text to speech, misheard attributions ------------------------------
+def test_route_only_says_whether_a_spoken_text_needs_confirmation():
+    assert client.post("/api/assistant", json={"message": "قال رسول الله ﷺ إنما الأعمال بالنيات", "route_only": True}).json() == {"kind": "verify"}
+    assert client.post("/api/assistant", json={"message": "ما مصادر الأداة؟", "route_only": True}).json() == {"kind": "tool"}
+
+
+def test_a_misheard_attribution_before_the_honorific_is_dropped():
+    from app.classify import looks_like_attribution, strip_attribution
+
+    heard = "ورحمة الله صلى الله عليه وسلم إنما الأعمال بالنيات وإنما لكل مرء مهنوة"   # speech-to-text of «قال رسول الله ﷺ …»
+    assert looks_like_attribution(heard)
+    assert strip_attribution(heard) == "إنما الأعمال بالنيات وإنما لكل مرء مهنوة"
+    out = client.post("/api/verify", json={"text": heard, "explain": False}).json()
+    assert out["state"] in ("verified", "partial") and out["source"]["collection"] == "bukhari"
+
+
+def test_tts_uses_gemini_wraps_pcm_in_wav_and_caches(monkeypatch):
+    import base64
+
+    from app import tts
+
+    calls: list[str] = []
+    urls: list[str] = []
+    pcm = b"\x00\x01" * 2400
+
+    def handler(r: httpx.Request) -> httpx.Response:
+        calls.append(r.url.host)
+        urls.append(str(r.url))
+        body = {"candidates": [{"content": {"parts": [{"inlineData": {"mimeType": "audio/L16;codec=pcm;rate=24000",
+                                                                       "data": base64.b64encode(pcm).decode()}}]}}]}
+        return httpx.Response(200, json=body)
+
+    monkeypatch.setattr(tts, "get_settings", lambda: Settings(_env_file=None, gemini_api_key="g", groq_api_key="q", tts_gemini=True,
+                                                             tts_piper_dir="/nonexistent"))
+    tts._cache.clear()
+    tts._piper_voice.cache_clear()
+    audio, mime = tts.synthesize("مؤيَّد بمصدر ﷺ", "ar", transport=httpx.MockTransport(handler))
+    assert mime == "audio/wav" and audio[:4] == b"RIFF" and len(audio) > len(pcm)
+    tts.synthesize("مؤيَّد بمصدر ﷺ", "ar", transport=httpx.MockTransport(handler))
+    assert calls == ["generativelanguage.googleapis.com"]          # no Groq voice configured; second call served from cache
+    assert not any("key=" in u for u in urls)                      # the key travels in a header, never in the URL
+    assert "صلى الله عليه وسلم" in tts.speakable("قال ﷺ")
+
+
+def test_tts_without_a_provider_lets_the_browser_speak(monkeypatch):
+    from app import tts
+
+    monkeypatch.setattr(tts, "get_settings", lambda: Settings(_env_file=None, gemini_api_key="", groq_api_key="", tts_piper_dir="/nonexistent"))
+    monkeypatch.delenv("TTS_PIPER_DIR", raising=False)
+    tts._cache.clear()
+    tts._piper_voice.cache_clear()
+    with pytest.raises(tts.TTSUnavailable):
+        tts.synthesize("نص", "ar")
+    r = client.post("/api/tts", json={"text": "نص", "lang": "ar"})
+    assert r.status_code == 503 and r.json()["detail"]["code"] == "tts_unavailable"
+
+
+@pytest.mark.parametrize("message,kind,expect", [
+    ("السلام عليكم", "greeting", "سند"),
+    ("كيف حالك؟", "how_are_you", "بخير"),
+    ("الحمد لله بخير", "fine", "يسعدني"),
+    ("بخير وأنت؟", "fine_and_you", "وأنا بخير"),
+    ("اسمي أحمد", "name", "أحمد"),
+    ("من أنت؟", "who", "سند"),
+])
+def test_sanad_small_talk(message, kind, expect):
+    out = assistant.reply(message, "ar")
+    assert out["kind"] == kind and expect in out["reply"]
+
+
+def test_small_talk_never_becomes_a_verification():
+    for m in ("الحمد لله بخير", "تمام الحمد لله", "I am looking for a hadith about honesty"):
+        assert assistant.route(m, False) != "name"
+    assert assistant.route("الحمد لله بخير", False) != "verify"
+
+
+def test_numbers_are_read_as_arabic_words():
+    from app.tts import arabic_number, speakable
+
+    assert arabic_number(416) == "أربعمئة وستة عشر" and arabic_number(1907) == "ألف وتسعمئة وسبعة" and arabic_number(2) == "اثنان"
+    assert speakable("الحكم: صحيح، في صحيح البخاري برقم 1.", "ar") == "الحكم صحيح، في صحيح البخاري برقم واحد."
+    assert speakable("Bukhari number 1", "en") == "Bukhari number 1"
+
+
+def test_piper_speaks_arabic_without_a_quota():
+    import os
+
+    from app import tts
+
+    folder = os.environ.get("TTS_PIPER_DIR") or os.path.expanduser("~/.cache/piper")
+    if not os.path.exists(os.path.join(folder, "ar_JO-kareem-medium.onnx")):
+        pytest.skip("Piper voices are installed in the Docker image, not in every dev environment")
+    tts._cache.clear()
+    tts._piper_voice.cache_clear()
+    audio, mime = tts.synthesize("مؤيَّد بمصدر.", "ar")
+    assert mime == "audio/wav" and audio[:4] == b"RIFF" and len(audio) > 20_000

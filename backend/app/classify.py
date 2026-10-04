@@ -50,7 +50,10 @@ def is_personal_fatwa(text: str) -> bool:
 
 
 def looks_like_attribution(text: str) -> bool:
-    return bool(re.search(_ATTRIB_AR, text)) or bool(re.search(_ATTRIB_EN, normalize_latin(text)))
+    if re.search(_ATTRIB_AR, text) or re.search(_ATTRIB_EN, normalize_latin(text)):
+        return True
+    m = re.search(r"صلى\s+(?:الله\s+)?عليه\s+(?:وآله\s+)?وسلم|صلي\s+(?:الله\s+)?عليه\s+وسلم", text)
+    return bool(m) and len(text[: m.start()].split()) <= 6   # the honorific near the start frames a saying of the Prophet
 
 
 _SALAWAT = r"(?:صلى\s+(?:الله\s+)?عليه\s+(?:وآله\s+)?وسلم|صلي\s+(?:الله\s+)?عليه\s+وسلم|ﷺ|عليه الصلاة والسلام|عليه السلام)"
@@ -64,9 +67,23 @@ _ATTRIB_PREFIX = re.compile(
 )
 
 
+_SALAWAT_RE = re.compile(_SALAWAT)
+
+
+def _cut_at_early_salawat(text: str) -> str:
+    """«… صلى الله عليه وسلم» within the first words is the end of an attribution, however its opening was written or
+    heard («قال رسول الله», a speech-to-text «ورحمة الله», an OCR slip): keep only what follows it."""
+    m = _SALAWAT_RE.search(text)
+    if not m or len(text[: m.start()].split()) > 6:
+        return text
+    rest = re.sub(r"^\s*(?:قال|يقول|أنه قال)?\s*[:：]?\s*", "", text[m.end():])
+    return rest if len(rest.split()) >= 3 else text
+
+
 def strip_attribution(text: str) -> str:
     """Remove a leading attribution so that the matcher sees the saying itself."""
     t = _ATTRIB_PREFIX.sub("", text, count=1)
+    t = _cut_at_early_salawat(t)
     t = re.sub(r"^\s*(?:the prophet(?: muhammad)?(?: \(?(?:pbuh|saw|peace be upon him)\)?| ﷺ)?\s*(?:said|says)\s*[:：]?\s*)", "", t, flags=re.IGNORECASE)
     t = re.sub(r"^\s*(?:hadith|حديث شريف|حديث)\s*[:：]\s*", "", t, flags=re.IGNORECASE)
     # trailing narration note: رواه البخاري / متفق عليه

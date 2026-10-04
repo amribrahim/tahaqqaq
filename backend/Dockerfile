@@ -20,6 +20,14 @@ RUN pip install --upgrade pip && pip install .
 ENV FASTEMBED_CACHE_PATH=/root/.cache/fastembed
 RUN python -c "from fastembed import TextEmbedding; TextEmbedding('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2', cache_dir='/root/.cache/fastembed')"
 
+# Self-hosted voice for the assistant (Piper, MIT; voices from rhasspy/piper-voices): no quota, no key
+ENV TTS_PIPER_DIR=/opt/piper
+RUN mkdir -p /opt/piper && cd /opt/piper \
+    && for v in ar/ar_JO/kareem/medium/ar_JO-kareem-medium en/en_US/ryan/medium/en_US-ryan-medium; do \
+         f=$(basename $v); \
+         curl -fsSL -o $f.onnx "https://huggingface.co/rhasspy/piper-voices/resolve/main/$v.onnx"; \
+         curl -fsSL -o $f.onnx.json "https://huggingface.co/rhasspy/piper-voices/resolve/main/$v.onnx.json"; \
+       done
 COPY app ./app
 COPY ingest ./ingest
 COPY tests ./tests

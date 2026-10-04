@@ -189,3 +189,11 @@ textarea::placeholder, input::placeholder { color: var(--placeholder); }
   .assistant-fab-label { display: none; }
   .assistant-fab { width: 56px; padding: 0; justify-content: center; }
 }
+.assistant-talk { align-self: center; height: 48px; padding: 0 22px; border-radius: 999px; font-size: 16px; gap: 8px; }
+.voice-call { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 14px; background: #f6f5fb; }
+.voice-orb { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; color: #0d1035; box-shadow: 0 10px 30px rgba(13,16,53,.18); }
+.voice-orb.live { animation: voicepulse 1.4s ease-in-out infinite; }
+@keyframes voicepulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .voice-orb.live { animation: none; } }
+.voice-card { align-self: stretch; background: #fff; border: 1px solid #ebe9f5; border-radius: 14px; padding: 10px 12px; font-size: 14.5px; line-height: 1.7; }
+.assistant-panel.calling { width: 460px; height: min(720px, calc(100vh - 120px)); }

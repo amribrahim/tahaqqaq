@@ -9,9 +9,9 @@ from collections.abc import Iterator
 import httpx
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 
-from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, stt
+from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, stt, tts
 from .config import get_settings
 from .embeddings import get_embedder
 from .normalize import detect_language
@@ -21,6 +21,7 @@ from .schemas import (
     ExplainRequest,
     HealthOut,
     ReviewRequest,
+    TTSRequest,
     VerifyRequest,
     VerifyResponse,
 )
@@ -222,15 +223,30 @@ def review(req: ReviewRequest) -> dict:
 def assistant_endpoint(req: AssistantRequest, request: Request) -> dict:
     """The chat assistant, limited to verifying hadiths, explaining the open report and answering questions about the
     tool. Verification replies come from the pipeline's report only. Nothing is stored server-side."""
+    if req.route_only:
+        ratelimit.check(request, "assistant-route", limit=60, window_s=600, lang=req.lang)
+        return {"kind": assistant.route_kind(req.message, req.report is not None)}
     ratelimit.check(request, "assistant", limit=30, window_s=600, lang=req.lang)
     return assistant.reply(req.message, req.lang, req.report)
+
+
+@app.post("/api/tts")
+def tts_endpoint(req: TTSRequest, request: Request) -> Response:
+    """One sentence of the assistant's reply as natural speech (WAV). 503 when no voice provider answers: the browser
+    then reads the text with the device's own voice. Nothing is stored."""
+    ratelimit.check(request, "tts", limit=120, window_s=600, lang=req.lang)
+    try:
+        audio, mime = tts.synthesize(req.text, "ar" if req.lang == "ar" else "en")
+    except tts.TTSUnavailable as e:
+        raise HTTPException(503, {"code": "tts_unavailable", "message": "voice unavailable"}) from e
+    return Response(content=audio, media_type=mime, headers={"Cache-Control": "no-store"})
 
 
 @app.post("/api/stt")
 async def stt_endpoint(request: Request, audio: UploadFile = File(...), lang: str = Form("ar")) -> dict:
     """Speech to text for the assistant (Arabic and English only). An unclear recording returns an error, never a guess;
     the transcript is shown to the user before anything is verified. Audio is not stored."""
-    ratelimit.check(request, "stt", limit=20, window_s=600, lang=lang)
+    ratelimit.check(request, "stt", limit=40, window_s=600, lang=lang)
     data = await audio.read()
     try:
         return stt.transcribe(data, audio.filename or "audio.webm", audio.content_type or "")

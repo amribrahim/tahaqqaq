@@ -188,3 +188,12 @@ export async function transcribeAudio(audio: Blob, lang: Lang): Promise<{ text: 
   if (!res.ok) throw await errorOf(res);
   return res.json();
 }
+
+/** The kind of a message without acting on it (the voice call confirms a heard hadith before verifying it). */
+export async function routeAssistant(message: string, lang: Lang, report: Report | null): Promise<AssistantReply["kind"]> {
+  const res = await fetch(`${API}/api/assistant`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, lang, report, route_only: true }),
+  });
+  if (!res.ok) throw await errorOf(res);
+  return (await res.json()).kind;
+}

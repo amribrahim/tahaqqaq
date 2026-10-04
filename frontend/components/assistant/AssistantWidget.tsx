@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
-import { askAssistant, transcribeAudio, VerifyError, type Report } from "@/lib/api";
+import { askAssistant, transcribeAudio, VerifyError, type AssistantReply, type Report } from "@/lib/api";
 import { useLang } from "@/lib/i18n";
 import { addHistory, getReport, newId, setReport } from "@/lib/session";
 import { STATE, type State } from "@/lib/tokens";
+import { VoiceCall } from "./VoiceCall";
+import { VoiceEngine } from "@/lib/voice";
 
 type Msg = { role: "user" | "bot"; text: string; error?: boolean; reportId?: string; state?: State };
 const STORE = "tahqaq.assistant.messages";
+const VOICE_PREF = "tahqaq.assistant.voice";
+const GREETED = "tahqaq.assistant.greeted";
 const MAX_SECONDS = 60;
 const VOICE_RMS = 0.02;          // loudness above which a 250 ms sample counts as sound
 const MIN_VOICED_SECONDS = 0.5;  // less audible sound than this: treated as silence, nothing is sent
@@ -42,7 +46,10 @@ export function AssistantWidget() {
   const [rec, setRec] = useState<"idle" | "recording" | "transcribing">("idle");
   const [seconds, setSeconds] = useState(0);
   const [pending, setPending] = useState<string | null>(null);
-  const [speak, setSpeak] = useState(false);
+  // «سند» speaks by default; the mute choice is remembered on this device
+  const [speak, setSpeak] = useState(() => { try { return typeof window === "undefined" || localStorage.getItem(VOICE_PREF) !== "0"; } catch { return true; } });
+  const speaker = useRef<VoiceEngine | null>(null);
+  const [calling, setCalling] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
   const log = useRef<HTMLDivElement>(null);
@@ -57,14 +64,12 @@ export function AssistantWidget() {
   const push = (m: Msg) => setMsgs((cur) => { const next = [...cur, m]; save(next); return next; });
   const scrollDown = () => requestAnimationFrame(() => { if (log.current) log.current.scrollTop = log.current.scrollHeight; });
 
+  /** Read a reply aloud with the natural voice (device voice as fallback), unless muted. */
   const say = (text: string, replyLang: string) => {
-    if (!speak || typeof speechSynthesis === "undefined") return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = replyLang === "ar" ? "ar-SA" : "en-US";
-    const voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith(replyLang === "ar" ? "ar" : "en"));
-    if (voice) u.voice = voice;
-    speechSynthesis.speak(u);
+    if (!speak) return;
+    if (!speaker.current) { speaker.current = new VoiceEngine(); speaker.current.startPlayback(); }
+    speaker.current.hush();
+    void speaker.current.speak(text.replace(/التقرير الكامل يعرض النص والمصادر والتفاصيل\.?|The full report shows the text, the sources and the details\.?/, ""), replyLang);
   };
 
   const toggle = () => {
@@ -75,13 +80,30 @@ export function AssistantWidget() {
     setOpen(true);
     requestAnimationFrame(() => field.current?.focus());
     scrollDown();
+    // the first time in a session, «سند» greets aloud (the click allows playback)
+    let greeted = false;
+    try { greeted = sessionStorage.getItem(GREETED) === "1"; sessionStorage.setItem(GREETED, "1"); } catch {}
+    if (!greeted && speak) {
+      speaker.current = speaker.current ?? new VoiceEngine();
+      speaker.current.startPlayback();
+      void speaker.current.speak(t("welcome"), lang);
+    }
   };
 
   const close = () => {
     if (rec === "recording") stopRecording(true);
-    if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
+    speaker.current?.hush();
     setOpen(false);
     requestAnimationFrame(() => button.current?.focus());
+  };
+
+  /** Store a verification report so the full report opens instantly; returns its id. */
+  const keep = (r: AssistantReply): string | undefined => {
+    if (r.kind !== "verify" || !r.report) return undefined;
+    const id = newId();
+    const rep = { ...r.report, id, via: "text" as const };
+    setReport(id, rep); addHistory(rep);
+    return id;
   };
 
   const send = async (text: string) => {
@@ -92,12 +114,7 @@ export function AssistantWidget() {
     setBusy(true); scrollDown();
     try {
       const r = await askAssistant(message, lang, openReport());
-      let reportId: string | undefined;
-      if (r.kind === "verify" && r.report) {
-        reportId = newId();
-        const rep = { ...r.report, id: reportId, via: "text" as const };
-        setReport(reportId, rep); addHistory(rep);
-      }
+      const reportId = keep(r);
       push({ role: "bot", text: r.reply, reportId, state: r.report?.state });
       say(r.reply, r.lang);
     } catch (e) {
@@ -169,7 +186,7 @@ export function AssistantWidget() {
   return (
     <div className="no-print" dir={lang === "ar" ? "rtl" : "ltr"}>
       {open && (
-        <section id="assistant-panel" role="dialog" aria-label={t("title")} data-testid="assistant-panel" className="assistant-panel"
+        <section id="assistant-panel" role="dialog" aria-label={t("title")} data-testid="assistant-panel" className={`assistant-panel${calling ? " calling" : ""}`}
           onKeyDown={(e) => { if (e.key === "Escape") close(); }}>
           <header style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 16px", background: "#0d1035", color: "#fff" }}>
             <span aria-hidden="true" style={{ width: 34, height: 34, borderRadius: 10, background: "#3ee6c0", color: "#0d1035", display: "grid", placeItems: "center", fontWeight: 800 }}>✓</span>
@@ -177,13 +194,21 @@ export function AssistantWidget() {
               <strong className="font-cairo" style={{ fontSize: 16 }}>{t("title")} <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 99, background: "rgba(124,108,240,0.35)", marginInlineStart: 6 }}>{t("aiLabel")}</span></strong>
               <span style={{ fontSize: 12, color: "#c9c3ff" }}>{t("subtitle")}</span>
             </div>
-            <button type="button" onClick={() => { setSpeak((v) => !v); if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel(); }}
+            <button type="button" onClick={() => { const v = !speak; setSpeak(v); try { localStorage.setItem(VOICE_PREF, v ? "1" : "0"); } catch {} if (!v) speaker.current?.hush(); }}
               aria-pressed={speak} aria-label={speak ? t("speakOff") : t("speakOn")} title={speak ? t("speakOff") : t("speakOn")} data-testid="assistant-speak"
               style={{ background: speak ? "#3ee6c0" : "transparent", color: speak ? "#0d1035" : "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer" }}>🔊</button>
             <button type="button" onClick={close} aria-label={t("close")} data-testid="assistant-close"
               style={{ background: "transparent", color: "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer", fontSize: 18 }}>×</button>
           </header>
 
+          <div style={{ display: calling ? "contents" : "block", padding: calling ? 0 : "10px 14px 0", background: "#f6f5fb" }}>
+            <VoiceCall lang={lang} report={openReport}
+              onUser={(text) => { push({ role: "user", text }); scrollDown(); }}
+              onBot={(r) => { const id = keep(r); push({ role: "bot", text: r.reply, reportId: id, state: r.report?.state }); return id; }}
+              onError={(text) => push({ role: "bot", text, error: true })}
+              onStart={() => { speaker.current?.hush(); setCalling(true); }} onEnd={() => { setCalling(false); scrollDown(); }} />
+          </div>
+          {!calling && <>
           <div ref={log} role="log" aria-live="polite" tabIndex={0} aria-label={t("title")} data-testid="assistant-log" style={{ flex: 1, overflowY: "auto", padding: 14, display: "flex", flexDirection: "column", gap: 10, background: "#f6f5fb" }}>
             <div className="assistant-bubble bot">{t("welcome")}</div>
             {msgs.map((m, i) => (
@@ -236,6 +261,7 @@ export function AssistantWidget() {
               <button type="button" onClick={() => { setMsgs([]); save([]); }} style={{ alignSelf: "flex-start", background: "none", border: 0, color: "#4f3fd0", fontSize: 12, cursor: "pointer", padding: 0 }}>{t("clear")}</button>
             )}
           </form>
+          </>}
         </section>
       )}
       <button ref={button} type="button" onClick={toggle} aria-expanded={open} aria-controls="assistant-panel" aria-label={t("open")} data-testid="assistant-open" className="assistant-fab">

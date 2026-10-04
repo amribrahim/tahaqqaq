@@ -159,6 +159,12 @@ class AssistantRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     lang: str = Field(default="ar", max_length=8)
     report: dict[str, Any] | None = None
+    route_only: bool = False   # voice flow: only say what kind of message this is (verify needs a spoken confirmation)
+
+
+class TTSRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=600)
+    lang: str = Field(default="ar", max_length=8)
 
 
 class ExplainRequest(BaseModel):

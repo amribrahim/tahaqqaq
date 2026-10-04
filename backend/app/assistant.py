@@ -47,12 +47,25 @@ _TOOL = re.compile(r"مصادر|مصدر|منهج|كيف تعمل|كيف يعم�
 _FIQH = re.compile(r"^\s*(?:ما|وش|ايش|شو)\s+حكم\s+(?!هذا\s+الحديث|حديث|الحديث|هذا\s+القول|هذا\s+النص)|^\s*(?:هل\s+يجوز|يجوز\s+لي|is it (?:halal|haram|permissible|allowed))", re.I)
 _REPORT_REF = re.compile(r"هذا|هذه|النتيجة|التقرير|الحكم|الحديث|النص|الروايات|المصدر|الثقة|this|result|report|ruling|grade|"
                          r"narration|source|confidence", re.I)
+_HOW_ARE_YOU = re.compile(r"كيف حالك|كيف الحال|كيفك|شلونك|شخبارك|عامل ايه|how are you|how r u", re.I)
+_FINE = re.compile(r"^\s*(?:و\s*)?(?:الحمد لله|الحمدلله|بخير|تمام|كويس|زين|طيب|ماشي الحال|i'?m fine|i am fine|fine|good|great|ok(?:ay)?)\b", re.I)
+_WHO = re.compile(r"من أنت|من انت|ما اسمك|وش اسمك|شو اسمك|عرف بنفسك|who are you|what(?:'s| is) your name", re.I)
+_NAME = re.compile(r"(?:اسمي|my name is)\s+([^\s،,.!؟?]{2,20})", re.I)
+_AND_YOU = re.compile(r"و\s*(?:أنت|انت|إنت|انتي|أنتِ)|and you|you\?", re.I)
 _GREETING = re.compile(r"^\s*(?:السلام عليكم|سلام عليكم|مرحبا|مرحبًا|أهلا|اهلا|هلا|صباح الخير|مساء الخير|hi|hello|hey|salam|assalamu)", re.I)
 _THANKS = re.compile(r"^\s*(?:شكرا|شكرًا|جزاك الله|جزاكم الله|thanks|thank you|jazak)", re.I)
 
 FIXED = {
-    "greeting": ("وعليكم السلام. أنا مساعد تحقّق: ألصق حديثًا أو قله بصوتك وأتحقق منه من المصادر المعتمدة، أو اسألني عن التقرير المفتوح أو عن طريقة عمل الأداة.",
-                 "Hello. I am the Tahaqqaq assistant: paste or say a hadith and I will verify it against approved sources, or ask me about the open report or how the tool works."),
+    "greeting": ("وعليكم السلام ورحمة الله. أنا سند، مساعدك في التحقق من الأحاديث. كيف حالك؟ قل لي الحديث الذي تريد أن نتحقق منه.",
+                 "Peace be upon you. I am Sanad, your assistant for verifying hadiths. How are you? Tell me the hadith you would like to check."),
+    "how_are_you": ("بخير والحمد لله، شكرًا لسؤالك. كيف أستطيع مساعدتك؟ قل لي الحديث الذي تريد أن نتحقق منه.",
+                    "I am well, thank you for asking. How can I help? Tell me the hadith you would like to check."),
+    "fine": ("الحمد لله، يسعدني ذلك. تفضل، قل لي الحديث الذي تريد أن نتحقق منه.",
+             "Glad to hear it. Go ahead, tell me the hadith you would like to check."),
+    "fine_and_you": ("الحمد لله، وأنا بخير، شكرًا لسؤالك. تفضل، قل لي الحديث الذي تريد أن نتحقق منه.",
+                     "Glad to hear it, and I am well too, thank you. Go ahead, tell me the hadith you would like to check."),
+    "who": ("أنا سند، مساعد أداة تحقّق. أتحقق لك من الأحاديث من المصادر المعتمدة وأنقل حكم العلماء كما هو، ولا أُصدر حكمًا من عندي.",
+            "I am Sanad, the Tahaqqaq assistant. I verify hadiths against approved sources and relay the scholars' rulings as recorded; I never issue a ruling of my own."),
     "thanks": ("وإياكم. أرسل أي حديث آخر للتحقق منه.", "You are welcome. Send any other hadith to verify."),
     "fatwa": ("هذا سؤال شخصي يحتاج إلى فتوى من أهل العلم، وأنا لا أُفتي. أستطيع التحقق من نص حديث تريد نشره.",
               "This is a personal question that needs a fatwa from qualified scholars, and I do not give fatwas. I can verify the text of a hadith you want to share."),
@@ -113,8 +126,16 @@ def route(message: str, has_report: bool) -> str:
         return "verify"         # «هل يصح حديث …» asks whether a hadith is authentic, not whether something is permissible
     if classify.is_personal_fatwa(m):
         return "fatwa"
+    if len(words) <= 8 and _WHO.search(m):
+        return "who"
+    if len(words) <= 8 and _HOW_ARE_YOU.search(m):
+        return "how_are_you"
+    if len(words) <= 8 and _NAME.search(m) and not attributed:
+        return "name"
     if len(words) <= 6 and _GREETING.search(m):
         return "greeting"
+    if len(words) <= 6 and _FINE.search(m):
+        return "fine_and_you" if _AND_YOU.search(m) else "fine"
     if len(words) <= 6 and _THANKS.search(m):
         return "thanks"
     if _VERIFY_HINT.search(m) and len(pwords) >= 3 and not _TOOL.search(payload):
@@ -330,6 +351,14 @@ def _report(message: str, lang: str, report: dict) -> dict:
     return {"kind": "report", "reply": compose_verify(report, lang), "lang": lang}
 
 
+def route_kind(message: str, has_report: bool) -> str:
+    """The kind of a message without acting on it (the voice flow asks for a spoken confirmation before verifying)."""
+    kind = route((message or "").strip(), has_report)
+    if kind == "ambiguous":
+        kind = _classify_with_model(message, has_report)[0] if llm.get_client().enabled else "other"
+    return {"other": "out_of_scope"}.get(kind, kind)
+
+
 def reply(message: str, ui_lang: str = "ar", report: dict | None = None) -> dict:
     message = (message or "").strip()
     lang = _lang_of(message, ui_lang)
@@ -349,6 +378,11 @@ def reply(message: str, ui_lang: str = "ar", report: dict | None = None) -> dict
         return _report(message, lang, report)
     if kind == "tool":
         return _tool(message, lang)
+    if kind == "name":
+        name = _NAME.search(message).group(1)
+        text = (f"تشرفت بمعرفتك يا {name}. أنا سند. قل لي الحديث الذي تريد أن نتحقق منه." if lang == "ar"
+                else f"Nice to meet you, {name}. I am Sanad. Tell me the hadith you would like to check.")
+        return {"kind": "name", "reply": text, "lang": lang}
     if kind in FIXED:
         return _fixed(kind, lang)
     return _fixed("out_of_scope", lang)

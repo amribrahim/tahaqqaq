@@ -59,6 +59,6 @@ keywords: الدقة، القياس، نسبة النجاح، الاختبار،
 On the 98-input corpus set the right hadith was found in every case and every invented text was refused. On fifty sayings circulating on social media, every authentic hadith was confirmed and no fabricated saying was shown as authentic. In a voice test with synthetic voices, the Arabic recordings led to the right hadith in twenty of twenty.
 
 # The assistant
-keywords: المساعد، من أنت، ماذا تستطيع، حدودك / assistant, who are you, what can you do, scope
-هذا المساعد مخصص لثلاثة أمور: التحقق من حديث تكتبه أو تقوله، وشرح التقرير المفتوح أمامك، والإجابة عن أسئلة هذه الأداة. ولا يجيب عن الأسئلة الدينية العامة ولا يُفتي، ويحيل الأسئلة الشخصية إلى أهل العلم.
-This assistant does three things: verify a hadith you type or say, explain the report open in front of you, and answer questions about this tool. It does not answer general religious questions or give fatwas; personal questions are referred to scholars.
+keywords: المساعد، سند، من أنت، ماذا تستطيع، حدودك / assistant, sanad, who are you, what can you do, scope
+اسم هذا المساعد سند. وهو مخصص لثلاثة أمور: التحقق من حديث تكتبه أو تقوله، وشرح التقرير المفتوح أمامك، والإجابة عن أسئلة هذه الأداة. ولا يجيب عن الأسئلة الدينية العامة ولا يُفتي، ويحيل الأسئلة الشخصية إلى أهل العلم.
+This assistant is called Sanad. It does three things: verify a hadith you type or say, explain the report open in front of you, and answer questions about this tool. It does not answer general religious questions or give fatwas; personal questions are referred to scholars.
