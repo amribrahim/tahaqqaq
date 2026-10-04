@@ -65,10 +65,18 @@ def _e(s: object) -> str:
     return html.escape(str(s or ""))
 
 
+def _dir(text: object) -> str:
+    """The direction of a block from its own letters (WeasyPrint does not implement dir="auto")."""
+    t = str(text or "")
+    arabic = sum(1 for ch in t if "\u0600" <= ch <= "\u06ff")
+    latin = sum(1 for ch in t if ch.isascii() and ch.isalpha())
+    return "rtl" if arabic >= latin else "ltr"
+
+
 def _row(label: str, value: str, ltr: bool = False) -> str:
     if not value:
         return ""
-    return f'<tr><th>{_e(label)}</th><td{" dir=ltr class=ltr" if ltr else " dir=auto"}>{_e(value)}</td></tr>'
+    return f'<tr><th>{_e(label)}</th><td{" dir=ltr class=ltr" if ltr else f" dir={_dir(value)}"}>{_e(value)}</td></tr>'
 
 
 def _link_row(label: str, url: str) -> str:
@@ -94,9 +102,9 @@ def render_html(report: dict, lang: str, name: str, email: str) -> str:
     parts.append(f'<section class="state" style="border-color:{STATE_COLORS.get(state, "#5a5d80")}">'
                  f'<div class="state-label" style="color:{STATE_COLORS.get(state, "#5a5d80")}">{_e(label)}</div>'
                  f'<div class="conf">{L("نسبة التطابق", "Match")}: <span dir="ltr">{_e(report.get("confidence"))}%</span></div>'
-                 f'<p dir="auto">{_e(report.get("reason_ar") if ar else report.get("reason_en"))}</p></section>')
+                 f'<p dir="{"rtl" if ar else "ltr"}">{_e(report.get("reason_ar") if ar else report.get("reason_en"))}</p></section>')
     parts.append(f'<section class="box"><h2>{L("النص المُدخل", "Text submitted")}</h2>'
-                 f'<p class="quote" dir="auto">{_e(report.get("input_text"))}</p></section>')
+                 f'<p class="quote" dir="{_dir(report.get("input_text"))}">{_e(report.get("input_text"))}</p></section>')
     mt = report.get("machine_translation")
     if mt:
         parts.append(f'<section class="box"><h2>{L("ترجمة آلية للمطابقة فقط", "Machine translation, for matching only")}'
@@ -129,12 +137,12 @@ def render_html(report: dict, lang: str, name: str, email: str) -> str:
     cands = [c for c in report.get("candidates") or [] if not c.get("accepted")][:4]
     if cands:
         items = "".join(f'<li>{_e(c.get("book_ar") if ar else c.get("book_en"))} <span dir="ltr">{_e(c.get("number"))}'
-                        f' · {_e(c.get("confidence"))}%</span><div class="cand" dir="auto">{_e((c.get("text_ar") or c.get("text_en") or "")[:220])}</div></li>'
+                        f' · {_e(c.get("confidence"))}%</span><div class="cand" dir="{_dir(c.get("text_ar") or c.get("text_en"))}">{_e((c.get("text_ar") or c.get("text_en") or "")[:220])}</div></li>'
                         for c in cands)
         parts.append(f'<section class="box"><h2>{L("نتائج قريبة أخرى", "Other close results")}</h2><ul>{items}</ul></section>')
     if report.get("ai_explanation"):
         parts.append(f'<section class="box ai"><h2>{L("شرح مولَّد بالذكاء الاصطناعي", "AI-generated explanation")}'
-                     f' · <span dir="ltr">{_e(report.get("ai_model"))}</span></h2><p dir="auto">{_e(report.get("ai_explanation"))}</p></section>')
+                     f' · <span dir="ltr">{_e(report.get("ai_model"))}</span></h2><p dir="{_dir(report.get("ai_explanation"))}">{_e(report.get("ai_explanation"))}</p></section>')
     parts.append(f'<footer>{L("ننقل أحكام المحدّثين من مصادرها، ولا نُصدر حكمًا آليًا.", "We relay the scholars’ rulings from their sources; the tool issues no ruling of its own.")}'
                  f' · <span dir="ltr">tahaqqaq.pages.dev</span></footer>')
     return f"""<!doctype html><html lang="{lang}" dir="{"rtl" if ar else "ltr"}"><head><meta charset="utf-8"><style>
@@ -145,7 +153,11 @@ header {{ border-bottom: 2px solid #4f3fd0; padding-bottom: 8px; margin-bottom: 
 .title {{ font-size: 14pt; font-weight: bold; }}
 .meta {{ font-size: 9.5pt; color: #5a5d80; }}
 h2 {{ font-size: 11.5pt; color: #4f3fd0; margin: 0 0 6px; }}
-.box {{ border: 1px solid #e4e1f5; border-radius: 8px; padding: 10px 12px; margin: 0 0 10px; break-inside: avoid; }}
+.box {{ border: 1px solid #e4e1f5; border-radius: 8px; padding: 10px 12px; margin: 0 0 10px; }}
+h2 {{ break-after: avoid; }}
+tr, li {{ break-inside: avoid; }}
+[dir=ltr] {{ text-align: left; }}
+[dir=rtl] {{ text-align: right; }}
 .state {{ border: 2px solid; border-radius: 8px; padding: 10px 12px; margin: 0 0 10px; }}
 .state-label {{ font-size: 15pt; font-weight: bold; }}
 .conf {{ font-size: 10.5pt; color: #3d4066; }}

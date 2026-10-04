@@ -100,3 +100,11 @@ def test_real_pdf_when_pango_is_available():
         pytest.skip("Pango not installed on this machine")
     pdf = HTML(string=review_pdf.render_html(REPORT, "ar", "عمرو", "a@b.co")).write_pdf()
     assert pdf[:5] == b"%PDF-" and len(pdf) > 5000
+
+
+def test_each_block_takes_the_direction_of_its_own_text():
+    """WeasyPrint has no dir="auto": an English paste inside the Arabic PDF must still read left to right."""
+    page = review_pdf.render_html({**REPORT, "input_text": 'Narrated Ibn `Umar: "Amongst the trees, there is a tree"'}, "ar", "عمرو", "a@b.co")
+    assert '<p class="quote" dir="ltr">Narrated Ibn' in page
+    assert review_pdf._dir("إنما الأعمال بالنيات") == "rtl" and review_pdf._dir("Actions are by intentions (ﷺ)") == "ltr"
+    assert 'dir="auto"' not in page and "dir=auto" not in page
