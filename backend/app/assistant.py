@@ -56,6 +56,8 @@ _GREETING = re.compile(r"^\s*(?:السلام عليكم|سلام عليكم|مر
 _THANKS = re.compile(r"^\s*(?:شكرا|شكرًا|جزاك الله|جزاكم الله|thanks|thank you|jazak)", re.I)
 
 FIXED = {
+    "wrong_language": ("في الواجهة العربية أتحقق من النصوص العربية. قل الحديث أو اكتبه بالعربية، أو بدّل الواجهة إلى English للتحقق من نص إنجليزي.",
+                       "In the English interface I check English texts. Say or write the hadith in English, or switch the interface to العربية to check an Arabic text."),
     "greeting": ("وعليكم السلام ورحمة الله. أنا سند، مساعدك في التحقق من الأحاديث. كيف حالك؟ قل لي الحديث الذي تريد أن نتحقق منه.",
                  "Peace be upon you. I am Sanad, your assistant for verifying hadiths. How are you? Tell me the hadith you would like to check."),
     "how_are_you": ("بخير والحمد لله، شكرًا لسؤالك. كيف أستطيع مساعدتك؟ قل لي الحديث الذي تريد أن نتحقق منه.",
@@ -216,8 +218,6 @@ def compose_verify(r: dict, lang: str) -> str:
         n = len(r.get("narrations") or [])
         if n:
             parts.append(f"وللنص نفسه {n} مواضع أخرى في كتب الحديث." if ar else f"The same text appears in {n} other places in the hadith books.")
-    if r.get("machine_translation"):
-        parts.append("طابقت النص بعد ترجمته آليًا إلى الإنجليزية." if ar else "I matched the text after a machine translation to English.")
     parts.append("التقرير الكامل يعرض النص والمصادر والتفاصيل." if ar else "The full report shows the text, the sources and the details.")
     return " ".join(p for p in parts if p)
 
@@ -334,8 +334,6 @@ def _report_facts(report: dict) -> dict:
         facts["ruling"] = report["grade"]
     facts["other_rulings"] = (report.get("grades") or [])[1:4]
     facts["narrations"] = [{k: n.get(k) for k in ("book_ar", "book_en", "number", "grade_ar", "grade_en")} for n in (report.get("narrations") or [])[:5]]
-    if report.get("machine_translation"):
-        facts["machine_translation"] = True
     return facts
 
 
@@ -374,7 +372,9 @@ def reply(message: str, ui_lang: str = "ar", report: dict | None = None) -> dict
         payload = text or payload_of(message)
         if len(payload.split()) < 2:
             return _fixed("out_of_scope", lang)
-        return _verify(payload, lang)
+        if detect_script_language(payload) != ui_lang:   # Arabic in the Arabic interface, English in the English one
+            return _fixed("wrong_language", ui_lang)
+        return _verify(payload, ui_lang)
     if kind == "report" and report is not None:
         return _report(message, lang, report)
     if kind == "tool":

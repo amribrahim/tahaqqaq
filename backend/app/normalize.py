@@ -62,24 +62,46 @@ def detect_language(text: str) -> str:
     return "ar" if ar >= 0.6 * la else "en"
 
 
-_NON_ARABIC_LETTERS = re.compile(r"[پچژگکیےۓہھںٹڈڑۀۂ]")  # Urdu / Persian / Pashto letters
+_URDU_PERSIAN_LETTERS = re.compile(r"[پچژگٹڈڑںےۓہۀۂ\u200c]")  # never in Arabic text (ی ک ھ are mere spelling variants)
+# Persian function words that are not Arabic words, so Arabic typed with Persian letters (فی، لکل) stays Arabic
+_PERSIAN_WORDS = set("را است که از برای های می نیست هست دارد دارند کند کنند شود شده بود یک آن تا اگر".split())
 _EN_STOP = set("the of and to in is was that he for it with as his on be at by i this had not are but from or have an they which you were her she there been one all we their has would when who will more no if out so said what up its about into than them can only other time new some could these two may first then do any like my now over such our man me even most made after also did many before must through back years where much your way well down should because each just those people mr how too little state good very make world still own see men work long get here between both life being under never day same another know while last might us great old year off come since against go came right used take three".split())
+# function words of other Latin-script languages that never occur as English words or in Arabic transliteration
+_FOREIGN_WORDS = set("""
+le les des du est une dans pour pas qui sur avec cette sont ont nous vous elle mais leur aux selon très être fait
+yang dan dari untuk dengan tidak adalah akan kepada pada dalam atau juga bahwa telah oleh sesungguhnya barangsiapa itu ini
+maka jika bagi kami mereka seorang
+ve bir bu için ile değil olan gibi daha diye eden olarak
+los las del una para pero como más está
+und das ist nicht mit sich auf für dem ein eine
+che sono della degli não uma com os
+""".split())
+_FOREIGN_CHARS = re.compile(r"[éèêëçñßğşıöœ]")   # none occurs in the published English translations (ü and ä do)
+# honorifics written in Arabic inside English translations («Muhammad صلى الله عليه وسلم») say nothing about the language
+_LANG_HONORIFICS = re.compile(r"ﷺ|صلى الله عليه وسلم|صلى الله عليه و سلم|رضي الله عنهما|رضي الله عنهم|رضي الله عنها|رضي الله عنه|"
+                         r"عليهم السلام|عليه السلام|عليها السلام|سبحانه وتعالى|عز وجل|جل جلاله")
 
 
 def detect_script_language(text: str) -> str:
-    """'ar' (Arabic), 'en' (English) or 'other' — for deciding whether the text can be matched directly."""
-    ar = len(_ARABIC_LETTERS.findall(text))
-    la = len(_LATIN_LETTERS.findall(text))
+    """'ar' (Arabic), 'en' (English) or 'other'. The input check rests on it: every Arabic text and every published
+    English translation in the corpus is recognised (tested on all 40,457 records), and a text counts as another language
+    only on positive evidence (that language's own words or letters), so English full of transliterated names stays
+    English."""
+    t = _LANG_HONORIFICS.sub(" ", strip_tashkeel(text))
+    ar = len(_ARABIC_LETTERS.findall(t))
+    la = len(_LATIN_LETTERS.findall(t))
     if ar == 0 and la == 0:
-        return "ar"
+        return "ar" if _ARABIC_LETTERS.search(text) else "en" if _LATIN_LETTERS.search(text) else "ar"
     if ar >= 0.6 * la:
-        # Urdu/Persian share the script: count their specific letters
-        return "other" if len(_NON_ARABIC_LETTERS.findall(text)) >= max(2, 0.02 * ar) else "ar"
-    words = re.findall(r"[a-z']+", text.lower())
-    if not words:
-        return "en"
-    stop = sum(1 for w in words if w in _EN_STOP)
-    return "en" if len(words) < 4 or stop >= 0.18 * len(words) else "other"
+        marks = len(_URDU_PERSIAN_LETTERS.findall(t)) + sum(1 for w in t.split() if w in _PERSIAN_WORDS)
+        return "other" if marks >= max(2, 0.02 * ar) else "ar"
+    low = t.lower()
+    words = re.findall(r"[a-zçéèêëñßğşıöœ']+", low)
+    english = sum(1 for w in words if w in _EN_STOP)
+    foreign = sum(1 for w in words if w in _FOREIGN_WORDS) + len(_FOREIGN_CHARS.findall(low))
+    if (foreign >= 2 and foreign > english) or (foreign >= 1 and english == 0 and len(words) >= 3):
+        return "other"
+    return "en"
 
 
 def to_arabic_digits(s: str) -> str:

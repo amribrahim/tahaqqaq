@@ -25,8 +25,8 @@ Matching runs in stages: exact match, then character similarity, then meaning si
 
 # Where AI is used
 keywords: الذكاء الاصطناعي، النموذج، نماذج لغوية، الآلة / artificial intelligence, ai, model, llm, machine
-الذكاء الاصطناعي يُستخدم في مهام محددة: قراءة الصور، واستخلاص المقاطع المقتبسة من النصوص الطويلة، وترجمة اللغات الأخرى للمطابقة فقط، والتأكد من أن النص المطابق هو الرواية نفسها، وكتابة شرح موجز يُفحص، وشرح موسّع ملخّص من شروح الدرر وحدها، وتحويل الصوت إلى نص في هذا المساعد. ولا يُصدر أي نموذج حكمًا على حديث أبدًا.
-AI is used for specific tasks: reading images, extracting quoted segments from long texts, translating other languages for matching only, checking that a matched record is the same report, writing a fact-checked brief explanation, an extended explanation summarised only from Dorar's commentaries, and turning speech into text in this assistant. No model ever issues a ruling on a hadith.
+الذكاء الاصطناعي يُستخدم في مهام محددة: قراءة الصور، واستخلاص المقاطع المقتبسة من النصوص الطويلة، والتأكد من أن النص المطابق هو الرواية نفسها، وكتابة شرح موجز يُفحص، وشرح موسّع ملخّص من شروح الدرر وحدها، وتحويل الصوت إلى نص في هذا المساعد. ولا يُصدر أي نموذج حكمًا على حديث أبدًا.
+AI is used for specific tasks: reading images, extracting quoted segments from long texts, checking that a matched record is the same report, writing a fact-checked brief explanation, an extended explanation summarised only from Dorar's commentaries, and turning speech into text in this assistant. No model ever issues a ruling on a hadith.
 
 # Narrations in other books
 keywords: الروايات، روايات، مواضع أخرى، كتب أخرى / narrations, other books, other places
@@ -35,8 +35,8 @@ The report lists the same text in other books or under other numbers, each with 
 
 # Languages and voice
 keywords: اللغات، اللغة، الصوت، التسجيل، الميكروفون، الترجمة / languages, language, voice, speech, microphone, translation
-النصوص العربية والإنجليزية تُطابق مباشرة، وأي لغة أخرى تُترجم آليًا للمطابقة فقط مع تنبيه. وفي هذا المساعد يُقبل الصوت بالعربية والإنجليزية فقط، ويظهر النص المسموع لتؤكده قبل التحقق، وإذا لم يكن السماع واضحًا يعتذر المساعد بدل أن يخمّن.
-Arabic and English texts are matched directly; any other language is machine-translated for matching only, with a notice. In this assistant, voice is accepted in Arabic and English only; the transcript is shown for you to confirm before verification, and when the speech is not clear the assistant says so instead of guessing.
+في الواجهة العربية نتحقق من النصوص العربية، وفي واجهة English من النصوص الإنجليزية، ولا نترجم نصوص اللغات الأخرى آليًا لأن الترجمة تغيّر اللفظ. أما الشرح فيُكتب بإحدى ٢٥ لغة. وفي هذا المساعد يُقبل الصوت بالعربية والإنجليزية فقط، ويظهر النص المسموع لتؤكده قبل التحقق، وإذا لم يكن السماع واضحًا يعتذر المساعد بدل أن يخمّن.
+The Arabic interface checks Arabic texts and the English interface checks English texts; texts in other languages are not machine-translated, because a translation changes the wording. The explanation can be written in any of 25 languages. In this assistant, voice is accepted in Arabic and English only; the transcript is shown for you to confirm before verification, and when the speech is not clear the assistant says so instead of guessing.
 
 # Privacy
 keywords: الخصوصية، الحفظ، التخزين، هل تحفظ، البيانات / privacy, storage, do you store, data

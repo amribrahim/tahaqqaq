@@ -54,204 +54,329 @@ test.afterEach(async () => {
   errors.length = 0;
 });
 
-for (const lang of LANGS) {
-  test.describe(`[${lang}] text input`, () => {
-    test("sahih exact", async ({ page }) => {
-      await verifyText(page, lang, "إنما الأعمال بالنيات");
-      expect(await state(page)).toBe("verified");
-      await expect(page.getByTestId("grade-chip").first()).toHaveText(lang === "ar" ? "صحيح" : "Sahih");
-      await expect(page.getByTestId("source-link")).toHaveAttribute("href", /dorar\.net\/hadith|shamela\.ws/);
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح البخاري" : "Sahih al-Bukhari");
-      await expect(page.getByTestId("number")).toHaveText(lang === "ar" ? "١" : "1");
-      // the approved reference: rulings fetched from الدرر السنية for the matched hadith (or a clear fallback with the link)
-      const dorarCard = page.getByTestId("dorar-card");
-      await expect(dorarCard).toBeVisible();
-      await expect(page.getByTestId("dorar-ruling").first().or(page.getByTestId("dorar-unavailable"))).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByTestId("dorar-link")).toHaveAttribute("href", /dorar\.net\/hadith/);
-      await shot(page, `${lang}-verified`);
-    });
-
-    test("sahih with typos, missing and extra words → diff", async ({ page }) => {
-      await verifyText(page, lang, "إنما الاعمال بالنيه ولكل امرء ما نوى يا إخوان");
-      expect(["verified", "partial"]).toContain(await state(page));
-      await expect(page.getByTestId("diff-card")).toBeVisible();
-      await expect(page.locator(".tok-del, .tok-ins").first()).toBeVisible();
-      await shot(page, `${lang}-partial`);
-    });
-
-    test("famous fabricated → موضوع with grader and source", async ({ page }) => {
-      await verifyText(page, lang, "حب الوطن من الإيمان");
-      expect(await state(page)).toBe("unreliable");
-      await expect(page.getByTestId("grade-chip").first()).toHaveText(lang === "ar" ? "موضوع" : "Fabricated");
-      await expect(page.getByTestId("grader")).not.toHaveText("—");
-      await expect(page.getByTestId("source-link")).toHaveAttribute("href", /dorar\.net/);
-      await expect(page.getByTestId("state-label")).toContainText(lang === "ar" ? "موضوع" : "Fabricated");
-      await shot(page, `${lang}-unreliable-mawdu`);
-    });
-
-    test("weak hadith → ضعيف with grader", async ({ page }) => {
-      await verifyText(page, lang, "صوموا تصحوا");
-      expect(await state(page)).toBe("unreliable");
-      await expect(page.getByTestId("grade-chip").first()).toHaveText(lang === "ar" ? "ضعيف" : "Weak");
-      await expect(page.getByTestId("grader")).toContainText(lang === "ar" ? "الألباني" : "Al-Albani");
-      await shot(page, `${lang}-unreliable-daif`);
-    });
-
-    test("english translation of a sahih hadith → arabic original + translation card", async ({ page }) => {
-      await verifyText(page, lang, "Actions are judged by intentions and every person will get what he intended");
-      // a free paraphrase matches on meaning: attributed once a strong model confirms it, otherwise the closest text
-      expect(["verified", "partial", "uncertain"]).toContain(await state(page));
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح" : "Sahih");
-      await expect(page.getByTestId("translation-card")).toBeVisible();
-      await expect(page.getByTestId("translation-card")).toContainText("الأَعْمَالُ");
-      await shot(page, `${lang}-translation`);
-    });
-
-    test("inaccurate english translation → issues listed", async ({ page }) => {
-      await verifyText(page, lang, "None of you is a Muslim until he loves for his brother what he loves for himself.");
-      await expect(page.getByTestId("translation-card")).toBeVisible();
-      await expect(page.getByTestId("issues").locator("li").first()).toBeVisible();
-      await shot(page, `${lang}-translation-issues`);
-    });
-
-    test("ayah quoted as hadith → آية with surah/ayah and note", async ({ page }) => {
-      await verifyText(page, lang, "قال رسول الله: وقل رب زدني علما");
-      await expect(page.getByTestId("quran-note")).toBeVisible();
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "طه" : "Taha");
-      await expect(page.getByTestId("number")).toHaveText(lang === "ar" ? "١١٤" : "114");
-      await expect(page.getByTestId("diff-card")).toContainText(/زِدْنِ[يى] عِلْمًا/);  // Uthmani script uses ى
-      await shot(page, `${lang}-quran`);
-    });
-
-    test("misquoted ayah → correct text with diff", async ({ page }) => {
-      await verifyText(page, lang, "وقل ربي زدني علما");
-      await expect(page.getByTestId("diff-card")).toContainText(/زِدْنِ[يى] عِلْمًا/);
-      await expect(page.locator(".tok-del, .tok-ins").first()).toBeVisible();
-      await shot(page, `${lang}-quran-misquote`);
-    });
-
-    test("near-meaning text → uncertain with closest-text note", async ({ page }) => {
-      // close in form to «النظافة من الإيمان» (itself a curated fabricated saying) but a different text
-      await verifyText(page, lang, "الصدق من الإيمان");
-      expect(["uncertain", "partial"]).toContain(await state(page));
-      if ((await state(page)) === "uncertain") {
-        await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "للنص الأقرب" : "closest text");
-      }
-      await expect(page.getByTestId("candidates")).toBeVisible();
-      await shot(page, `${lang}-uncertain`);
-    });
-
-    test("invented text → abstain, nearest results, review, no grade", async ({ page }) => {
-      await verifyText(page, lang, "من قرأ هذا النص غُفر له كل ذنب");
-      expect(["abstain", "uncertain"]).toContain(await state(page));
-      if ((await state(page)) === "abstain") {
-        await expect(page.getByTestId("abstain-card")).toBeVisible();
-        await expect(page.getByTestId("grade-card")).toHaveCount(0);
-        await expect(page.getByTestId("review-btn")).toBeVisible();
-      }
-      await expect(page.getByTestId("candidates")).toBeVisible();
-      await shot(page, `${lang}-abstain`);
-    });
-
-    test("personal fatwa question → referral, no verdict", async ({ page }) => {
-      await verifyText(page, lang, "هل يجوز لي أن أفعل كذا في زواجي؟");
-      expect(await state(page)).toBe("referral");
-      await expect(page.getByTestId("grade-card")).toHaveCount(0);
-      await expect(page.getByTestId("abstain-card")).toBeVisible();
-      await shot(page, `${lang}-referral`);
-    });
-
-    test("empty, whitespace and >2000 chars are blocked client-side", async ({ page }) => {
-      await open(page, lang);
-      const btn = page.getByTestId("verify-btn");
-      await expect(btn).toBeDisabled();
-      await page.getByTestId("input-text").fill("    ");
-      await expect(btn).toBeDisabled();
-      await page.getByTestId("input-text").fill("ا".repeat(2001));
-      await expect(btn).toBeDisabled();
-      await expect(page.getByTestId("counter")).toHaveCSS("color", "rgb(168, 50, 74)");
-      await page.getByTestId("input-text").fill("نص");
-      await expect(btn).toBeEnabled();
-    });
-
-    test("other language (French) → matched through a labelled machine translation", async ({ page, request }) => {
-      const h = await (await request.get(`${API}/health`)).json();
-      test.skip(!h.llm, "no LLM provider configured on the stack");
-      await verifyText(page, lang, "Les actions ne valent que par les intentions, et chacun n'aura que ce qu'il a eu l'intention de faire");
-      await expect(page.getByTestId("mt-card")).toBeVisible();
-      // attributed when the model check confirms the match, otherwise shown as the closest text (never another hadith)
-      expect(["verified", "partial", "uncertain"]).toContain(await state(page));
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح" : "Sahih");
-      await shot(page, `${lang}-other-language`);
-    });
-
-    test("emoji, gibberish and mixed scripts are graceful", async ({ page }) => {
-      for (const text of ["😀😀😀 🙏", "asdkjh qwe zxcv mnb", "hello مرحبا 123 😀"]) {
-        await verifyText(page, lang, text);
-        await expect(page.getByTestId("status-banner")).toBeVisible();
-        expect(["abstain", "uncertain"]).toContain(await state(page));
-      }
-    });
+// ---------------------------------------------------------------- Arabic interface: Arabic texts
+test.describe("[ar] text input", () => {
+  const lang: Lang = "ar";
+  test("sahih exact", async ({ page }) => {
+    await verifyText(page, lang, "إنما الأعمال بالنيات");
+    expect(await state(page)).toBe("verified");
+    await expect(page.getByTestId("grade-chip").first()).toHaveText("صحيح");
+    await expect(page.getByTestId("source-link")).toHaveAttribute("href", /dorar\.net\/hadith|shamela\.ws/);
+    await expect(page.getByTestId("grade-card")).toContainText("صحيح البخاري");
+    await expect(page.getByTestId("number")).toHaveText("١");
+    // the approved reference: rulings fetched from الدرر السنية for the matched hadith (or a clear fallback with the link)
+    await expect(page.getByTestId("dorar-card")).toBeVisible();
+    await expect(page.getByTestId("dorar-ruling").first().or(page.getByTestId("dorar-unavailable"))).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId("dorar-link")).toHaveAttribute("href", /dorar\.net\/hadith/);
+    await shot(page, "ar-verified");
   });
 
-  test.describe(`[${lang}] image input`, () => {
-    test("arabic hadith image → OCR shown, editable, same verdict", async ({ page }) => {
-      await open(page, lang);
-      await page.getByTestId("tab-image").click();
-      await page.getByTestId("input-file").setInputFiles(path.join(IMG, "ar.png"));
-      const ocr = page.getByTestId("ocr-text");
-      await expect(ocr).toBeVisible({ timeout: 60_000 });
-      // OCR may come from the vision model (diacritics kept) or Tesseract: match the word ignoring diacritics
-      await expect(ocr).toHaveValue(/ا[\u064B-\u0652]*ل[\u064B-\u0652]*[أا][\u064B-\u0652]*ع[\u064B-\u0652]*م[\u064B-\u0652]*ا[\u064B-\u0652]*ل/);
-      await ocr.fill((await ocr.inputValue()).replace("رواه البخاري", ""));  // user can edit before verifying
+  test("sahih with typos, missing and extra words → diff", async ({ page }) => {
+    await verifyText(page, lang, "إنما الاعمال بالنيه ولكل امرء ما نوى يا إخوان");
+    expect(["verified", "partial"]).toContain(await state(page));
+    await expect(page.getByTestId("diff-card")).toBeVisible();
+    await expect(page.locator(".tok-del, .tok-ins").first()).toBeVisible();
+    await shot(page, "ar-partial");
+  });
+
+  test("famous fabricated → موضوع with grader and source", async ({ page }) => {
+    await verifyText(page, lang, "حب الوطن من الإيمان");
+    expect(await state(page)).toBe("unreliable");
+    await expect(page.getByTestId("grade-chip").first()).toHaveText("موضوع");
+    await expect(page.getByTestId("grader")).not.toHaveText("—");
+    await expect(page.getByTestId("source-link")).toHaveAttribute("href", /dorar\.net/);
+    await expect(page.getByTestId("state-label")).toContainText("موضوع");
+    await shot(page, "ar-unreliable-mawdu");
+  });
+
+  test("weak hadith → ضعيف with grader", async ({ page }) => {
+    await verifyText(page, lang, "صوموا تصحوا");
+    expect(await state(page)).toBe("unreliable");
+    await expect(page.getByTestId("grade-chip").first()).toHaveText("ضعيف");
+    await expect(page.getByTestId("grader")).toContainText("الألباني");
+    await shot(page, "ar-unreliable-daif");
+  });
+
+  test("ayah quoted as hadith → آية with surah/ayah and note", async ({ page }) => {
+    await verifyText(page, lang, "قال رسول الله: وقل رب زدني علما");
+    await expect(page.getByTestId("quran-note")).toBeVisible();
+    await expect(page.getByTestId("grade-card")).toContainText("طه");
+    await expect(page.getByTestId("number")).toHaveText("١١٤");
+    await expect(page.getByTestId("diff-card")).toContainText(/زِدْنِ[يى] عِلْمًا/);  // Uthmani script uses ى
+    await shot(page, "ar-quran");
+  });
+
+  test("misquoted ayah → correct text with diff", async ({ page }) => {
+    await verifyText(page, lang, "وقل ربي زدني علما");
+    await expect(page.getByTestId("diff-card")).toContainText(/زِدْنِ[يى] عِلْمًا/);
+    await expect(page.locator(".tok-del, .tok-ins").first()).toBeVisible();
+    await shot(page, "ar-quran-misquote");
+  });
+
+  test("near-meaning text → uncertain with closest-text note", async ({ page }) => {
+    // close in form to «النظافة من الإيمان» (itself a curated fabricated saying) but a different text
+    await verifyText(page, lang, "الصدق من الإيمان");
+    expect(["uncertain", "partial"]).toContain(await state(page));
+    if ((await state(page)) === "uncertain") await expect(page.getByTestId("grade-card")).toContainText("للنص الأقرب");
+    await expect(page.getByTestId("candidates")).toBeVisible();
+    await shot(page, "ar-uncertain");
+  });
+
+  test("invented text → abstain, nearest results, review, no grade", async ({ page }) => {
+    await verifyText(page, lang, "من قرأ هذا النص غُفر له كل ذنب");
+    expect(["abstain", "uncertain"]).toContain(await state(page));
+    if ((await state(page)) === "abstain") {
+      await expect(page.getByTestId("abstain-card")).toBeVisible();
+      await expect(page.getByTestId("grade-card")).toHaveCount(0);
+      await expect(page.getByTestId("review-btn")).toBeVisible();
+    }
+    await expect(page.getByTestId("candidates")).toBeVisible();
+    await shot(page, "ar-abstain");
+  });
+
+  test("personal fatwa question → referral, no verdict", async ({ page }) => {
+    await verifyText(page, lang, "هل يجوز لي أن أفعل كذا في زواجي؟");
+    expect(await state(page)).toBe("referral");
+    await expect(page.getByTestId("grade-card")).toHaveCount(0);
+    await expect(page.getByTestId("abstain-card")).toBeVisible();
+    await shot(page, "ar-referral");
+  });
+
+  test("empty, whitespace and >2000 chars are blocked client-side", async ({ page }) => {
+    await open(page, lang);
+    const btn = page.getByTestId("verify-btn");
+    await expect(btn).toBeDisabled();
+    await page.getByTestId("input-text").fill("    ");
+    await expect(btn).toBeDisabled();
+    await page.getByTestId("input-text").fill("ا".repeat(2001));
+    await expect(btn).toBeDisabled();
+    await expect(page.getByTestId("counter")).toHaveCSS("color", "rgb(168, 50, 74)");
+    await page.getByTestId("input-text").fill("نص");
+    await expect(btn).toBeEnabled();
+  });
+
+  test("an English text is not sent: clear message, one click switches the interface and verifies in English", async ({ page }) => {
+    await open(page, lang);
+    await expect(page.getByTestId("tab-text")).toContainText("عربي");
+    await page.getByTestId("input-text").fill("The reward of deeds depends upon the intentions");
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("lang-error")).toBeVisible();
+    await expect(page).not.toHaveURL(/\/result\//);
+    await shot(page, "ar-language-mismatch");
+    await page.getByTestId("lang-switch").click();
+    await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+    await expect(page.getByTestId("input-text")).toHaveValue("The reward of deeds depends upon the intentions");
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+    expect(await state(page)).toBe("verified");
+  });
+
+  test("emoji, gibberish and mixed text are graceful", async ({ page }) => {
+    for (const text of ["😀😀😀 🙏", "سيبسي شسيب ضصثق", "مرحبا بكم hello 😀"]) {
+      await verifyText(page, lang, text);
+      await expect(page.getByTestId("status-banner")).toBeVisible();
+      expect(["abstain", "uncertain"]).toContain(await state(page));
+    }
+  });
+});
+
+// ---------------------------------------------------------------- English interface: English texts
+test.describe("[en] text input", () => {
+  const lang: Lang = "en";
+  test("sahih, published translation → verified with the Arabic source", async ({ page }) => {
+    await verifyText(page, lang, "The reward of deeds depends upon the intentions and every person will get the reward according to what he has intended");
+    expect(await state(page)).toBe("verified");
+    await expect(page.getByTestId("grade-chip").first()).toHaveText("Sahih");
+    await expect(page.getByTestId("grade-card")).toContainText("Sahih al-Bukhari");
+    await expect(page.getByTestId("number")).toHaveText("1");
+    await expect(page.getByTestId("source-link")).toHaveAttribute("href", /dorar\.net\/hadith|shamela\.ws/);
+    await expect(page.getByTestId("dorar-card")).toBeVisible();
+    await shot(page, "en-verified");
+  });
+
+  test("free translation of a sahih hadith → Arabic original + translation card", async ({ page }) => {
+    await verifyText(page, lang, "Actions are judged by intentions and every person will get what he intended");
+    // a free paraphrase matches on meaning: attributed once a strong model confirms it, otherwise the closest text
+    expect(["verified", "partial", "uncertain"]).toContain(await state(page));
+    await expect(page.getByTestId("grade-card")).toContainText("Sahih");
+    await expect(page.getByTestId("translation-card")).toBeVisible();
+    await expect(page.getByTestId("translation-card")).toContainText("الأَعْمَالُ");
+    await shot(page, "en-translation");
+  });
+
+  test("inaccurate English translation → issues listed", async ({ page }) => {
+    await verifyText(page, lang, "None of you is a Muslim until he loves for his brother what he loves for himself.");
+    await expect(page.getByTestId("translation-card")).toBeVisible();
+    await expect(page.getByTestId("issues").locator("li").first()).toBeVisible();
+    await shot(page, "en-translation-issues");
+  });
+
+  test("famous fabricated → Fabricated with grader and source", async ({ page }) => {
+    await verifyText(page, lang, "Love of the homeland is part of faith");
+    expect(await state(page)).toBe("unreliable");
+    await expect(page.getByTestId("grade-chip").first()).toHaveText("Fabricated");
+    await expect(page.getByTestId("grader")).not.toHaveText("—");
+    await expect(page.getByTestId("source-link")).toHaveAttribute("href", /dorar\.net/);
+    await expect(page.getByTestId("state-label")).toContainText("Fabricated");
+    await shot(page, "en-unreliable-mawdu");
+  });
+
+  test("weak hadith → Weak with grader", async ({ page }) => {
+    await verifyText(page, lang, "Fast and you will be healthy");
+    expect(await state(page)).toBe("unreliable");
+    await expect(page.getByTestId("grade-chip").first()).toHaveText("Weak");
+    await expect(page.getByTestId("grader")).toContainText("Al-Albani");
+    await shot(page, "en-unreliable-daif");
+  });
+
+  test("verse quoted as a hadith → Qur'an with surah/ayah and note", async ({ page }) => {
+    await verifyText(page, lang, "The Prophet said: My Lord, increase me in knowledge");
+    await expect(page.getByTestId("quran-note")).toBeVisible();
+    await expect(page.getByTestId("grade-card")).toContainText("Taha");
+    await expect(page.getByTestId("number")).toHaveText("114");
+    await shot(page, "en-quran");
+  });
+
+  test("invented text → abstain, nearest results, review, no grade", async ({ page }) => {
+    await verifyText(page, lang, "Whoever reads this text will have all his sins forgiven");
+    expect(["abstain", "uncertain"]).toContain(await state(page));
+    if ((await state(page)) === "abstain") {
+      await expect(page.getByTestId("abstain-card")).toBeVisible();
+      await expect(page.getByTestId("grade-card")).toHaveCount(0);
+      await expect(page.getByTestId("review-btn")).toBeVisible();
+    }
+    await shot(page, "en-abstain");
+  });
+
+  test("personal fatwa question → referral, no verdict", async ({ page }) => {
+    await verifyText(page, lang, "Is it permissible for me to delay zakat until next year?");
+    expect(await state(page)).toBe("referral");
+    await expect(page.getByTestId("grade-card")).toHaveCount(0);
+    await expect(page.getByTestId("abstain-card")).toBeVisible();
+    await shot(page, "en-referral");
+  });
+
+  test("empty, whitespace and >2000 chars are blocked client-side", async ({ page }) => {
+    await open(page, lang);
+    const btn = page.getByTestId("verify-btn");
+    await expect(btn).toBeDisabled();
+    await page.getByTestId("input-text").fill("    ");
+    await expect(btn).toBeDisabled();
+    await page.getByTestId("input-text").fill("a".repeat(2001));
+    await expect(btn).toBeDisabled();
+    await expect(page.getByTestId("counter")).toHaveCSS("color", "rgb(168, 50, 74)");
+    await page.getByTestId("input-text").fill("text");
+    await expect(btn).toBeEnabled();
+  });
+
+  test("an Arabic text is not sent: clear message, one click switches the interface", async ({ page }) => {
+    await open(page, lang);
+    await expect(page.getByTestId("tab-text")).toContainText("English");
+    await page.getByTestId("input-text").fill("إنما الأعمال بالنيات");
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("lang-error")).toBeVisible();
+    await expect(page).not.toHaveURL(/\/result\//);
+    await shot(page, "en-language-mismatch");
+    await page.getByTestId("lang-switch").click();
+    await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+    expect(await state(page)).toBe("verified");
+  });
+
+  test("another language is refused by the server with a clear message, no translation, no switch offered", async ({ page }) => {
+    await verifyText(page, lang, "Les actions ne valent que par les intentions, et chacun n'aura que ce qu'il a eu l'intention de faire");
+    await expect(page.getByTestId("error-card")).toHaveAttribute("data-code", "wrong_language");
+    await expect(page.getByTestId("error-card")).toContainText("not in English");
+    await expect(page.getByTestId("error-lang-switch")).toHaveCount(0);
+    await shot(page, "en-other-language");
+  });
+
+  test("a direct link with an Arabic text offers the switch, and verifies it in Arabic", async ({ page }) => {
+    await open(page, lang, "/result/?id=e2e-switch&text=" + encodeURIComponent("إنما الأعمال بالنيات"));
+    await expect(page.getByTestId("error-card")).toHaveAttribute("data-code", "wrong_language", { timeout: 30_000 });
+    await page.getByTestId("error-lang-switch").click();
+    await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+    expect(await state(page)).toBe("verified");
+  });
+
+  test("emoji, gibberish and mixed text are graceful", async ({ page }) => {
+    for (const text of ["😀😀😀 🙏", "asdkjh qwe zxcv mnb", "hello world مرحبا 123 😀"]) {
+      await verifyText(page, lang, text);
+      await expect(page.getByTestId("status-banner")).toBeVisible();
+      expect(["abstain", "uncertain"]).toContain(await state(page));
+    }
+  });
+});
+
+// ---------------------------------------------------------------- images
+test.describe("[ar] image input", () => {
+  const lang: Lang = "ar";
+  test("arabic hadith image → OCR shown, editable, same verdict", async ({ page }) => {
+    await open(page, lang);
+    await page.getByTestId("tab-image").click();
+    await page.getByTestId("input-file").setInputFiles(path.join(IMG, "ar.png"));
+    const ocr = page.getByTestId("ocr-text");
+    await expect(ocr).toBeVisible({ timeout: 60_000 });
+    // OCR may come from the vision model (diacritics kept) or Tesseract: match the word ignoring diacritics
+    await expect(ocr).toHaveValue(/ا[ً-ْ]*ل[ً-ْ]*[أا][ً-ْ]*ع[ً-ْ]*م[ً-ْ]*ا[ً-ْ]*ل/);
+    await ocr.fill((await ocr.inputValue()).replace("رواه البخاري", ""));  // user can edit before verifying
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+    expect(["verified", "partial"]).toContain(await state(page));
+    await expect(page.getByTestId("grade-card")).toContainText("صحيح البخاري");
+    await expect(page.getByTestId("extracted-card")).toBeVisible();
+    await shot(page, "ar-image");
+  });
+
+  test("sunnah.com screenshot with chain of narrators → whole text for review, verdict Bukhari 1", async ({ page }) => {
+    await open(page, lang);
+    await page.getByTestId("tab-image").click();
+    await page.getByTestId("input-file").setInputFiles(path.join(IMG, "sunnah-bukhari1.png"));
+    const ocr = page.getByTestId("ocr-text");
+    await expect(ocr).toBeVisible({ timeout: 60_000 });
+    const value = (await ocr.inputValue()).replace(/[ً-ْٰ]/g, "");
+    expect(value).toMatch(/سفيان/);          // the chain of narrators is there …
+    expect(value).toMatch(/هاجر إل[يى]ه/);  // … and the end of the matn: nothing was cut
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+    expect(["verified", "partial"]).toContain(await state(page));
+    await expect(page.getByTestId("grade-card")).toContainText("صحيح البخاري");
+    await shot(page, "ar-image-sunnah");
+  });
+
+  test("blurry image → OCR result editable, no crash", async ({ page }) => {
+    await open(page, lang);
+    await page.getByTestId("tab-image").click();
+    await page.getByTestId("input-file").setInputFiles(path.join(IMG, "ar-blurry.png"));
+    await expect(page.getByTestId("ocr-text").or(page.getByTestId("ocr-error"))).toBeVisible({ timeout: 60_000 });
+    if (await page.getByTestId("ocr-text").isVisible()) {
+      await page.getByTestId("ocr-text").fill("إنما الأعمال بالنيات");
       await page.getByTestId("verify-btn").click();
       await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
-      expect(["verified", "partial"]).toContain(await state(page));
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح البخاري" : "Sahih al-Bukhari");
-      await expect(page.getByTestId("extracted-card")).toBeVisible();
-      await shot(page, `${lang}-image`);
-    });
+    }
+  });
+});
 
-    test("sunnah.com screenshot with chain of narrators → whole text for review, verdict Bukhari 1", async ({ page }) => {
-      await open(page, lang);
-      await page.getByTestId("tab-image").click();
-      await page.getByTestId("input-file").setInputFiles(path.join(IMG, "sunnah-bukhari1.png"));
-      const ocr = page.getByTestId("ocr-text");
-      await expect(ocr).toBeVisible({ timeout: 60_000 });
-      const value = (await ocr.inputValue()).replace(/[\u064B-\u0652\u0670]/g, "");
-      expect(value).toMatch(/سفيان/);          // the chain of narrators is there …
-      expect(value).toMatch(/هاجر إل[يى]ه/);  // … and the end of the matn: nothing was cut
-      await page.getByTestId("verify-btn").click();
-      await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
-      expect(["verified", "partial"]).toContain(await state(page));
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح البخاري" : "Sahih al-Bukhari");
-      await shot(page, `${lang}-image-sunnah`);
-    });
+test.describe("[en] image input", () => {
+  const lang: Lang = "en";
+  test("english text image → OCR + verdict", async ({ page }) => {
+    await open(page, lang);
+    await page.getByTestId("tab-image").click();
+    await page.getByTestId("input-file").setInputFiles(path.join(IMG, "en.png"));
+    const ocr = page.getByTestId("ocr-text");
+    await expect(ocr).toBeVisible({ timeout: 60_000 });
+    await expect(ocr).toHaveValue(/Muslim/);
+    await page.getByTestId("verify-btn").click();
+    await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByTestId("translation-card")).toBeVisible();
+    await shot(page, "en-image");
+  });
+});
 
-    test("english text image → OCR + verdict", async ({ page }) => {
-      await open(page, lang);
-      await page.getByTestId("tab-image").click();
-      await page.getByTestId("input-file").setInputFiles(path.join(IMG, "en.png"));
-      const ocr = page.getByTestId("ocr-text");
-      await expect(ocr).toBeVisible({ timeout: 60_000 });
-      await expect(ocr).toHaveValue(/Muslim/);
-      await page.getByTestId("verify-btn").click();
-      await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
-      await expect(page.getByTestId("translation-card")).toBeVisible();
-    });
-
-    test("blurry image → OCR result editable, no crash", async ({ page }) => {
-      await open(page, lang);
-      await page.getByTestId("tab-image").click();
-      await page.getByTestId("input-file").setInputFiles(path.join(IMG, "ar-blurry.png"));
-      await expect(page.getByTestId("ocr-text").or(page.getByTestId("ocr-error"))).toBeVisible({ timeout: 60_000 });
-      if (await page.getByTestId("ocr-text").isVisible()) {
-        await page.getByTestId("ocr-text").fill("إنما الأعمال بالنيات");
-        await page.getByTestId("verify-btn").click();
-        await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
-      }
-    });
-
+for (const lang of LANGS) {
+  test.describe(`[${lang}] image files`, () => {
     test("non-image, 0-byte and >10MB files are rejected", async ({ page }) => {
       await open(page, lang);
       await page.getByTestId("tab-image").click();
@@ -263,41 +388,59 @@ for (const lang of LANGS) {
       await shot(page, `${lang}-image-rejected`);
     });
   });
+}
 
-  test.describe(`[${lang}] link input`, () => {
-    async function verifyUrl(page: Page, url: string) {
-      await open(page, lang);
-      await page.getByTestId("tab-url").click();
-      await page.getByTestId("input-url").fill(url);
-      await page.getByTestId("verify-btn").click();
-      await page.waitForURL(/\/result\//);
-      await expect(page.getByTestId("status-banner").or(page.getByTestId("error-card"))).toBeVisible({ timeout: 30_000 });
+// ---------------------------------------------------------------- links
+async function verifyUrl(page: Page, lang: Lang, url: string) {
+  await open(page, lang);
+  await page.getByTestId("tab-url").click();
+  await page.getByTestId("input-url").fill(url);
+  await page.getByTestId("verify-btn").click();
+  await page.waitForURL(/\/result\//);
+  await expect(page.getByTestId("status-banner").or(page.getByTestId("error-card"))).toBeVisible({ timeout: 30_000 });
+}
+
+test.describe("[ar] link input", () => {
+  test("page containing a hadith → extracted, same verdict", async ({ page }) => {
+    await verifyUrl(page, "ar", "http://fixtures/hadith.html");
+    expect(["verified", "partial"]).toContain(await state(page));
+    await expect(page.getByTestId("grade-card")).toContainText("صحيح البخاري");
+    await expect(page.getByTestId("extracted-card")).toBeVisible();
+    await shot(page, "ar-link");
+  });
+
+  test("page with two hadiths → both segments listed with their own matches", async ({ page }) => {
+    await verifyUrl(page, "ar", "http://fixtures/multi.html");
+    expect(["verified", "partial"]).toContain(await state(page));
+    await expect(page.getByTestId("segments-card")).toBeVisible();
+    expect(await page.getByTestId("segment").count()).toBeGreaterThanOrEqual(2);
+    await expect(page.getByTestId("segments-card")).toContainText("صحيح مسلم");
+    await shot(page, "ar-link-segments");
+  });
+});
+
+test.describe("[en] link input", () => {
+  test("English page containing a hadith → extracted, translation checked", async ({ page }) => {
+    await verifyUrl(page, "en", "http://fixtures/images/en.html");
+    expect(["verified", "partial", "uncertain"]).toContain(await state(page));
+    await expect(page.getByTestId("translation-card")).toBeVisible();
+    await expect(page.getByTestId("extracted-card")).toBeVisible();
+    await shot(page, "en-link");
+  });
+
+  test("Arabic page in the English interface → clear language message", async ({ page }) => {
+    await verifyUrl(page, "en", "http://fixtures/hadith.html");
+    await expect(page.getByTestId("error-card")).toHaveAttribute("data-code", "wrong_language");
+  });
+});
+
+for (const lang of LANGS) {
+  test(`[${lang}] link errors: no text, unreachable, non-http, redirect loop → graceful errors`, async ({ page }) => {
+    for (const url of ["http://fixtures/empty.html", "http://nonexistent.invalid/page", "javascript:alert(1)", "http://fixtures/loop1"]) {
+      await verifyUrl(page, lang, url);
+      await expect(page.getByTestId("error-card")).toHaveAttribute("data-code", "url_unreachable");
     }
-
-    test("page containing a hadith → extracted, same verdict", async ({ page }) => {
-      await verifyUrl(page, "http://fixtures/hadith.html");
-      expect(["verified", "partial"]).toContain(await state(page));
-      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح البخاري" : "Sahih al-Bukhari");
-      await expect(page.getByTestId("extracted-card")).toBeVisible();
-      await shot(page, `${lang}-link`);
-    });
-
-    test("page with two hadiths → both segments listed with their own matches", async ({ page }) => {
-      await verifyUrl(page, "http://fixtures/multi.html");
-      expect(["verified", "partial"]).toContain(await state(page));
-      await expect(page.getByTestId("segments-card")).toBeVisible();
-      expect(await page.getByTestId("segment").count()).toBeGreaterThanOrEqual(2);
-      await expect(page.getByTestId("segments-card")).toContainText(lang === "ar" ? "صحيح مسلم" : "Sahih Muslim");
-      await shot(page, `${lang}-link-segments`);
-    });
-
-    test("no text, unreachable, non-http, redirect loop → graceful errors", async ({ page }) => {
-      for (const url of ["http://fixtures/empty.html", "http://nonexistent.invalid/page", "javascript:alert(1)", "http://fixtures/loop1"]) {
-        await verifyUrl(page, url);
-        await expect(page.getByTestId("error-card")).toHaveAttribute("data-code", "url_unreachable");
-      }
-      await shot(page, `${lang}-link-error`);
-    });
+    await shot(page, `${lang}-link-error`);
   });
 }
 
@@ -324,7 +467,7 @@ test.describe("cross-cutting", () => {
     test(`[${lang}] loading indicator shows 4 steps and result renders within 10s`, async ({ page }) => {
       await page.route("**/api/verify/stream", async (route) => { await new Promise((r) => setTimeout(r, 1200)); await route.continue(); });
       await open(page, lang);
-      await page.getByTestId("input-text").fill("إنما الأعمال بالنيات");
+      await page.getByTestId("input-text").fill(lang === "ar" ? "إنما الأعمال بالنيات" : "The reward of deeds depends upon the intentions");
       const t0 = Date.now();
       await page.getByTestId("verify-btn").click();
       await expect(page.getByTestId("loading-panel")).toBeVisible();
@@ -348,8 +491,8 @@ test.describe("cross-cutting", () => {
     });
 
     test(`[${lang}] recent checks lists this session's items and a new session is empty`, async ({ page, browser }) => {
-      await verifyText(page, lang, "إنما الأعمال بالنيات");
-      await verifyText(page, lang, "حب الوطن من الإيمان");
+      await verifyText(page, lang, lang === "ar" ? "إنما الأعمال بالنيات" : "The reward of deeds depends upon the intentions");
+      await verifyText(page, lang, lang === "ar" ? "حب الوطن من الإيمان" : "Love of the homeland is part of faith");
       await page.goto("/recent/");
       await expect(page.getByTestId("history-row")).toHaveCount(2);
       await shot(page, `${lang}-recent`);
@@ -367,16 +510,21 @@ test.describe("cross-cutting", () => {
     });
   }
 
-  test("example chips fill the input and run", async ({ page }) => {
-    for (const [key, expected] of [["ex1", ["verified", "partial"]], ["ex2", ["unreliable"]], ["ex3", ["verified", "partial"]]] as const) {
-      await open(page, "ar");
-      await page.getByTestId(`example-${key}`).click();
-      await expect(page.getByTestId("input-text")).not.toHaveValue("");
-      await page.getByTestId("verify-btn").click();
-      await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
-      expect(expected as readonly string[]).toContain(await state(page));
-    }
-  });
+  // each chip's label is what the tool returns for it
+  const CHIPS = { ar: [["ex1", ["verified"]], ["ex2", ["unreliable"]], ["ex3", ["unreliable"]]],
+                  en: [["ex1", ["verified"]], ["ex2", ["unreliable"]], ["ex3", ["verified", "partial"]]] } as const;
+  for (const lang of LANGS) {
+    test(`[${lang}] example chips fill the input and run`, async ({ page }) => {
+      for (const [key, expected] of CHIPS[lang]) {
+        await open(page, lang);
+        await page.getByTestId(`example-${key}`).click();
+        await expect(page.getByTestId("input-text")).not.toHaveValue("");
+        await page.getByTestId("verify-btn").click();
+        await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+        expect(expected as readonly string[]).toContain(await state(page));
+      }
+    });
+  }
 
   test("export report as PDF and request human review", async ({ page }) => {
     await verifyText(page, "ar", "إنما الأعمال بالنيات");
@@ -444,7 +592,7 @@ test.describe("cross-cutting", () => {
   });
 
   test("share image in English for a fabricated saying", async ({ page }) => {
-    await verifyText(page, "en", "اطلبوا العلم ولو في الصين");
+    await verifyText(page, "en", "Seek knowledge even if you have to go to China");
     const [download] = await Promise.all([page.waitForEvent("download"), page.getByTestId("share-btn").click()]);
     await download.saveAs(path.join(SHOTS, "share-card-en.png"));
   });

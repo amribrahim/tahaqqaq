@@ -29,7 +29,7 @@ const STEPS = [
   { ar: ["تطبيع", "تطبيع موحّد لكل مُدخل (نص، صورة بعد القراءة الآلية، رابط): إزالة التشكيل وعلامات الاقتباس والألقاب الشريفة وصيغ النسبة، وتوحيد الهمزات والتاء المربوطة. وللصور والروابط والنصوص الطويلة يستخلص نموذج لغوي المقاطع المقتبسة بعد التحقق من أنها موجودة في المُدخل حرفيًا."], en: ["Normalize", "One normaliser for every input (text, OCR'd image, link): diacritics, quotes, honorifics and attribution phrases removed, letter forms unified. For images, links and long texts a language model extracts the quoted segments, each validated as literally present in the input."] },
   { ar: ["مطابقة", "تدرّج صريح: تطابق حرفي أو احتواء ← تشابه ثلاثي الحروف مع تغطية الكلمات ← تشابه دلالي (تضمينات متعددة اللغات في pgvector) مشروط بوجود تطابق لفظي ← وإلا امتناع مع عرض أقرب النتائج. المطابقة الحرفية تحكم؛ الدلالة تُرتّب فقط."], en: ["Match", "An explicit cascade: exact/substring → trigram similarity with word coverage → semantic similarity (multilingual embeddings in pgvector) conditioned on some shared wording → otherwise abstain with the nearest results. Wording decides; meaning only ranks."] },
   { ar: ["إسناد", "الحكم يُقرأ بنصّه من سجل المصدر، وتُجلب بجانبه أحكام المحدّثين من الموسوعة الحديثية في الدرر السنية للحديث المطابق. لا يُنسب حديث بلا حكم منقول، ولا يُنتج أي نموذج حكمًا."], en: ["Attribute", "The ruling is read verbatim from the source record, and the scholars' rulings from the Dorar.net Hadith Encyclopedia are fetched next to it for the matched hadith. No hadith is attributed without a recorded ruling, and no model ever produces a grade."] },
-  { ar: ["تقرير", "النتيجة ومستوى الثقة والفروق، أو الامتناع. الشرح المولَّد آليًا (موجز أو موسّع، بأي لغة) معنون ومفصول عن النص المنقول، ويُراجع نص الشرح لغويًا قبل عرضه، ولا يُعرض إلا بعد ثبوت النتيجة من المصدر."], en: ["Report", "The result, confidence and differences, or an abstention. AI wording (brief or extended, in any language) is labelled and kept apart from quoted text, is checked to be in the requested language, and is only shown after the source has settled the result."] },
+  { ar: ["تقرير", "النتيجة ومستوى الثقة والفروق، أو الامتناع. الشرح المولَّد آليًا (موجز أو موسّع، بإحدى ٢٥ لغة) معنون ومفصول عن النص المنقول، ويُراجع نص الشرح لغويًا قبل عرضه، ولا يُعرض إلا بعد ثبوت النتيجة من المصدر."], en: ["Report", "The result, confidence and differences, or an abstention. AI wording (brief or extended, in any of 25 languages) is labelled and kept apart from quoted text, is checked to be in the requested language, and is only shown after the source has settled the result."] },
 ];
 
 const LEVELS: { key: keyof typeof STATE; whenAr: string; whenEn: string; showAr: string; showEn: string }[] = [
@@ -48,7 +48,8 @@ const LIMITS = {
     "التغطية محصورة في المصادر أعلاه؛ غياب النص عنها لا يعني أنه مكذوب.",
     "قائمة الأحاديث المنتشرة بأحكامها صغيرة ومُراجَعة يدويًا، وتحتاج مراجعة مختص قبل الاعتماد.",
     "استخراج النص من الصور قد يخطئ في الخطوط المزخرفة؛ راجع النص المستخرج قبل التحقق.",
-    "الترجمة الآلية والشرح المولَّد يُستخدمان للعرض فقط، ولا يُعرضان بوصفهما حكمًا أو ترجمة معتمدة.",
+    "نتحقق من النصوص العربية في الواجهة العربية، ومن الإنجليزية في واجهة English؛ ولا نترجم نصوص اللغات الأخرى آليًا للمطابقة، لأن الترجمة تغيّر اللفظ الذي يقوم عليه الحكم.",
+    "الشرح المولَّد يُستخدم للعرض فقط، ولا يُعرض بوصفه حكمًا أو ترجمة معتمدة.",
     "أحكام الدرر السنية تُجلب بالبحث بنص الحديث المطابق وقد تظهر معها روايات قريبة؛ نرتّب أولًا ما يطابق الكتاب والرقم، والرابط يفتح البحث نفسه للتثبّت.",
     "الشرح الموسّع لا يُولَّد إلا من نص شرح الحديث أو التفسير في الدرر السنية؛ وإن لم يوجد شرح لا يُعرض شيء.",
     "الشرح المولَّد اختياري: عند تفعيله يُرسَل النص إلى مزوّد النموذج اللغوي (Gemini أو Groq أو غيرهما) لصياغة الشرح فقط، ولا يُنتج النموذج أي حكم.",
@@ -59,7 +60,8 @@ const LIMITS = {
     "Coverage is limited to the sources above; absence from them does not make a text fabricated.",
     "The curated list of circulated sayings is small and hand-reviewed; a specialist should review it before relying on it.",
     "OCR may misread decorative fonts; review the extracted text before verifying.",
-    "Machine translation and generated explanations are for display only and are never shown as an approved ruling or translation.",
+    "Arabic texts are checked in the Arabic interface and English texts in the English one; texts in other languages are not machine-translated for matching, because a translation changes the wording the ruling rests on.",
+    "Generated explanations are for display only and are never shown as an approved ruling or translation.",
     "Dorar.net rulings are fetched by searching the matched hadith's text and related narrations may appear; entries with the same book and number come first, and the link opens the same search for confirmation.",
     "The extended explanation is only generated from Dorar.net's hadith explanation or tafsir text; when there is none, nothing is shown.",
     "The generated explanation is optional: when enabled, the text is sent to the language-model provider (Gemini, Groq or another) for wording only; the model never produces a ruling.",

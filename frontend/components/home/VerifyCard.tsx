@@ -7,6 +7,7 @@ import { ocr, VerifyError } from "@/lib/api";
 import { useLang } from "@/lib/i18n";
 import { num } from "@/lib/format";
 import { newId, setPending } from "@/lib/session";
+import { scriptOf } from "@/lib/lang";
 
 type Tab = "text" | "image" | "url";
 const MAX = 2000;
@@ -14,13 +15,15 @@ const MAX = 2000;
 export function VerifyCard({ text, setText, tab, setTab }: { text: string; setText: (t: string) => void; tab: Tab; setTab: (t: Tab) => void }) {
   const t = useTranslations("home");
   const tr = useTranslations("result");
-  const { lang } = useLang();
+  const { lang, setLang } = useLang();
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [ocrState, setOcrState] = useState<"idle" | "running" | "done" | "error">("idle");
   const [ocrText, setOcrText] = useState("");
   const [ocrFull, setOcrFull] = useState("");
   const [err, setErr] = useState("");
+  const [langErr, setLangErr] = useState(false);
+  const other = lang === "ar" ? "en" : "ar";
   const fileRef = useRef<HTMLInputElement>(null);
 
   const canSubmit = tab === "text" ? text.trim().length > 0 && text.length <= MAX
@@ -29,6 +32,10 @@ export function VerifyCard({ text, setText, tab, setTab }: { text: string; setTe
 
   const submit = () => {
     if (!canSubmit) return;
+    // Arabic texts in the Arabic interface, English texts in the English one
+    const typed = tab === "text" ? text : tab === "image" ? ocrText : "";
+    const script = typed ? scriptOf(typed) : null;
+    if (script && script !== lang) { setLangErr(true); return; }
     const id = newId();
     if (tab === "text") setPending(id, { text: text.trim(), via: "text" });
     else if (tab === "url") setPending(id, { url: url.trim(), via: "url" });
@@ -69,11 +76,11 @@ export function VerifyCard({ text, setText, tab, setTab }: { text: string; setTe
 
       {tab === "text" && (
         <div style={{ padding: "clamp(16px,2vw,24px)", display: "flex", flexDirection: "column", gap: 12 }}>
-          <textarea data-testid="input-text" aria-label={t("placeholder")} dir="auto" value={text} onChange={(e) => setText(e.target.value.slice(0, MAX + 200))} placeholder={t("placeholder")} className="field"
+          <textarea data-testid="input-text" aria-label={t("placeholder")} dir="auto" value={text} onChange={(e) => { setText(e.target.value.slice(0, MAX + 200)); setLangErr(false); }} placeholder={t("placeholder")} className="field"
             onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") submit(); }}
             style={{ minHeight: 168, resize: "vertical", padding: "18px 20px", fontSize: 19, lineHeight: 1.8 }} />
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", fontSize: 13, color: "#5a5d80" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3ee6c0" }} />{t("langAuto")}</span>
+            <span data-testid="lang-note" style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3ee6c0" }} />{t("langOnly")}</span>
             <span data-testid="counter" style={{ color: text.length > MAX ? "#a8324a" : undefined }}>{num(text.length, lang)} / {t("counterMax")}</span>
           </div>
         </div>
@@ -94,7 +101,7 @@ export function VerifyCard({ text, setText, tab, setTab }: { text: string; setTe
           {ocrState === "done" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <span className="label">{t("ocrDone")}</span>
-              <textarea data-testid="ocr-text" dir="auto" value={ocrText} onChange={(e) => setOcrText(e.target.value)} className="field"
+              <textarea data-testid="ocr-text" dir="auto" value={ocrText} onChange={(e) => { setOcrText(e.target.value); setLangErr(false); }} className="field"
                 rows={Math.min(14, Math.max(5, Math.ceil(ocrText.length / 80) + 1))}
                 style={{ minHeight: 160, padding: "14px 16px", fontSize: 18, lineHeight: 1.9, resize: "vertical" }} />
             </div>
@@ -113,6 +120,14 @@ export function VerifyCard({ text, setText, tab, setTab }: { text: string; setTe
               style={{ flex: 1, minWidth: 0, border: 0, background: "transparent", outline: "none", fontFamily: "var(--font-tajawal)", fontSize: 17, color: "#14173d" }} />
           </div>
           <span style={{ fontSize: 13, lineHeight: 1.6, color: "#5a5d80" }}>{t("urlHelp")}</span>
+        </div>
+      )}
+
+      {langErr && (tab === "text" || tab === "image") && (
+        <div data-testid="lang-error" role="alert" style={{ padding: "0 clamp(16px,2vw,24px) 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <ErrorRow text={t("langMismatch")} />
+          <button data-testid="lang-switch" className="btn btn-m btn-secondary" style={{ alignSelf: "flex-start" }}
+            onClick={() => { setLangErr(false); setLang(other); }}>{t("langSwitch")}</button>
         </div>
       )}
 

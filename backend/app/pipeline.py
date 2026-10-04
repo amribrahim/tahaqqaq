@@ -124,29 +124,24 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
     report_id = uuid.uuid4().hex[:12]
     text = text.strip()
     lang_in = detect_language(text)
-    # Arabic and English are matched directly (the corpus holds Arabic texts and published English translations).
-    # Any other language is machine-translated to English for MATCHING ONLY, and the report says so.
-    mt: dict | None = None
-    original_text = text
-    if detect_script_language(text) == "other":
-        mt = llm.translate_for_matching(text)
-        if mt:
-            text, lang_in = mt["english"], "en"
+    # Arabic texts are matched with the Arabic records and English texts with their published English translations.
+    # Other languages are not matched (the API refuses them before this point): a machine translation would change
+    # the wording that the verdict rests on.
 
     def tick(step: int, label: str) -> None:
         if progress:
             progress(step, label)
 
     tick(STEP_NORMALIZE, "normalize")
-    base = dict(id=report_id, input_text=original_text if mt else text, input_lang=lang_in, via=via, extracted_text=extracted,
-                threshold=settings.threshold_partial, created_at=_now(), machine_translation=mt)
-    if detect_script_language(original_text) == "other" and not mt:
+    base = dict(id=report_id, input_text=text, input_lang=lang_in, via=via, extracted_text=extracted,
+                threshold=settings.threshold_partial, created_at=_now())
+    if detect_script_language(text) == "other":
         timings["total"] = int((time.perf_counter() - t0) * 1000)
         tick(STEP_REPORT, "report")
         return VerifyResponse(
             **base, state="abstain", confidence=0,
-            reason_ar="لغة النص غير العربية والإنجليزية تحتاج ترجمة آلية للمطابقة، وهي غير متاحة الآن؛ الصق النص بالعربية أو الإنجليزية.",
-            reason_en="Text in languages other than Arabic and English needs machine translation for matching, which is unavailable right now; paste it in Arabic or English.",
+            reason_ar="نتحقق من النصوص العربية والإنجليزية فقط؛ الصق النص بالعربية في الواجهة العربية، أو بالإنجليزية في واجهة English.",
+            reason_en="We check Arabic and English texts only: paste the text in Arabic in the Arabic interface, or in English in the English interface.",
             timings_ms=timings,
         )
 
@@ -256,7 +251,7 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
         resp.reason_ar = f"وُجد نص قريب في {rec.book_ar} ({to_arabic_digits(rec.number)}) لكن لم يُنقل له حكم معتمد في بياناتنا؛ راجع المصدر قبل النسبة."
         resp.reason_en = f"A close text exists in {rec.book_en} {rec.number} but no recorded ruling is in our data; check the source before attributing."
 
-    if lang_in == "en" and not mt:
+    if lang_in == "en":
         resp.glossary_terms = glossary_notes(text, glossary)
 
     if state == "abstain" or rec is None:
@@ -284,7 +279,7 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
 
     if lang_in == "ar":
         resp.diff_input, resp.diff_source = diff_tokens(query, rec.matn_ar if rec.kind != "quran" else rec.text_ar, "ar")
-    elif not mt:
+    else:
         card = translation_card(query, rec, glossary)
         if card:
             resp.translation = TranslationOut(**card)

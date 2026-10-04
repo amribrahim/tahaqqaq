@@ -217,9 +217,15 @@ used by the site). The code is `backend/app/pipeline.py::run`.
      verifying.
    - Link: X posts through the fxtwitter JSON API, sunnah.com pages by a dedicated parser, other pages through
      trafilatura.
-2. **Language.** Arabic and English are matched directly. Any other language (detected by script, or by Latin-script
-   language markers) is translated to English **for matching only** by a model. The report labels this and never grades
-   that translation.
+2. **Language.** The text must be in the interface language: Arabic in the Arabic interface, English in the English one
+   (`check_language` in `app/main.py`, before anything else runs). Anything else gets `422 wrong_language` with a clear
+   message; it is never machine-translated, because a translation changes the wording the verdict rests on. The detector
+   (`detect_script_language`) recognises every Arabic text and every published English translation in the corpus, and
+   calls a text another language only on positive evidence: Urdu or Persian letters and words, or the function words and
+   letters of French, Indonesian, Turkish, Spanish, German, Italian or Portuguese. English full of transliterated names
+   stays English, and Arabic honorifics inside an English translation do not make it Arabic. The site shows the same
+   check before sending, with a one-click switch of the interface. A sunnah.com link gives the Arabic text in the Arabic
+   interface and its English translation in the English one.
 3. **Guards.**
    - A personal fatwa question returns `referral` and stops.
    - A request to *write* a hadith returns `abstain`, with no retrieval and no model call.
@@ -260,8 +266,7 @@ used by the site). The code is `backend/app/pipeline.py::run`.
     It is available in 25 languages on request.
 
 The response (`VerifyResponse` in `app/schemas.py`) carries the state, confidence, reason in Arabic and English,
-source, grades, narrations, candidates, segments, diff, translation card, glossary notes, the machine translation (if
-any), the match check (if any), the explanation and per-step timings.
+source, grades, narrations, candidates, segments, diff, translation card, glossary notes, the match check (if any), the explanation and per-step timings.
 
 ## 9. Retrieval cascade and scoring
 
@@ -297,10 +302,10 @@ Extra rules:
   is marked `meaning_only`. The pipeline shows it as an attribution only if a strong model confirms it is the same report.
 - **Ties:** the Qur'an, then the Sahihayn, then the curated seed, then the Sunan.
 
-**Embedding model choice, measured:** multilingual-e5-large (1024 dimensions, ten times larger) was evaluated against
-MiniLM on the English side of the multilingual set. Recall of the labelled record: top 1 was 3% for e5 against 8% for
-MiniLM, top 5 was 25% against 26%, and top 10 was 33% for both. It brought no gain, so MiniLM stays. The comparison
-scripts are `backend/eval/embed_candidate.py` and `backend/eval/compare_embeddings.py`.
+**Embedding model choice, measured (4 October 2026):** multilingual-e5-large (1024 dimensions, ten times larger) was
+evaluated against MiniLM on English paraphrases. Recall of the labelled record: top 1 was 3% for e5 against 8% for
+MiniLM, top 5 was 25% against 26%, and top 10 was 33% for both. It brought no gain, so MiniLM stays. (The comparison
+scripts were removed with the multilingual set they ran on, when input in other languages was dropped.)
 
 ## 10. RAG: the extended explanation
 
@@ -320,7 +325,7 @@ from the record.
 
 ## 11. AI components and how they are controlled
 
-There are **no autonomous agents**. The pipeline is deterministic code that calls a model for ten narrow, bounded tasks.
+There are **no autonomous agents**. The pipeline is deterministic code that calls a model for a few narrow, bounded tasks.
 Each call has a fixed prompt, returns JSON, is validated by code, and has a non-AI fallback or simply turns off.
 **No model ever produces or changes a ruling.**
 
@@ -328,8 +333,7 @@ Each call has a fixed prompt, returns JSON, is validated by code, and has a non-
 |---|---|---|---|---|
 | **Transcriber** (vision) | Image input | Image → the text as written | Validated as an image before upload; whole transcription shown for user review; Tesseract fallback | Tesseract + OpenCV |
 | **Extractor** | Long text, image or link | Text → cleaned text + quoted segments with type | Every segment must exist **literally** in the input; a rewritten "cleaned text" is discarded; honorific/reference spans are dropped | Rule-based spans |
-| **Translator** | Input not in Arabic or English | Text → English, for matching only | Labelled in the report; never graded as the user's translation | Abstain with a clear reason |
-| **Match checker** | English or translated input, top three non-exact records | Input + records → same report or not, for each | Only a strong model (Groq `gpt-oss-120b`, or Anthropic) may **raise** a record, to partial at most; any model may **reject**; a Qur'an verse is never raised; "when unsure, false"; a match resting on meaning alone needs this confirmation. English is compared with English (the Arabic is sent only for a record without a translation, a third fewer tokens), and a verdict is reused for the same text | Wording-based matches stand; meaning-only matches are shown as the closest text |
+| **Match checker** | English input, top three non-exact records | Input + records → same report or not, for each | Only a strong model (Groq `gpt-oss-120b`, or Anthropic) may **raise** a record, to partial at most; any model may **reject**; a Qur'an verse is never raised; "when unsure, false"; a match resting on meaning alone needs this confirmation. English is compared with English (the Arabic is sent only for a record without a translation, a third fewer tokens), and a verdict is reused for the same text | Wording-based matches stand; meaning-only matches are shown as the closest text |
 | **Brief explainer** + **fact checker** | Every report, if enabled | Facts → 2–4 sentences in the chosen language | Code checks: no grade contradicting the record, no verdict when abstaining, no number absent from the facts. A second model pass flags claims the facts do not support (meaning, virtues, invented references). One rewrite with the problems listed, then a fixed template built only from the facts | Not shown |
 | **Grounded explainer** | Extended explanation, on request | Facts + retrieved شرح/tafsir → summary | Source text is the only input; source link shown; no source → no text; language checked by script | Not shown |
 | **Assistant classifier** | Assistant message the rules cannot place | Message → verify, report, tool or other | Only classifies; the action is code. A "verify" pointer must be text found literally in the message | Out-of-scope reply |
@@ -355,7 +359,7 @@ al-Bukhari «الراوي» (narrator) instead of the compiler. There, the fixed
 
 | Service | Free limit | Used by | Roughly allows per day |
 |---|---|---|---|
-| Gemini `flash-lite` | 500 requests a day | Brief explanations, translation for matching, assistant answers, OCR reading | 500 model answers |
+| Gemini `flash-lite` | 500 requests a day | Brief explanations, assistant answers, OCR reading | 500 model answers |
 | Gemini `3.1-flash-lite` (backup) | Its own daily quota | The same tasks, when the first Gemini quota is used up; reads images | a second pool of answers |
 | Groq `gpt-oss-120b` | 1,000 requests and 200,000 tokens a day, 8,000 tokens a minute | Match checker (preferred), fallback for the rest | ~250 match checks (600 to 1,500 tokens each) |
 | Groq `gpt-oss-20b` | 1,000 requests a day, 8,000 tokens a minute, its own daily tokens | Last fallback | a few hundred answers |
@@ -368,8 +372,7 @@ What each action costs:
 - **No model at all:** matching and verdicts, Arabic verification with explanations off, assistant greetings and small
   talk, the spoken voice.
 - **One model call:** a brief explanation (plus a fact check), a question to the assistant about the tool or the
-  open report, a text in a language other than Arabic or English (translation), an English text whose match is not
-  exact (match check).
+  open report, an English text whose match is not exact (match check).
 - **One Whisper call:** each spoken assistant turn.
 
 When a quota runs out, the next provider answers. When all are used up, verification still works (wording-based
@@ -493,7 +496,8 @@ a labels file and run the same way.
 | GET | `/api/review/pdf/{token}` | The review PDF (`noindex`, not cached); 404 once expired |
 
 Errors use `{detail: {code, message}}`, for example `too_long` (413), `image_too_large` (413), `ocr_failed` (415/422),
-`url_unreachable` (422).
+`url_unreachable` (422), `wrong_language` (422: the text is not in the interface language; the message says which
+interface to use).
 
 ## 13. Frontend
 
@@ -501,7 +505,7 @@ Next.js App Router, statically exported (`frontend/out`), with four screens:
 
 - **Verify** (`/`): text, image or link input, with example chips.
 - **Result** (`/result/?id=`): status banner, then these cards:
-  - extracted text and machine translation;
+  - extracted text;
   - segments;
   - word diff, translation accuracy and glossary notes;
   - grade and source, الدرر rulings, narrations;
@@ -535,9 +539,9 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 178 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 195 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
-| Browser tests (Playwright, Chrome), Arabic and English | 58 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
+| Browser tests (Playwright, Chrome), Arabic and English | 52 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
 | Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages, and the review dialog | 12 | `npx playwright test e2e/a11y.spec.ts` |
 | Phone-size tests (Pixel 7, iPhone 13 size), touch flow, no sideways scroll | 4 | `npx playwright test e2e/mobile.spec.ts` |
 | Assistant: verification in chat, scope, report questions, voice confirm/error/silence, spoken call with yes and no, spoken greeting, keyboard, accessibility | 15 | `npx playwright test e2e/assistant.spec.ts` |
@@ -550,11 +554,10 @@ Details:
 | Circulated texts (`circulated.jsonl`, 50 sayings, 46 scored) | Sayings that circulate on social media; labels decided from الدرر rulings, quoted per item | Authentic 21/21 confirmed; weak/fabricated/not hadith 22/25 flagged or abstained, 3 closest text only; **0 dangerous errors** |
 | Voice (`eval/voice/`, 33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic 20/20 right hadith, English 9/10; Arabic word error rate 10% as heard, 0% median after spelling correction; English 5%; 3/3 refusals correct; no attribution to another hadith |
 | English pastes (`run_english_paste.py`, 40 records) | The full published English of Bukhari and Muslim records as pasted from translation sites, narrator line and story included | **40/40** right hadith (34/40 before the like-for-like key and full-text comparison were added) |
-| Translated pastes (`translated_paste.jsonl`, 39 inputs) | The same full texts translated by a model into French, Indonesian, Urdu and Turkish | 26/39 right hadith (fr 8/9, id 6/10, ur 7/10, tr 5/10). The two "other" records are the same saying of Anas in other chapters of al-Bukhari (600 → 661, 572), so **0 attributed to a different hadith**. Measured while Groq's daily quota ran out, so part of the run had no match check |
-| Multilingual paraphrases (`multilingual.jsonl`, 90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | 31% confirmed the right hadith; 56 abstained or closest text only; 3 of 90 attributed to another hadith (different incident, same topic). Measured with the model check available |
+| Language check (`detect_script_language`, every record, plus 111 texts in other languages) | Arabic texts (the saying and the full text with its chain, also retyped with Persian ya and kaf), the published English translations (full and the quoted words), and texts in French, Indonesian, Turkish and Urdu | Arabic **80,914/80,914** and English **80,802/80,802** recognised, **0** refused by mistake; 109 of the 111 other-language texts caught (the other 2 are checked as English and find no match) |
 
 "Same hadith" means the returned record is the labelled one, or the labelled record appears among the returned
-record's narrations, or it is a parallel narration listed in `multilingual_equivalents.json` after manual review.
+record's narrations.
 
 ## 15. Security and privacy
 
@@ -589,7 +592,8 @@ Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertai
 
 - The searchable corpus is the Six Books, the Qur'an and a small curated list. A saying found only in other collections
   is not matched. The tool abstains, and the الدرر link lets the user search further.
-- Loosely paraphrased input in other languages often abstains. This is by design: precision before recall.
+- Only Arabic and English texts are checked; another language is refused, not machine-translated.
+- Loosely paraphrased English often abstains. This is by design: precision before recall.
 - The curated list of circulated sayings and the parallel-narration review were made by the developer from الدرر
   rulings, not by a hadith specialist. A specialist review is the next step before a public launch.
 - Instagram, Facebook, YouTube and TikTok links cannot be read. Paste the text or a screenshot instead.
@@ -607,7 +611,7 @@ backend/
   app/          FastAPI app: pipeline, matcher, store, normalize, quotes, dorar, llm, ocr, fetch_url, schemas,
                 assistant (+ assistant_kb.md), stt, ratelimit
   ingest/       idempotent ingestion steps and seeds
-  eval/         benchmark sets, generators and runners (corpus, circulated, multilingual, embeddings)
+  eval/         benchmark sets, generators and runners (corpus, circulated, English pastes, voice)
   tests/        unit tests and integration tests (TAHQAQ_STACK=1)
 frontend/
   app/          pages: verify, result, sources, recent

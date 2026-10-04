@@ -34,8 +34,9 @@ def _normalize(url: str) -> str:
     return url
 
 
-def extract(url: str, max_chars: int = 2000) -> tuple[str, str]:
-    """Return (quote, context): the text to verify and the surrounding extracted text."""
+def extract(url: str, max_chars: int = 2000, lang: str = "ar") -> tuple[str, str]:
+    """Return (quote, context): the text to verify and the surrounding extracted text. `lang` is the interface
+    language: a page carrying both (sunnah.com) gives the Arabic text in Arabic and its English translation in English."""
     url = _normalize(url)
     host = (urlparse(url).hostname or "").lower().removeprefix("www.")
     if any(host == d or host.endswith("." + d) for d in _UNSUPPORTED):
@@ -57,12 +58,9 @@ def extract(url: str, max_chars: int = 2000) -> tuple[str, str]:
         tag.decompose()
 
     if host == "sunnah.com":
-        matn = soup.select_one(".arabic_text_details") or soup.select_one(".arabic_hadith_full")
-        if matn:
-            quote = _clean(matn.get_text(" ", strip=True))
-            en = soup.select_one(".text_details")
-            context = quote + ("\n" + _clean(en.get_text(" ", strip=True)) if en else "")
-            return quote[:max_chars], context[:max_chars]
+        found = sunnah_texts(soup, lang)
+        if found:
+            return found[0][:max_chars], found[1][:max_chars]
 
     main = _main_text(r.text, soup)
     if len(main) < 10:
@@ -100,8 +98,21 @@ def _main_text(html: str, soup: BeautifulSoup) -> str:
     return "\n".join(blocks[:6])
 
 
-def extract_text(url: str, max_chars: int = 2000) -> str:
-    return extract(url, max_chars)[0]
+def sunnah_texts(soup: BeautifulSoup, lang: str) -> tuple[str, str] | None:
+    """(quote, context) of a sunnah.com hadith page: the Arabic saying, or the English translation in English."""
+    ar_el = soup.select_one(".arabic_text_details") or soup.select_one(".arabic_hadith_full")
+    en_el = soup.select_one(".english_hadith_full") or soup.select_one(".text_details")
+    ar = _clean(ar_el.get_text(" ", strip=True)) if ar_el else ""
+    en = re.sub(r"\s+", " ", en_el.get_text(" ", strip=True)).strip() if en_el else ""
+    quote = en if lang == "en" and en else ar
+    if not quote:
+        return None
+    other = ar if quote == en else en
+    return quote, quote + ("\n" + other if other else "")
+
+
+def extract_text(url: str, max_chars: int = 2000, lang: str = "ar") -> str:
+    return extract(url, max_chars, lang)[0]
 
 
 def _clean(t: str) -> str:

@@ -19,7 +19,7 @@ export type Report = {
   id: string; state: State; confidence: number; threshold: number; match_level: string; reason_ar: string; reason_en: string; input_text: string; input_lang: "ar" | "en";
   via: "text" | "image" | "url"; extracted_text: string; source: Source | null; grade: Grade | null; grades: Grade[]; closest_only: boolean;
   diff_input: Token[]; diff_source: Token[]; translation: Translation | null; glossary_terms: Issue[]; quran_note: { ar: string; en: string } | null;
-  candidates: Candidate[]; narrations: Narration[]; match_check: MatchCheck | null; segments: Segment[]; cleaned_text: string; extraction_model: string | null; machine_translation: { language: string; english: string; model: string } | null; ai_explanation: string | null; ai_model: string | null; created_at: string; timings_ms: Record<string, number>;
+  candidates: Candidate[]; narrations: Narration[]; match_check: MatchCheck | null; segments: Segment[]; cleaned_text: string; extraction_model: string | null; ai_explanation: string | null; ai_model: string | null; created_at: string; timings_ms: Record<string, number>;
   server_id?: string;  // the API's id (r.id is replaced by the session id in the URL)
 };
 export type ApiError = { code: string; message: string };

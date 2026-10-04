@@ -22,6 +22,7 @@ import { DorarCard } from "@/components/result/DorarCard";
 import { NarrationsCard } from "@/components/result/NarrationsCard";
 import { ReviewDialog } from "@/components/result/ReviewDialog";
 import { drawShareCard, shareOrDownload } from "@/lib/shareCard";
+import { scriptOf } from "@/lib/lang";
 
 export default function ResultPage() {
   return <Suspense fallback={null}><ResultForId /></Suspense>;
@@ -50,7 +51,7 @@ function initFor(id: string, direct: string | null): Init {
 
 function ResultView({ id, direct }: { id: string; direct: string | null }) {
   const t = useTranslations("result");
-  const { lang } = useLang();
+  const { lang, setLang } = useLang();
   const [init] = useState(() => initFor(id, direct));
   const [status, setStatus] = useState<"loading" | "done" | "error" | "missing">(init.status);
   const [step, setStep] = useState(0);
@@ -64,9 +65,9 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
   const inputText = init.pending?.text || init.pending?.url || "";
 
   /** Run one verification and report through the callbacks; returns a cancel function. */
-  const start = (pending: Pending) => {
+  const start = (pending: Pending, inLang: "ar" | "en" = lang) => {
     let alive = true;
-    verifyStream({ text: pending.text, url: pending.url, lang, via: pending.via }, (st) => { if (alive) setStep(Math.max(0, st)); })
+    verifyStream({ text: pending.text, url: pending.url, lang: inLang, via: pending.via }, (st) => { if (alive) setStep(Math.max(0, st)); })
       .then((r) => {
         r.server_id = r.id;
         r.id = id;  // the session id in the URL is the key for the cached report and the history row
@@ -90,12 +91,17 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const retry = () => {
+  const retry = (inLang: "ar" | "en" = lang) => {
     const pending = getPending(id);
     if (!pending) { setStatus("missing"); return; }
     setStatus("loading"); setStep(0);
-    start(pending);
+    start(pending, inLang);
   };
+  // the text is in the other interface language: switch the interface and verify it there (only offered when the
+  // text really is in that language; for any other language switching would not help)
+  const otherLang = lang === "ar" ? "en" : "ar";
+  const canSwitch = !!inputText && !init.pending?.url && scriptOf(inputText) === otherLang;
+  const switchLang = () => { setLang(otherLang); retry(otherLang); };
 
   const onExport = () => {
     if (!report) return;
@@ -150,7 +156,7 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
       <main id="main" className="wrap" style={{ padding: "32px var(--gutter) 64px", display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start", width: "100%" }}>
         <div style={{ flex: "999 1 560px", minWidth: 0, display: "flex", flexDirection: "column", gap: 24 }}>
           {status === "loading" && <SkeletonCards inputText={inputText} inputLabel={t("input")} />}
-          {status === "error" && <ErrorCard code={err.code} message={err.message} onRetry={retry} />}
+          {status === "error" && <ErrorCard code={err.code} message={err.message} onRetry={() => retry()} onSwitchLang={canSwitch ? switchLang : undefined} />}
           {status === "missing" && <section className="card"><p style={{ margin: 0 }}>{t("notFound")}</p></section>}
           {status === "done" && r && (
             <>
@@ -158,13 +164,6 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
                 <section className="card" data-testid="extracted-card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <span className="label">{t("extracted")} · {r.via === "image" ? t("viaImage") : t("viaUrl")}</span>
                   <p dir="auto" style={{ margin: 0, fontSize: 17, lineHeight: 1.8, color: "#3d4066" }}>{r.extracted_text}</p>
-                </section>
-              )}
-              {r.machine_translation && (
-                <section className="card" data-testid="mt-card" style={{ border: "1.5px dashed #cfc9f5", background: "#fbfaff", boxShadow: "none", display: "flex", flexDirection: "column", gap: 8 }}>
-                  <span className="chip" style={{ alignSelf: "flex-start", background: "#ecebfe", color: "#4f3fd0" }}>🤖 {t("mtTitle")} · {r.machine_translation.language}</span>
-                  <span style={{ fontSize: 13, color: "#5a5d80" }}>{t("mtBody")}</span>
-                  <p dir="ltr" style={{ margin: 0, fontSize: 16, lineHeight: 1.7, textAlign: "left" }}>{r.machine_translation.english}</p>
                 </section>
               )}
               {r.segments && r.segments.length > 1 && <SegmentsCard r={r} />}

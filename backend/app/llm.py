@@ -110,11 +110,6 @@ Tasks:
 Rules: never invent text that is not in the input; never grade or comment; at most 8 segments, longest first.
 Return JSON: {"cleaned_text": "...", "segments": [{"text": "...", "type": "..."}]}"""
 
-TRANSLATE_SYSTEM = """You translate a short religious text (a hadith, a Qur'anic verse or a quoted saying) into English
-for MATCHING ONLY inside a hadith-verification tool. Translate faithfully and literally; do not explain, correct,
-complete, grade or identify the text, and do not substitute a well-known translation you remember.
-Return JSON: {"language": "<English name of the input language>", "english": "<translation>"}"""
-
 TRANSCRIBE_SYSTEM = """You transcribe images for a hadith-verification tool. Return ONLY the text visible in the
 image, exactly as printed and in reading order: every line, including any chain of narrators (حدثنا … عن …),
 headings and source notes. Keep Arabic diacritics if printed, keep quotation marks and punctuation as printed,
@@ -567,25 +562,6 @@ def extract_segments(text: str) -> dict | None:
     if cleaned and fuzz.ratio(normalize_ar(cleaned, strip_leadins=False), src_ar) < 85:
         cleaned = ""  # a "cleaned" text that drifted from the input is not a cleaning
     return {"cleaned_text": cleaned, "segments": segments, "model": model}
-
-
-def translate_for_matching(text: str) -> dict | None:
-    """{"language", "english", "model"} for text that is neither Arabic nor English, or None."""
-    client = get_client()
-    if not client.enabled:
-        return None
-    out = client.complete(TRANSLATE_SYSTEM, text[:2000], json_mode=True, max_tokens=900)
-    if not out:
-        return None
-    raw, model = out
-    try:
-        parsed = json.loads(raw[raw.find("{") : raw.rfind("}") + 1])
-    except ValueError:
-        return None
-    english = str(parsed.get("english") or "").strip()
-    if not english:
-        return None
-    return {"language": str(parsed.get("language") or "").strip(), "english": english, "model": model}
 
 
 def transcribe_image(data: bytes, media_type: str = "image/png") -> str | None:

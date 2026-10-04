@@ -21,7 +21,7 @@ for (const phone of PHONES) {
         await page.addInitScript((l) => { localStorage.setItem("tahqaq.lang", l); localStorage.setItem("tahqaq.banner.dismissed", "1"); localStorage.setItem("tahqaq.explain", "0"); }, lang);
         await page.goto("/");
         await noSideScroll(page);
-        await page.getByTestId("input-text").fill("إنما الأعمال بالنيات");
+        await page.getByTestId("input-text").fill(lang === "ar" ? "إنما الأعمال بالنيات" : "The reward of deeds depends upon the intentions");
         await page.getByTestId("verify-btn").tap();
         await expect(page.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
         await expect(page.getByTestId("pdf-btn")).toBeVisible();

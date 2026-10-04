@@ -126,7 +126,6 @@ class VerifyResponse(BaseModel):
     match_check: dict | None = None  # {"model", "outcome": "confirmed" | "rejected" | "kept", "checked"}
     segments: list[SegmentOut] = []     # AI/rule-extracted quotations with their matches (long text, link, image)
     cleaned_text: str = ""              # AI-corrected OCR/page text (certain fixes only), when it differs
-    machine_translation: dict[str, str] | None = None  # {"language","english","model"}: non-Arabic/English input, for matching only
     extraction_model: str | None = None
     ai_explanation: str | None = None  # labelled "شرح مولَّد بالذكاء الاصطناعي" in the UI
     ai_model: str | None = None

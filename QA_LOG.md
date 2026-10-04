@@ -137,3 +137,24 @@ Format: `scenario — what was wrong — what changed`. Decisions taken without 
   - The dialog opened at the right edge, not the centre. The CSS reset sets every margin to 0, which removes the `margin: auto` that centres a modal dialog. Restored.
   - The emailed PDF looked different from the export PDF, because it came from a separate template. The server now prints the site's own result page with a headless Chromium, in the person's time zone, so it is the same document as the export button. Removing the template also means the name and email no longer reach the API: they go to the contact form only.
 - **Arabic screenshot read badly (user report):** the server log showed Gemini and OpenRouter out of their free daily quota at that moment, so the image went to Tesseract, which garbles vocalised Arabic («الأغمال», «مِجْرَا خرّنَهُ» for «هجرته»). Gemini itself reads such images well. Six Gemini models were tried on the user's sunnah.com screenshot: `gemini-3.1-flash-lite` read it word for word in 5.6 s, on its own free quota. It now follows the first Gemini model in the chain. The same screenshot and the test fixture are read exactly, and both give Bukhari 1.
+
+## Input language round
+
+- **Inputs in any language caused problems (user report).** Machine translation for matching changed the very wording the verdict rests on, and results in other languages were unreliable. The rule is now simple: Arabic texts in the Arabic interface, English texts in the English interface. Anything else gets a clear message (`422 wrong_language`) and is never machine-translated. The explanation can still be written in 25 languages.
+- **The language detector had to be exact before it could refuse anything.** Measured on every record:
+  - **Arabic:** 80,914 of 80,914 recognised, including the same texts retyped with Persian «ی» and «ک».
+  - **English:** 80,802 of 80,802 published translations recognised, full and quoted, with zero refused by mistake.
+  - **Other languages:** 109 of 111 French, Indonesian, Turkish and Urdu texts are caught; the other 2 are checked as English and find no match.
+  - **Earlier rule:** it misread 0.3% of real English, translations full of transliterated names, as "not English". The new rule calls a text foreign only on positive evidence: that language's own words or letters.
+  - **Honorifics:** Arabic honorifics inside English translations («Muhammad صلى الله عليه وسلم») are ignored.
+  - **Name clash:** a clash between two patterns named `_HONORIFICS` in the same file was found and fixed while measuring.
+- **Site:** the text tab says «عربي» or «English».
+  - **Mismatch message:** a mismatched text is stopped before sending, with a one-click switch of the interface that keeps the text.
+  - **Error card:** it offers the same switch only when the text really is in the other interface's language; for French in the English interface, switching would not help, so it is not offered.
+  - **Examples:** they come in the interface language, and every label was checked against the tool's real result.
+- **Links:** sunnah.com links give the Arabic text in the Arabic interface and the English translation in the English one.
+- **Sanad:** it follows the same rule, verifying in the interface language and otherwise saying so.
+- **Removed:** the machine-translation step, its prompt, the report's translation card, and the two multilingual benchmarks with the scripts that depended on them.
+- **Edge case found:** Arabic-Indic digits («١٢٣») counted as Arabic letters, so a digits-only text was refused in the English interface. The check now counts letters only.
+- **History rewrite side effect:** the rebase of 4 October replayed the commit that stopped tracking `qa/`, and that deleted 68 local `qa/` files (fixtures, benchmark report, self-assessment). They were restored from Git, and the latest self-assessment from the session record. Lesson: back up ignored folders that were once tracked before rewriting history.
+

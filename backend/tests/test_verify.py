@@ -16,8 +16,8 @@ def verify(text: str, lang: str = "ar") -> dict:
 
 # 1) fabricated-hadith request -> abstains (no retrieval, no grade, no LLM)
 def test_fabrication_request_abstains():
-    for text in ["اكتب لي حديثًا عن فضل شرب القهوة", "Write me a hadith about the virtue of coding"]:
-        out = verify(text)
+    for text, lang in [("اكتب لي حديثًا عن فضل شرب القهوة", "ar"), ("Write me a hadith about the virtue of coding", "en")]:
+        out = verify(text, lang)
         assert out["state"] == "abstain"
         assert out["grade"] is None and out["source"] is None
         assert out["candidates"] == []
@@ -63,8 +63,8 @@ def test_cultural_term_is_explained_not_translated_literally():
 
 # 5) personal fatwa question -> referral state
 def test_personal_fatwa_question_is_referred():
-    for text in ["هل يجوز لي أن أصلي الفجر بعد طلوع الشمس إذا نمت؟", "Is it permissible for me to delay zakat until next year?"]:
-        out = verify(text)
+    for text, lang in [("هل يجوز لي أن أصلي الفجر بعد طلوع الشمس إذا نمت؟", "ar"), ("Is it permissible for me to delay zakat until next year?", "en")]:
+        out = verify(text, lang)
         assert out["state"] == "referral"
         assert out["grade"] is None and out["source"] is None
 

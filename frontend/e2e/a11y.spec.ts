@@ -17,13 +17,17 @@ async function seed(page: Page, lang: Lang) {
   }, lang);
 }
 
-const SCREENS: { name: string; path: string; ready: (p: Page) => Promise<void> }[] = [
+const TEXT = {
+  verified: { ar: "إنما الأعمال بالنيات", en: "The reward of deeds depends upon the intentions" },
+  abstain: { ar: "الصبر مفتاح كل باب مغلق في الدنيا والآخرة", en: "Whoever reads this text will have all his sins forgiven" },
+};
+const SCREENS: { name: string; path: string | ((lang: Lang) => string); ready: (p: Page) => Promise<void> }[] = [
   { name: "home", path: "/", ready: async (p) => { await expect(p.getByTestId("verify-btn")).toBeVisible(); } },
-  { name: "result (verified)", path: `/result/?id=a11y-v&text=${encodeURIComponent("إنما الأعمال بالنيات")}`,
+  { name: "result (verified)", path: (l) => `/result/?id=a11y-v&text=${encodeURIComponent(TEXT.verified[l])}`,
     ready: async (p) => { await expect(p.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 }); } },
-  { name: "result (abstain)", path: `/result/?id=a11y-a&text=${encodeURIComponent("الصبر مفتاح كل باب مغلق في الدنيا والآخرة")}`,
+  { name: "result (abstain)", path: (l) => `/result/?id=a11y-a&text=${encodeURIComponent(TEXT.abstain[l])}`,
     ready: async (p) => { await expect(p.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 }); } },
-  { name: "review dialog", path: `/result/?id=a11y-r&text=${encodeURIComponent("إنما الأعمال بالنيات")}`,
+  { name: "review dialog", path: (l) => `/result/?id=a11y-r&text=${encodeURIComponent(TEXT.verified[l])}`,
     ready: async (p) => {
       await expect(p.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
       await p.getByTestId("review-btn-aside").click();
@@ -37,7 +41,7 @@ for (const lang of ["ar", "en"] as Lang[]) {
   for (const s of SCREENS) {
     test(`[${lang}] ${s.name} has no WCAG 2.1 AA violations`, async ({ page }) => {
       await seed(page, lang);
-      await page.goto(s.path);
+      await page.goto(typeof s.path === "function" ? s.path(lang) : s.path);
       await s.ready(page);
       await page.waitForTimeout(500);
       const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();

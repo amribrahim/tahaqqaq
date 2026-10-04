@@ -15,7 +15,7 @@ from fastapi.responses import Response, StreamingResponse
 from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, review_pdf, stt, tts, voice_fix
 from .config import get_settings
 from .embeddings import get_embedder
-from .normalize import detect_language
+from .normalize import detect_language, detect_script_language
 from .schemas import (
     AssistantRequest,
     ExplainOut,
@@ -79,14 +79,35 @@ def _validate_text(text: str, limit: int | None = None) -> str:
     return text
 
 
+WRONG_LANGUAGE = {
+    ("ar", "en"): "النص بالإنجليزية، والواجهة العربية تتحقق من النصوص العربية. الصق النص بالعربية، أو بدّل الواجهة إلى English.",
+    ("ar", "other"): "النص ليس بالعربية. الواجهة العربية تتحقق من النصوص العربية، وواجهة English من النصوص الإنجليزية.",
+    ("en", "ar"): "This text is in Arabic, and the English interface checks English texts. Paste the text in English, or switch the interface to العربية.",
+    ("en", "other"): "This text is not in English. The English interface checks English texts, and the Arabic interface checks Arabic texts.",
+}
+
+
+def check_language(text: str, lang: str) -> None:
+    """Arabic texts are verified in the Arabic interface and English texts in the English one; anything else is
+    refused with a clear message (no machine translation: it would change the wording the verdict rests on)."""
+    if not re.search(r"[A-Za-z\u0621-\u064A\u0671-\u06D3]", text):   # letters only: digits say nothing
+        return   # no letters at all: nothing to tell; the pipeline abstains
+    got = detect_script_language(text)
+    if got != lang:
+        raise HTTPException(422, {"code": "wrong_language", "message": WRONG_LANGUAGE[(lang, got)]})
+
+
 def _resolve_input(req: VerifyRequest) -> tuple[str, str, str]:
     if req.url.strip():
         try:
-            main, context = fetch_url.extract(req.url, max_chars=3000)
+            main, context = fetch_url.extract(req.url, max_chars=3000, lang=req.lang)
         except fetch_url.URLError as e:
             raise HTTPException(422, {"code": "url_unreachable", "message": str(e)}) from e
-        return _validate_text(main, limit=3000), "url", context
-    return _validate_text(req.text), ("image" if req.via == "image" else "text"), ""
+        text, via, extracted = _validate_text(main, limit=3000), "url", context
+    else:
+        text, via, extracted = _validate_text(req.text), ("image" if req.via == "image" else "text"), ""
+    check_language(text, req.lang)
+    return text, via, extracted
 
 
 @app.post("/api/verify", response_model=VerifyResponse)
