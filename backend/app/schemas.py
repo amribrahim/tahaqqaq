@@ -154,6 +154,13 @@ class HealthOut(BaseModel):
     version: str
 
 
+class AssistantRequest(BaseModel):
+    """A message to the assistant; `report` is the report open on the page, if any (kept in the browser, sent as context)."""
+    message: str = Field(min_length=1, max_length=2000)
+    lang: str = Field(default="ar", max_length=8)
+    report: dict[str, Any] | None = None
+
+
 class ExplainRequest(BaseModel):
     """Re-generate the AI explanation of an existing report in another language or mode (facts unchanged)."""
     lang: str = Field(default="ar", max_length=40)

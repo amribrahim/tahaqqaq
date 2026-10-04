@@ -1,0 +1,33 @@
+{"file": "ar01.m4a", "lang": "ar", "text": "من أتى هذا البيت فلم يرفث ولم يفسق رجع كما ولدته أمه", "expect_record": [["muslim", "1350a"]]}
+{"file": "ar02.m4a", "lang": "ar", "text": "من يرد الله به خيرا يفقهه في الدين إنما أنا خازن فمن أعطيته عن طيب نفس فيبارك له فيه ومن أعطيته عن مسألة وشره كان كالذي يأكل ولا يشبع", "expect_record": [["muslim", "1037a"]]}
+{"file": "ar03.m4a", "lang": "ar", "text": "على المنبر فقال من جاء إلى الجمعة فليغتسل", "expect_record": [["bukhari", "919"]]}
+{"file": "ar04.m4a", "lang": "ar", "text": "فأنزل الله ما أنزل، فأخبرها فقالت بحمد الله لا بحمد أحد", "expect_record": [["bukhari", "3388"]]}
+{"file": "ar05.m4a", "lang": "ar", "text": "خطبتان يجلس بينهما يقرأ القرآن ويذكر الناس", "expect_record": [["muslim", "862a"]]}
+{"file": "ar06.m4a", "lang": "ar", "text": "لولا الهجرة لكنت امرأ من الأنصار، ولو سلك الناس واديا وسلكت الأنصار واديا  أو شعبا  لسلكت وادي الأنصار أو شعب الأنصار", "expect_record": [["bukhari", "7244"]]}
+{"file": "ar07.m4a", "lang": "ar", "text": "حدثنا الحسن بن بشر، حدثنا المعافى، عن عثمان بن الأسود، عن ابن أبي مليكة، قال أوتر معاوية بعد العشاء بركعة وعنده مولى لابن عباس، فأتى ابن عباس فقال دعه، فإنه صحب رسول الله صلى الله عليه وسلم", "expect_record": [["bukhari", "3764"]]}
+{"file": "ar08.m4a", "lang": "ar", "text": "كان يصلي العصر، والشمس في حجرتها قبل أن تظهر", "expect_record": [["abudawud", "407"], ["bukhari", "521"], ["bukhari", "522"], ["muslim", "611a"]]}
+{"file": "ar09.m4a", "lang": "ar", "text": "من شىء قال ما ترك إلا ما بين الدفتين. قال ودخلنا على محمد ابن الحنفية فسألناه فقال ما ترك إلا ما بين الدفتين", "expect_record": [["bukhari", "5019"]]}
+{"file": "ar10.m4a", "lang": "ar", "text": "من جر ثوبه من الخيلاء لم ينظر الله إليه يوم القيامة", "expect_record": [["muslim", "2085e"]]}
+{"file": "ar11.m4a", "lang": "ar", "text": "إن بين يدى الساعة أياما يرفع فيها العلم، وينزل فيها الجهل، ويكثر فيها الهرج، والهرج القتل", "expect_record": [["bukhari", "7064"], ["muslim", "2672a"]]}
+{"file": "ar12.m4a", "lang": "ar", "text": "لأعطين الراية  أو ليأخذن الراية  غدا رجلا يحبه الله ورسوله  أو قال يحب الله ورسوله  يفتح الله عليه", "expect_record": [["bukhari", "3702"]]}
+{"file": "ar13.m4a", "lang": "ar", "text": "حدثنا شيبان بن فروخ، حدثنا جرير يعني ابن حازم، ح وحدثنا محمد بن المثنى، حدثنا عبد الوهاب، قال سمعت يحيى بن سعيد، ح وحدثنا محمد بن المثنى، حدثنا ابن، أبي عدي عن ابن عون، كلهم عن نافع، بنحو حديث الليث عن نافع، عن أبي سعيد، الخدري عن النبي صلى الله عليه وسلم", "expect_record": [["muslim", "1584c"]]}
+{"file": "ar14.m4a", "lang": "ar", "text": "مات اليوم عبد لله صالح أصحمة فقام فأمنا وصلى عليه", "expect_record": [["muslim", "952b"]]}
+{"file": "ar15.m4a", "lang": "ar", "text": "في خاتم الذهب نحو حديث الليث", "expect_record": [["muslim", "2091c"]]}
+{"file": "ar16.m4a", "lang": "ar", "text": "والله لأن يغدو أحدكم فيحطب على ظهره فيبيعه", "expect_record": [["muslim", "1042b"]]}
+{"file": "ar17.m4a", "lang": "ar", "text": "صلاته أقبل عليهم ثم قال أحسنتم أو قال قد أصبتم يغبطهم أن صلوا الصلاة لوقتها", "expect_record": [["muslim", "274l"]]}
+{"file": "ar18.m4a", "lang": "ar", "text": "حدثنا محمد بن يوسف، عن ابن عيينة، عن عمرو، عن جابر  رضى الله عنه  قال نزلت هذه الآية فينا {إذ همت طائفتان منكم أن تفشلا} بني سلمة وبني حارثة، وما أحب أنها لم تنزل، والله يقول {والله وليهما}", "expect_record": [["bukhari", "4051"]]}
+{"file": "ar19.m4a", "lang": "ar", "text": "كان يطول في الركعة الأولى من صلاة الظهر، ويقصر في الثانية، ويفعل ذلك في صلاة الصبح", "expect_record": [["bukhari", "779"]]}
+{"file": "ar20.m4a", "lang": "ar", "text": "لكل نبي دعوة مستجابة يدعو بها، وأريد أن أختبئ دعوتي شفاعة لأمتي في الآخرة", "expect_record": [["bukhari", "6304"]]}
+{"file": "en01.m4a", "lang": "en", "text": "That he heard Allah's Messenger (ﷺ) saying in the year of the Conquest (of Mecca) while he was in Mecca, \"Allah and His Apostle have made the selling of wine (i.e. alcoholic drinks) unlawful", "expect_record": [["bukhari", "4296"]]}
+{"file": "en02.m4a", "lang": "en", "text": "Aisha added:The Prophet (ﷺ) and I used to take a bath from one container (of water)", "expect_record": [["bukhari", "5956"]]}
+{"file": "en03.m4a", "lang": "en", "text": "Ibn `Abbas asked me, \"Are you married?\" I replied, \"No.\" He said, \"Marry, for the best person of this (Muslim) nation (i.e., Muhammad) of all other Muslims, had the largest number of wives", "expect_record": [["bukhari", "5069"]]}
+{"file": "en04.m4a", "lang": "en", "text": "The same but said, \"O Allah, teach him (Ibn Abbas) the Book (i.e. the understanding of the knowledge of Qur'an).\" Narrated Khalid: As above", "expect_record": [["bukhari", "3756.2"]]}
+{"file": "en05.m4a", "lang": "en", "text": "While Allah's Messenger (ﷺ) was on the pulpit, he said, \"May Allah forgive the tribe of Ghifar! And may Allah save the tribe of Aslam! The tribe of `Usaiya have disobeyed Allah and His Apostle", "expect_record": [["bukhari", "3513"]]}
+{"file": "en06.m4a", "lang": "en", "text": "the mother of the faithful believers: The Prophet (ﷺ) was asked by his wives about Jihad and he replied, \"The best Jihad (for you) is (the performance of) Hajj", "expect_record": [["bukhari", "2876"]]}
+{"file": "en07.m4a", "lang": "en", "text": "The Prophet (ﷺ) was cupped while he was in the state of Ihram, and also while he was observing a fast", "expect_record": [["bukhari", "1938"]]}
+{"file": "en08.m4a", "lang": "en", "text": "About a man who came to Allah's Messenger (ﷺ) and said, \"I was shown in a dream last night...\" Then Ibn `Abbas mentioned the narration", "expect_record": [["bukhari", "7000"]]}
+{"file": "en09.m4a", "lang": "en", "text": "A man passed through the mosque and he was carrying arrows, the heads of which were exposed (protruding). The man was ordered (by the Prophet) to hold the iron heads so that it might not scratch (injure) any Muslim", "expect_record": [["bukhari", "7074"]]}
+{"file": "en10.m4a", "lang": "en", "text": "The Prophet (ﷺ) used to love to start doing things from the right side whenever possible, in performing ablution, putting on his shoes, and combing his hair. (Al-Ash'ath said: The Prophet (ﷺ) used to do so in all his affairs", "expect_record": [["bukhari", "5380"]]}
+{"file": "neg_french.m4a", "expect_error": "stt_language"}
+{"file": "neg_silence.wav", "expect_error": "stt_no_speech"}
+{"file": "neg_noise.wav", "expect_error": "stt_no_speech|stt_unclear|stt_language"}

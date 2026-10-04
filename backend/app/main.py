@@ -7,15 +7,23 @@ import time
 from collections.abc import Iterator
 
 import httpx
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
-from . import fetch_url, llm, ocr, pipeline
+from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, stt
 from .config import get_settings
 from .embeddings import get_embedder
 from .normalize import detect_language
-from .schemas import ExplainOut, ExplainRequest, HealthOut, ReviewRequest, VerifyRequest, VerifyResponse
+from .schemas import (
+    AssistantRequest,
+    ExplainOut,
+    ExplainRequest,
+    HealthOut,
+    ReviewRequest,
+    VerifyRequest,
+    VerifyResponse,
+)
 from .store import get_store
 
 logging.basicConfig(level=logging.INFO)
@@ -208,6 +216,26 @@ def review(req: ReviewRequest) -> dict:
         except httpx.HTTPError as e:
             log.warning("review webhook failed: %s", e)
     return {"accepted": True, "forwarded": forwarded, "sla_hours": 48, "ts": int(time.time())}
+
+
+@app.post("/api/assistant")
+def assistant_endpoint(req: AssistantRequest, request: Request) -> dict:
+    """The chat assistant, limited to verifying hadiths, explaining the open report and answering questions about the
+    tool. Verification replies come from the pipeline's report only. Nothing is stored server-side."""
+    ratelimit.check(request, "assistant", limit=30, window_s=600, lang=req.lang)
+    return assistant.reply(req.message, req.lang, req.report)
+
+
+@app.post("/api/stt")
+async def stt_endpoint(request: Request, audio: UploadFile = File(...), lang: str = Form("ar")) -> dict:
+    """Speech to text for the assistant (Arabic and English only). An unclear recording returns an error, never a guess;
+    the transcript is shown to the user before anything is verified. Audio is not stored."""
+    ratelimit.check(request, "stt", limit=20, window_s=600, lang=lang)
+    data = await audio.read()
+    try:
+        return stt.transcribe(data, audio.filename or "audio.webm", audio.content_type or "")
+    except stt.STTError as e:
+        raise HTTPException(e.status, {"code": e.code, "message": e.message(lang)}) from e
 
 
 @app.get("/api/sources")

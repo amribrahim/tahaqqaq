@@ -131,7 +131,8 @@ for (const lang of LANGS) {
     });
 
     test("near-meaning text → uncertain with closest-text note", async ({ page }) => {
-      await verifyText(page, lang, "النظافة من الإيمان");
+      // close in form to «النظافة من الإيمان» (itself a curated fabricated saying) but a different text
+      await verifyText(page, lang, "الصدق من الإيمان");
       expect(["uncertain", "partial"]).toContain(await state(page));
       if ((await state(page)) === "uncertain") {
         await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "للنص الأقرب" : "closest text");

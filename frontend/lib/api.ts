@@ -163,3 +163,28 @@ export async function explainIn(report: Report, lang: string, mode: "brief" | "e
   if (!res.ok) throw await errorOf(res);
   return res.json();
 }
+
+export type AssistantReply = {
+  kind: "verify" | "report" | "tool" | "fatwa" | "generate" | "greeting" | "thanks" | "out_of_scope" | "unavailable";
+  reply: string; lang: "ar" | "en"; report?: Report; sources?: string[]; model?: string;
+};
+
+/** POST /api/assistant: verification, the open report, or questions about the tool (nothing else). */
+export async function askAssistant(message: string, lang: Lang, report: Report | null): Promise<AssistantReply> {
+  const res = await fetchWithRetry(`${API}/api/assistant`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message, lang, report }),
+  });
+  if (!res.ok) throw await errorOf(res);
+  return res.json();
+}
+
+/** POST /api/stt: speech to text (Arabic and English). Unclear audio raises a VerifyError with a stt_* code. */
+export async function transcribeAudio(audio: Blob, lang: Lang): Promise<{ text: string; lang: "ar" | "en"; duration: number; confidence: number }> {
+  const ext = audio.type.includes("mp4") ? "m4a" : audio.type.includes("ogg") ? "ogg" : audio.type.includes("wav") ? "wav" : "webm";
+  const fd = new FormData();
+  fd.append("audio", audio, `voice.${ext}`);
+  fd.append("lang", lang);
+  const res = await fetch(`${API}/api/stt`, { method: "POST", body: fd });
+  if (!res.ok) throw await errorOf(res);
+  return res.json();
+}
