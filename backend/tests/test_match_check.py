@@ -76,3 +76,14 @@ def test_a_quran_verse_is_never_raised_by_the_check(monkeypatch):
     verse["record"].kind = "quran"
     pipeline._check_match("We were on a campaign and had no wives with us ...", [verse])
     assert verse["confidence"] == 60 and not verse.get("ai_confirmed")
+
+
+def test_a_meaning_only_english_match_needs_confirmation(monkeypatch):
+    # no provider at all: an English match that rests on meaning (not wording) is shown only as the closest text
+    monkeypatch.setattr(llm_mod, "_client", LLMClient(Settings(_env_file=None, llm_provider="none", anthropic_api_key="")))
+    meaning, wording = _cand(1, 78, lex=55.0), _cand(2, 80, lex=85.0)
+    meaning["meaning_only"] = True
+    cands = [meaning, wording]
+    pipeline._check_match("x", cands)
+    assert meaning["confidence"] == 74 and meaning["unconfirmed"]
+    assert wording["confidence"] == 80 and cands[0] is wording   # shared wording stands on its own

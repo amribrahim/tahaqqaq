@@ -1,14 +1,43 @@
 {
   "_note": "Parallel narrations reviewed by hand (by the developer, not by a hadith scholar) from the benchmark runs: for each labelled record, other records that carry the SAME report (same saying or incident, possibly another Companion or wording). A different incident that only shares the topic or the ruling is NOT listed. The runner counts an answer as the right hadith when it returns the labelled record, one listed here, or a record whose narrations include the label.",
-  "muslim 2658g": ["bukhari 1358"],
-  "bukhari 4076": ["bukhari 4073", "bukhari 4074"],
-  "bukhari 1471": ["bukhari 1470", "muslim 1042a"],
-  "bukhari 6220": ["ibnmajah 3226"],
-  "muslim 1192a": ["bukhari 267", "nasai 431"],
-  "muslim 1544": ["muslim 1536p"],
-  "muslim 701": ["bukhari 400"],
-  "bukhari 3078": ["bukhari 4305"],
-  "bukhari 2734": ["bukhari 1498"],
-  "bukhari 6111": ["bukhari 406", "nasai 724", "muslim 547a"],
-  "bukhari 6471": ["nasai 1644"]
+  "muslim 2658g": [
+    "bukhari 1358",
+    "muslim 2659a"
+  ],
+  "bukhari 4076": [
+    "bukhari 4073",
+    "bukhari 4074"
+  ],
+  "bukhari 1471": [
+    "bukhari 1470",
+    "muslim 1042a",
+    "muslim 1042c"
+  ],
+  "bukhari 6220": [
+    "ibnmajah 3226"
+  ],
+  "muslim 1192a": [
+    "bukhari 267",
+    "nasai 431"
+  ],
+  "muslim 1544": [
+    "muslim 1536p"
+  ],
+  "muslim 701": [
+    "bukhari 400"
+  ],
+  "bukhari 3078": [
+    "bukhari 4305"
+  ],
+  "bukhari 2734": [
+    "bukhari 1498"
+  ],
+  "bukhari 6111": [
+    "bukhari 406",
+    "nasai 724",
+    "muslim 547a"
+  ],
+  "bukhari 6471": [
+    "nasai 1644"
+  ]
 }

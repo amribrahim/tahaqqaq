@@ -15,9 +15,9 @@ import httpx
 HERE = Path(__file__).resolve().parent
 
 
-def verify(c: httpx.Client, text: str) -> dict:
+def verify(c: httpx.Client, text: str, pause: float = 1.0) -> dict:
     for wait in (0, 20, 45, 90):   # other-language input needs the LLM translation step; free tiers rate-limit
-        time.sleep(wait or 1)
+        time.sleep(wait or pause)
         j = c.post("/api/verify", json={"text": text, "lang": "en", "explain": False}).json()
         if not (j["state"] == "abstain" and "Arabic or English" in (j.get("reason_en") or "")):
             return j
@@ -29,13 +29,14 @@ def main() -> None:
     ap.add_argument("--api", default="http://localhost:8000")
     ap.add_argument("--out", default="/tmp/multilingual.md")
     ap.add_argument("--save", default="")
+    ap.add_argument("--pause", type=float, default=1.0, help="seconds between items (free model tiers allow few calls per minute)")
     a = ap.parse_args()
     items = [json.loads(x) for x in (HERE / "multilingual.jsonl").read_text(encoding="utf-8").splitlines() if x.strip()]
     equiv = {k: v for k, v in json.loads((HERE / "multilingual_equivalents.json").read_text(encoding="utf-8")).items() if not k.startswith("_")}
     rows = []
     with httpx.Client(base_url=a.api, timeout=180) as c:
         for it in items:
-            j = verify(c, it["text"])
+            j = verify(c, it["text"], a.pause)
             src = j.get("source") or {}
             got = [src.get("collection"), src.get("number")] if src else None
             narr = [[n["collection"], n["number"]] for n in j.get("narrations") or []]

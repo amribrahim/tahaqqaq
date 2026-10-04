@@ -305,7 +305,26 @@ CHECK_REJECT_CAP = 60       # a rejected record can at most be shown as the clos
 STRONG_JUDGES = ("groq/", "anthropic/")   # only these may raise a record; a lighter fallback model may only reject
 
 
+def _cap_unconfirmed(cands: list[dict]) -> None:
+    """An English match resting on meaning alone, not confirmed by a strong model, is at most the closest text."""
+    partial = get_settings().threshold_partial
+    changed = False
+    for c in cands:
+        if c.get("meaning_only") and not c.get("ai_confirmed") and c["confidence"] >= partial:
+            c["confidence"], c["unconfirmed"], changed = partial - 1, True, True
+    if changed:
+        order = {id(c): k for k, c in enumerate(cands)}
+        cands.sort(key=lambda c: (-c["confidence"], order[id(c)]))
+
+
 def _check_match(query: str, cands: list[dict]) -> dict | None:
+    try:
+        return _run_match_check(query, cands)
+    finally:
+        _cap_unconfirmed(cands)
+
+
+def _run_match_check(query: str, cands: list[dict]) -> dict | None:
     if not cands or not llm.get_client().enabled:
         return None
     eligible = [c for c in cands[:3] if c["stage"] != "exact" and c["confidence"] < get_settings().threshold_verified

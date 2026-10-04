@@ -99,7 +99,9 @@ for (const lang of LANGS) {
 
     test("english translation of a sahih hadith → arabic original + translation card", async ({ page }) => {
       await verifyText(page, lang, "Actions are judged by intentions and every person will get what he intended");
-      expect(["verified", "partial"]).toContain(await state(page));
+      // a free paraphrase matches on meaning: attributed once a strong model confirms it, otherwise the closest text
+      expect(["verified", "partial", "uncertain"]).toContain(await state(page));
+      await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح" : "Sahih");
       await expect(page.getByTestId("translation-card")).toBeVisible();
       await expect(page.getByTestId("translation-card")).toContainText("الأَعْمَالُ");
       await shot(page, `${lang}-translation`);
@@ -176,7 +178,8 @@ for (const lang of LANGS) {
       test.skip(!h.llm, "no LLM provider configured on the stack");
       await verifyText(page, lang, "Les actions ne valent que par les intentions, et chacun n'aura que ce qu'il a eu l'intention de faire");
       await expect(page.getByTestId("mt-card")).toBeVisible();
-      expect(["verified", "partial"]).toContain(await state(page));
+      // attributed when the model check confirms the match, otherwise shown as the closest text (never another hadith)
+      expect(["verified", "partial", "uncertain"]).toContain(await state(page));
       await expect(page.getByTestId("grade-card")).toContainText(lang === "ar" ? "صحيح" : "Sahih");
       await shot(page, `${lang}-other-language`);
     });

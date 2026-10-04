@@ -31,6 +31,7 @@ LEX_FOR_SEMANTIC = 45.0  # … with at least some shared wording: MiniLM gives 0
 TRIGRAM_FOR_SEMANTIC = 0.55  # … and a trigram hit from the index (wording decides; meaning only ranks)
 LEX_STRONG = 80.0       # stage 2 alternative: strong blended wording evidence (typos, extra words)
 LEX_WITH_TRIGRAM = 70.0
+EN_SEM_FOR_WORDING = 60.0  # English: shared common words alone are not evidence; the meaning must agree too
 
 _STOP_AR = set("من في ما هذا هذه بين الي علي عن ان لا له لها او ثم قد كان قال ذلك الذي التي هو هي انا انت اذا حتي كل ولا الا لم لن ليس عند بعد قبل مع يا ثم فان ان".split())
 _STOP_EN = set("the a an of to in and or is are was were be been for on at by with that this it he she they them his her its as not no until till who whom which what".split())
@@ -109,7 +110,9 @@ def _stage(r: Record, lex: float, score: int, lang: str, short_miss: bool = Fals
         return "exact", max(score, 90)
     cos = r.semantic
     if lang == "en":
-        lexical_ok = lex >= LEX_WITH_TRIGRAM or score >= 75  # translations legitimately vary in wording
+        # translations legitimately vary in wording; a wording match must also agree in meaning, and a match on
+        # meaning alone is confirmed (or not) by the pipeline's match check
+        lexical_ok = (lex >= LEX_WITH_TRIGRAM and _semantic(cos, lang) >= EN_SEM_FOR_WORDING) or score >= 75
     else:
         lexical_ok = (r.lexical >= TRIGRAM_MIN and lex >= LEX_WITH_TRIGRAM) or lex >= LEX_STRONG
     if lexical_ok and short_miss:
@@ -180,7 +183,9 @@ def search(text: str, lang: str = "ar", kinds: list[str] | None = None, limit: i
         score = confidence(lex, sem, lang)
         stage, conf = _stage(r, lex, score, lang, _short_quote_missing_word(norm, docs[r.id], lang))
         r.stage = stage
-        cands.append({"record": r, "lexical": lex, "semantic": sem, "confidence": conf, "stage": stage})
+        # English admitted on meaning rather than shared wording: needs a strong model's confirmation (pipeline)
+        meaning_only = lang == "en" and stage == "trigram" and lex < LEX_WITH_TRIGRAM
+        cands.append({"record": r, "lexical": lex, "semantic": sem, "confidence": conf, "stage": stage, "meaning_only": meaning_only})
     # order: cascade stage, then confidence; ties: Qur'an, the Sahihayn, the curated seed, the Sunan
     prio = {"quran": 0, "bukhari": 1, "muslim": 2, "seed": 3}
     rank = {"exact": 0, "trigram": 1, "semantic": 2, "none": 3}
