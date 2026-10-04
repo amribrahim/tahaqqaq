@@ -304,6 +304,7 @@
     "phase_thinking": "أتحقق…",
     "phase_confirming": "قل نعم أو لا",
     "phase_speaking": "أتحدث…",
-    "phase_idle": ""
+    "phase_idle": "",
+    "asHeard": "كما سُمع قبل تصحيح الإملاء"
   }
 }

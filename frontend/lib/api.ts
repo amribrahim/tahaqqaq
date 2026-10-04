@@ -179,7 +179,7 @@ export async function askAssistant(message: string, lang: Lang, report: Report |
 }
 
 /** POST /api/stt: speech to text (Arabic and English). Unclear audio raises a VerifyError with a stt_* code. */
-export async function transcribeAudio(audio: Blob, lang: Lang): Promise<{ text: string; lang: "ar" | "en"; duration: number; confidence: number }> {
+export async function transcribeAudio(audio: Blob, lang: Lang): Promise<{ text: string; heard?: string; corrected?: boolean; lang: "ar" | "en"; duration: number; confidence: number }> {
   const ext = audio.type.includes("mp4") ? "m4a" : audio.type.includes("ogg") ? "ogg" : audio.type.includes("wav") ? "wav" : "webm";
   const fd = new FormData();
   fd.append("audio", audio, `voice.${ext}`);

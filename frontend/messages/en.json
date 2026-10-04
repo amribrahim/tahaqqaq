@@ -304,6 +304,7 @@
     "phase_thinking": "Checking…",
     "phase_confirming": "Say yes or no",
     "phase_speaking": "Speaking…",
-    "phase_idle": ""
+    "phase_idle": "",
+    "asHeard": "As heard, before spelling correction"
   }
 }

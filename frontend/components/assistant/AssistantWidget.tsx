@@ -46,6 +46,7 @@ export function AssistantWidget() {
   const [rec, setRec] = useState<"idle" | "recording" | "transcribing">("idle");
   const [seconds, setSeconds] = useState(0);
   const [pending, setPending] = useState<string | null>(null);
+  const [heardRaw, setHeardRaw] = useState<string | null>(null);   // the transcript before spelling correction
   // «سند» speaks by default; the mute choice is remembered on this device
   const [speak, setSpeak] = useState(() => { try { return typeof window === "undefined" || localStorage.getItem(VOICE_PREF) !== "0"; } catch { return true; } });
   const speaker = useRef<VoiceEngine | null>(null);
@@ -174,6 +175,7 @@ export function AssistantWidget() {
       try {
         const out = await transcribeAudio(new Blob(chunks.current, { type: mr.mimeType }), lang);
         setPending(out.text);
+        setHeardRaw(out.corrected && out.heard && out.heard !== out.text ? out.heard : null);
       } catch (e) {
         push({ role: "bot", text: e instanceof VerifyError && e.message ? e.message : t("errNetwork"), error: true });
       } finally { setRec("idle"); scrollDown(); }
@@ -228,7 +230,8 @@ export function AssistantWidget() {
             {pending !== null && (
               <div className="assistant-bubble confirm" data-testid="assistant-confirm">
                 <strong style={{ fontSize: 13 }}>{t("confirmTitle")}</strong>
-                <p dir="auto" style={{ margin: "6px 0 10px" }} data-testid="assistant-transcript">{pending}</p>
+                <p dir="auto" style={{ margin: "6px 0 4px" }} data-testid="assistant-transcript">{pending}</p>
+                {heardRaw && <p dir="auto" data-testid="assistant-heard-raw" style={{ margin: "0 0 10px", fontSize: 12, color: "#5a5d80" }}>{t("asHeard")}: {heardRaw}</p>}
                 <div style={{ display: "flex", gap: 8 }}>
                   <button type="button" className="btn btn-s btn-primary" onClick={() => send(pending)} data-testid="assistant-confirm-send">{t("confirmSend")}</button>
                   <button type="button" className="btn btn-s btn-secondary" onClick={() => { setInput(pending); setPending(null); field.current?.focus(); }} data-testid="assistant-confirm-edit">{t("confirmEdit")}</button>

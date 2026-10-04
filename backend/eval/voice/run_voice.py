@@ -56,20 +56,24 @@ def main() -> None:
                 continue
             norm = normalize_ar if it["lang"] == "ar" else normalize_latin
             w = wer(norm(it["text"]), norm(body["text"]))
+            w_raw = wer(norm(it["text"]), norm(body.get("heard") or body["text"]))
             v = c.post("/api/verify", json={"text": body["text"], "lang": it["lang"], "explain": False}).json()
             src = v.get("source") or {}
             got = [src.get("collection"), src.get("number")]
             narr = [[n["collection"], n["number"]] for n in v.get("narrations") or []]
             right = v["state"] in ("verified", "partial") and (got in it["expect_record"] or any(e in narr for e in it["expect_record"]))
-            rows.append({**it, "ok": right, "wer": w, "state": v["state"], "got": got, "transcript": body["text"], "confidence": body["confidence"]})
+            rows.append({**it, "ok": right, "wer": w, "wer_raw": w_raw, "state": v["state"], "got": got, "transcript": body["text"], "confidence": body["confidence"]})
     pos = [r for r in rows if "expect_error" not in r]
     neg = [r for r in rows if "expect_error" in r]
-    lines = ["| Set | n | Right hadith | Median word error rate | Mean word error rate |", "|---|---|---|---|---|"]
+    lines = ["| Set | n | Right hadith | Word error rate as heard (median / mean) | After correction (median / mean) | Perfect transcripts |",
+             "|---|---|---|---|---|---|"]
     for lang in ("ar", "en"):
         rs = [r for r in pos if r["lang"] == lang]
         if rs:
-            lines.append(f"| {lang} | {len(rs)} | {sum(r['ok'] for r in rs)}/{len(rs)} | {statistics.median(r['wer'] for r in rs):.0%} | "
-                         f"{statistics.mean(r['wer'] for r in rs):.0%} |")
+            lines.append(f"| {lang} | {len(rs)} | {sum(r['ok'] for r in rs)}/{len(rs)} | "
+                         f"{statistics.median(r.get('wer_raw', 1) for r in rs):.0%} / {statistics.mean(r.get('wer_raw', 1) for r in rs):.0%} | "
+                         f"{statistics.median(r['wer'] for r in rs):.0%} / {statistics.mean(r['wer'] for r in rs):.0%} | "
+                         f"{sum(r['wer'] == 0 for r in rs)}/{len(rs)} |")
     lines.append(f"| refusals (silence, French, noise) | {len(neg)} | {sum(r['ok'] for r in neg)}/{len(neg)} refused correctly | — | — |")
     misses = [f"- {r['file']}: {r.get('state', '')} {r.get('got')} | {r.get('transcript', '')[:80]}" for r in rows if not r["ok"]]
     print("\n".join(lines + ["", "Misses:"] + (misses or ["none"])))

@@ -57,7 +57,7 @@ Three benchmarks in [`backend/eval`](backend/eval), run against the live API:
 |---|---|---|
 | Corpus set (98 inputs, fixed seed) | Exact and variant quotes of Sahihayn hadiths, fabricated/weak sayings, exact and misquoted verses, invented texts, fatwa questions | **100%** right hadith (98% the exact labelled number); **0** attributions to another hadith; **6/6** invented texts abstain; median latency ~0.3 s |
 | Circulated texts (50 sayings, 46 scored) | Sayings that circulate on social media as hadiths; each label decided from الدرر السنية rulings, quoted per item | Authentic: **21/21** confirmed. Weak, fabricated or not a hadith: **22/25** flagged with their ruling or abstained, 3 shown only as the closest text. **0 dangerous errors** (nothing fabricated shown as authentic, nothing authentic shown as weak) |
-| Voice in the assistant (33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic **20/20** right hadith, English **9/10**; median word error rate 10% Arabic, 5% English; silence, French and noise all refused with a clear message |
+| Voice in the assistant (33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic **20/20** right hadith, English **9/10**; Arabic word error rate 10% as heard and **0%** median after the spelling correction (13/20 perfect transcripts), English 5%; silence, French and noise all refused with a clear message |
 | Multilingual paraphrases (90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | **31%** confirmed the right hadith (French 28%, Indonesian 39%, Urdu 33%, Turkish 33%, English 22%); 56 abstained or shown only as the closest text; **3 of 90** attributed to another hadith, each a different incident on the same topic. Measured with the free model check available; when its quota is exhausted, matches on meaning alone fall back to the closest text |
 
 "Right hadith" counts the labelled record, a record whose narrations include it, or a parallel narration confirmed by hand review ([`multilingual_equivalents.json`](backend/eval/multilingual_equivalents.json)). The embedding model was also tested against a ten-times-larger one (multilingual-e5-large); it gave no gain, so the small model stays ([TECHNICAL.md §9](TECHNICAL.md#9-retrieval-cascade-and-scoring)).
@@ -76,7 +76,7 @@ Re-runnable ingestion steps: `ingest.ingest_hadith`, `ingest.ingest_quran`, `ing
 ## Tests
 
 ```bash
-cd backend && .venv/bin/pytest -q                                  # 154 unit tests (offline, real fixtures)
+cd backend && .venv/bin/pytest -q                                  # 167 unit tests (offline, real fixtures)
 docker compose --profile qa up -d db api web fixtures
 cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # 37 checks against the running stack
 cd frontend && npx playwright test                                 # 85 browser tests: 57 scenarios in Arabic and English, 14 assistant

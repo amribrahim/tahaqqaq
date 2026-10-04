@@ -409,6 +409,19 @@ headers, never in URLs, so they cannot appear in access logs.
 
 Spoken replies are on by default, with a mute button remembered on the device.
 
+**Spelling correction of Arabic voice transcripts** (`backend/app/voice_fix.py`): Whisper makes spelling slips on
+classical Arabic, such as «لو لا» for «لولا», «بن» for «ابن», «يصل» for «يصلي», «شفاع» for «شفاعه» and «مرئ» for
+«امرئ». When the transcript matches a source text at 80 or more, each mismatched stretch is compared with the
+source's words in a spelling-blind form: spaces, hamza, a leading alef or «ال», and weak endings ignored. The source's
+spelling is used only when the two forms are then identical. Rules:
+
+- A different word is never changed: «بالنية», a real narration, stays «بالنية».
+- Words the speaker added are kept, and missing words are never inserted.
+- The raw transcript is shown under the corrected one as "as heard".
+
+On the voice benchmark this lowered the Arabic word error rate from 10% to 0% median and 5% mean, with 13 of 20
+transcripts perfect.
+
 **Misheard attributions:** speech-to-text sometimes garbles the opening, for example «قال رسول الله» heard as
 «ورحمة الله». Anything before «صلى الله عليه وسلم» within the first six words is therefore treated as the attribution
 and removed before matching. Without this, «إنما الأعمال بالنيات» fell one point short of "partial".
@@ -419,7 +432,7 @@ and removed before matching. Without this, «إنما الأعمال بالني�
 
 | Set | Right hadith | Median word error rate |
 |---|---|---|
-| Arabic: 20 authentic hadiths read aloud | 20 of 20 | 10% |
+| Arabic: 20 authentic hadiths read aloud | 20 of 20 | 10% as heard, 0% after spelling correction (mean 5%, 13/20 perfect) |
 | English: 10 published translations read aloud | 9 of 10 | 5% |
 | Silence, French, noise | 3 of 3 refused with the right message | — |
 
@@ -481,7 +494,7 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 154 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 167 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
 | Browser tests (Playwright, Chrome), Arabic and English | 57 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
 | Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages | 10 | `npx playwright test e2e/a11y.spec.ts` |
@@ -494,7 +507,7 @@ Details:
 |---|---|---|
 | Labelled corpus set (`benchmark.jsonl`, 98 inputs, fixed seed) | Exact and variant quotes of Sahihayn hadiths, fabricated/weak seeds, exact and misquoted verses, invented texts, fatwa questions | 98% strict, **100% same hadith**, 0 attributions to another hadith, 6/6 invented texts abstain, median latency ~0.3 s |
 | Circulated texts (`circulated.jsonl`, 50 sayings, 46 scored) | Sayings that circulate on social media; labels decided from الدرر rulings, quoted per item | Authentic 21/21 confirmed; weak/fabricated/not hadith 22/25 flagged or abstained, 3 closest text only; **0 dangerous errors** |
-| Voice (`eval/voice/`, 33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic 20/20 right hadith, English 9/10; median word error rate 10% Arabic, 5% English; 3/3 refusals correct |
+| Voice (`eval/voice/`, 33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic 20/20 right hadith, English 9/10; Arabic word error rate 10% as heard, 0% median after spelling correction; English 5%; 3/3 refusals correct; no attribution to another hadith |
 | Multilingual paraphrases (`multilingual.jsonl`, 90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | 31% confirmed the right hadith; 56 abstained or closest text only; 3 of 90 attributed to another hadith (different incident, same topic). Measured with the model check available |
 
 "Same hadith" means the returned record is the labelled one, or the labelled record appears among the returned

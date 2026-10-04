@@ -248,3 +248,33 @@ def test_piper_speaks_arabic_without_a_quota():
     tts._piper_voice.cache_clear()
     audio, mime = tts.synthesize("مؤيَّد بمصدر.", "ar")
     assert mime == "audio/wav" and audio[:4] == b"RIFF" and len(audio) > 20_000
+
+
+# -- corpus-aware spelling correction of Arabic voice transcripts ---------------------------------------
+@pytest.mark.parametrize("heard,source,same", [
+    ("مرئ", "امرئ", True), ("لو لا", "لولا", True), ("بن", "ابن", True), ("يصل", "يصلي", True),
+    ("شفاع", "شفاعه", True), ("ظهر", "الظهر", True),
+    ("بالنيه", "بالنيات", False),     # a real variant wording («إنما الأعمال بالنية»), never changed
+    ("الليف", "الليث", False), ("دعوتي", "دعوه", False),
+])
+def test_spelling_blind_skeleton(heard, source, same):
+    from app.normalize import normalize_ar
+    from app.voice_fix import skeleton
+
+    assert (skeleton([normalize_ar(w) for w in heard.split()]) == skeleton([normalize_ar(w) for w in source.split()])) is same
+
+
+def test_snap_fixes_spelling_but_keeps_words_and_variants():
+    from app.voice_fix import snap
+
+    assert snap("إنما الأعمال بالنيات وإنما لكل مرئ ما نوى") == ("إنما الأعمال بالنيات وإنما لكل امرئ ما نوى", True)
+    assert snap("إنما الأعمال بالنية وإنما لكل امرئ ما نوى")[1] is False      # a narration variant stays as said
+    assert snap("كلام لا علاقة له بأي حديث نبوي معروف هنا")[1] is False         # no strong match: untouched
+    fixed, changed = snap("إنما الأعمال بالنيات وإنما لكل مرئ ما نوى يا إخواني")
+    assert changed and fixed.endswith("يا إخواني")                               # words the speaker added are kept
+
+
+def test_stt_endpoint_returns_corrected_text_and_what_was_heard(monkeypatch):
+    monkeypatch.setattr(stt, "transcribe", lambda *a, **k: {"text": "إنما الأعمال بالنيات وإنما لكل مرئ ما نوى", "lang": "ar", "duration": 3, "confidence": 90})
+    out = client.post("/api/stt", files={"audio": ("a.webm", b"x" * 10, "audio/webm")}, data={"lang": "ar"}).json()
+    assert out["corrected"] and out["text"].endswith("لكل امرئ ما نوى") and out["heard"].endswith("لكل مرئ ما نوى")

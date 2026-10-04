@@ -11,7 +11,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 
-from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, stt, tts
+from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, stt, tts, voice_fix
 from .config import get_settings
 from .embeddings import get_embedder
 from .normalize import detect_language
@@ -249,9 +249,16 @@ async def stt_endpoint(request: Request, audio: UploadFile = File(...), lang: st
     ratelimit.check(request, "stt", limit=40, window_s=600, lang=lang)
     data = await audio.read()
     try:
-        return stt.transcribe(data, audio.filename or "audio.webm", audio.content_type or "")
+        out = stt.transcribe(data, audio.filename or "audio.webm", audio.content_type or "")
     except stt.STTError as e:
         raise HTTPException(e.status, {"code": e.code, "message": e.message(lang)}) from e
+    out["heard"], out["corrected"] = out["text"], False
+    if out["lang"] == "ar":
+        try:
+            out["text"], out["corrected"] = voice_fix.snap(out["text"])
+        except Exception as e:  # noqa: BLE001 - the correction is an aid; the transcript stands without it
+            log.warning("voice correction failed: %s", e)
+    return out
 
 
 @app.get("/api/sources")

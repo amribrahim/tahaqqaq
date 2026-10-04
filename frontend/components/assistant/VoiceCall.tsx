@@ -32,6 +32,7 @@ export function VoiceCall(props: {
   const s = useTranslations("states");
   const [phase, setPhase] = useState<Phase>("idle");
   const [heard, setHeard] = useState("");
+  const [heardRaw, setHeardRaw] = useState("");
   const [answer, setAnswer] = useState<{ text: string; state?: State; reportId?: string } | null>(null);
   const engine = useRef<VoiceEngine | null>(null);
   const choice = useRef<((yes: boolean) => void) | null>(null);
@@ -87,6 +88,7 @@ export function VoiceCall(props: {
       try {
         const out = await transcribeAudio(blob, lang);
         text = out.text; heardLang = out.lang;
+        setHeardRaw(out.corrected && out.heard && out.heard !== out.text ? out.heard : "");
       } catch (e) {
         setPhase("speaking"); await eng.speak(errorText(e), lang); continue;
       }
@@ -139,6 +141,7 @@ export function VoiceCall(props: {
         <div className="voice-card">
           <span style={{ fontSize: 12, color: "#5a5d80" }}>{t("vHeardLabel")}</span>
           <p dir="auto" data-testid="voice-heard" style={{ margin: "4px 0 0" }}>{heard}</p>
+          {heardRaw && <p dir="auto" style={{ margin: "4px 0 0", fontSize: 12, color: "#5a5d80" }}>{t("asHeard")}: {heardRaw}</p>}
         </div>
       )}
       {phase === "confirming" && (
