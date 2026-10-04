@@ -15,7 +15,13 @@ from pathlib import Path
 import httpx
 
 HERE = Path(__file__).resolve().parent
-_WEAK = re.compile(r"ضعيف|موضوع|باطل|لا أصل|منكر|كذب|مكذوب|لا يصح|ليس بحديث|واه|Da'?if|Fabricated|False|No basis", re.I)
+_WEAK_EN = re.compile(r"Da'?if|Fabricated|False|No basis|Not a hadith|Not authentic|Very weak|Weak|Denounced", re.I)
+
+
+def _weak(grade_ar: str) -> bool:
+    from app.grades import is_unreliable  # the product's own reading of a ruling
+
+    return is_unreliable(grade_ar) or bool(_WEAK_EN.search(grade_ar))
 
 
 def main() -> None:
@@ -31,7 +37,7 @@ def main() -> None:
             g = (j.get("grade") or {}).get("grade_ar", "")
             src = j.get("source") or {}
             state = j["state"]
-            weak_shown = state == "unreliable" or (state in ("verified", "partial") and bool(_WEAK.search(g)))
+            weak_shown = state == "unreliable" or (state in ("verified", "partial") and _weak(g))
             strong_shown = state in ("verified", "partial") and not weak_shown
             if it["label"] == "authentic":
                 outcome = "right" if strong_shown else "dangerous" if weak_shown else "missed"

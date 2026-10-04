@@ -80,3 +80,17 @@ def test_a_short_arabic_quote_must_contain_every_word(quote, record, missing):
     from app.normalize import normalize_ar
 
     assert _short_quote_missing_word(normalize_ar(quote), normalize_ar(record), "ar") is missing
+
+
+def test_every_curated_saying_resolves_to_a_weak_state():
+    # a curated circulated saying must never show a green "confirmed" state next to a not-authentic ruling
+    import json
+    from pathlib import Path
+
+    from app.grades import is_unreliable
+
+    seed = json.loads((Path(__file__).resolve().parents[1] / "ingest" / "seeds" / "rulings_seed.json").read_text(encoding="utf-8"))
+    assert len(seed["items"]) >= 60
+    for it in seed["items"]:
+        assert it["grades"] and is_unreliable(it["grades"][0]["grade_ar"]), it["text_ar"]
+        assert all(g["grade_ar"] and g["grader_ar"] and g["source_ar"] for g in it["grades"])

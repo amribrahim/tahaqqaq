@@ -177,6 +177,17 @@ class DorarClient:
         self._cache_put(key, self.search_url(matn, words), {"cards": cards})
         return cards
 
+    def search_authentic(self, matn: str, words: int = 8) -> list[dict]:
+        """The same search restricted by الدرر's own ruling filter to rulings of authenticity (d[]=1)."""
+        q = " ".join(re.sub(r"[^\w\s]", " ", strip_tashkeel(matn)).split()[:words])
+        key = f"hadith-search-authentic:{normalize_ar(q)}"
+        hit = self._cache_get(key)
+        if hit is not None:
+            return hit.get("cards", [])
+        cards = parse_cards(self._get(f"{BASE}/hadith/search", q=q, **{"d[]": "1"}))
+        self._cache_put(key, self.search_url(matn, words) + "&d[]=1", {"cards": cards})
+        return cards
+
     def explain(self, xplain_id: str) -> dict:
         key = f"hadith-explain:{xplain_id}"
         hit = self._cache_get(key)

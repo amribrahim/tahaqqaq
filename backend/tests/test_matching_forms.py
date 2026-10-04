@@ -71,5 +71,8 @@ def test_cascade_stage_bands():
     """exact -> >=90, trigram -> >=75, semantic-only -> 50-74, none -> <50 (the Sources-page bands)."""
     assert verify("إنما الأعمال بالنيات")["confidence"] >= 90
     assert 75 <= verify("إنما الاعمال بالنيه ولكل امرء ما نوى يا إخوان")["confidence"]
-    near = verify("النظافة من الإيمان")
+    near = verify("الصدق من الإيمان")      # close to «النظافة من الإيمان» in form, but a different saying
     assert near["state"] in ("uncertain", "abstain") and near["confidence"] < 75
+    # «النظافة من الإيمان» itself is a curated circulated saying: found, with its not-authentic ruling
+    seeded = verify("النظافة من الإيمان")
+    assert seeded["state"] == "unreliable" and seeded["grade"]["grader_ar"]

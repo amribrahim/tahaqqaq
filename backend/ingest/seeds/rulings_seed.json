@@ -1,107 +1,2227 @@
 {
-  "_note": "Curated seed of widely circulated sayings that are NOT in the Six Books, with the scholars' rulings as recorded on dorar.net (الموسوعة الحديثية). Every entry must be reviewed by a specialist before launch. The grade text is shown verbatim.",
-  "items": [
+ "_note": "Curated seed of widely circulated sayings that are NOT in the Six Books, with the scholars' rulings as recorded on dorar.net (الموسوعة الحديثية), copied verbatim. Items with \"source\": \"dorar\" were added by ingest/build_seed_from_dorar.py (decisions in seed_review.md). Every entry must be reviewed by a specialist before launch.",
+ "items": [
+  {
+   "text_ar": "حب الوطن من الإيمان",
+   "text_en": "Love of the homeland is part of faith.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
     {
-      "text_ar": "حب الوطن من الإيمان",
-      "text_en": "Love of the homeland is part of faith.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "الصغاني", "grader_en": "Al-Saghani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "الموضوعات", "source_en": "Al-Mawdu'at", "number": "81"},
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "36"}
-      ]
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "الموضوعات",
+     "source_en": "Al-Mawdu'at",
+     "number": "81"
     },
     {
-      "text_ar": "اطلبوا العلم ولو بالصين",
-      "text_en": "Seek knowledge even if it be in China.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "باطل", "grade_en": "False (batil)", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "416"},
-        {"grader_ar": "ابن الجوزي", "grader_en": "Ibn al-Jawzi", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "الموضوعات", "source_en": "Al-Mawdu'at", "number": "1/215"}
-      ]
-    },
-    {
-      "text_ar": "اختلاف أمتي رحمة",
-      "text_en": "The differing of my nation is a mercy.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "لا أصل له", "grade_en": "Has no basis", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "57"}
-      ]
-    },
-    {
-      "text_ar": "من عرف نفسه فقد عرف ربه",
-      "text_en": "Whoever knows himself knows his Lord.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "66"},
-        {"grader_ar": "النووي", "grader_en": "Al-Nawawi", "grade_ar": "ليس بثابت", "grade_en": "Not established", "source_ar": "الفتاوى", "source_en": "Al-Fatawa", "number": ""}
-      ]
-    },
-    {
-      "text_ar": "لولاك لما خلقت الأفلاك",
-      "text_en": "Were it not for you, I would not have created the heavens.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "282"},
-        {"grader_ar": "الصغاني", "grader_en": "Al-Saghani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "الموضوعات", "source_en": "Al-Mawdu'at", "number": "52"}
-      ]
-    },
-    {
-      "text_ar": "الجنة تحت أقدام الأمهات",
-      "text_en": "Paradise lies under the feet of mothers.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "note_ar": "المعنى ثابت بلفظ آخر: «فالزمها فإن الجنة تحت رجليها» (النسائي ٣١٠٤، حسّنه الألباني).",
-      "note_en": "The meaning is established in another wording: 'Stay with her, for Paradise is beneath her feet' (al-Nasa'i 3104, graded hasan by al-Albani).",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "593"}
-      ]
-    },
-    {
-      "text_ar": "أنا مدينة العلم وعلي بابها",
-      "text_en": "I am the city of knowledge and Ali is its gate.",
-      "type_ar": "حديث نبوي", "type_en": "Prophetic hadith",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "2955"}
-      ]
-    },
-    {
-      "text_ar": "كنت كنزًا مخفيًا فأحببت أن أعرف فخلقت الخلق",
-      "text_en": "I was a hidden treasure and I loved to be known, so I created creation.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "ابن تيمية", "grader_en": "Ibn Taymiyyah", "grade_ar": "ليس من كلام النبي ﷺ ولا يُعرف له سند صحيح ولا ضعيف", "grade_en": "Not the Prophet's words; no known chain, sound or weak", "source_ar": "مجموع الفتاوى", "source_en": "Majmu' al-Fatawa", "number": "18/376"}
-      ]
-    },
-    {
-      "text_ar": "ما خاب من استخار ولا ندم من استشار",
-      "text_en": "He who seeks guidance is never let down, and he who consults never regrets.",
-      "type_ar": "حكمة منتشرة", "type_en": "Popular saying",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "موضوع", "grade_en": "Fabricated", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "611"}
-      ]
-    },
-    {
-      "text_ar": "من لم يهتم بأمر المسلمين فليس منهم",
-      "text_en": "Whoever is not concerned with the affairs of the Muslims is not one of them.",
-      "type_ar": "حديث نبوي", "type_en": "Prophetic hadith",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "ضعيف", "grade_en": "Weak", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "309"}
-      ]
-    },
-    {
-      "text_ar": "صوموا تصحوا",
-      "text_en": "Fast and you will be healthy.",
-      "type_ar": "حديث نبوي", "type_en": "Prophetic hadith",
-      "grades": [
-        {"grader_ar": "الألباني", "grader_en": "Al-Albani", "grade_ar": "ضعيف", "grade_en": "Weak", "source_ar": "السلسلة الضعيفة", "source_en": "Al-Silsilah al-Da'ifah", "number": "253"}
-      ]
-    },
-    {
-      "text_ar": "الناس نيام فإذا ماتوا انتبهوا",
-      "text_en": "People are asleep; when they die they wake up.",
-      "type_ar": "قول عالم", "type_en": "Scholar's saying",
-      "grades": [
-        {"grader_ar": "العراقي", "grader_en": "Al-Iraqi", "grade_ar": "لم أجد له أصلًا مرفوعًا", "grade_en": "I found no basis for it as a Prophetic saying", "source_ar": "تخريج أحاديث الإحياء", "source_en": "Takhrij Ahadith al-Ihya'", "number": "4/20"}
-      ]
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "36"
     }
-  ]
+   ]
+  },
+  {
+   "text_ar": "اطلبوا العلم ولو بالصين",
+   "text_en": "Seek knowledge even if it be in China.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل",
+     "grade_en": "False (batil)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "416"
+    },
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "الموضوعات",
+     "source_en": "Al-Mawdu'at",
+     "number": "1/215"
+    }
+   ]
+  },
+  {
+   "text_ar": "اختلاف أمتي رحمة",
+   "text_en": "The differing of my nation is a mercy.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "Has no basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "57"
+    }
+   ]
+  },
+  {
+   "text_ar": "من عرف نفسه فقد عرف ربه",
+   "text_en": "Whoever knows himself knows his Lord.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "66"
+    },
+    {
+     "grader_ar": "النووي",
+     "grader_en": "Al-Nawawi",
+     "grade_ar": "ليس بثابت",
+     "grade_en": "Not established",
+     "source_ar": "الفتاوى",
+     "source_en": "Al-Fatawa",
+     "number": ""
+    }
+   ]
+  },
+  {
+   "text_ar": "لولاك لما خلقت الأفلاك",
+   "text_en": "Were it not for you, I would not have created the heavens.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "282"
+    },
+    {
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "الموضوعات",
+     "source_en": "Al-Mawdu'at",
+     "number": "52"
+    }
+   ]
+  },
+  {
+   "text_ar": "الجنة تحت أقدام الأمهات",
+   "text_en": "Paradise lies under the feet of mothers.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "note_ar": "المعنى ثابت بلفظ آخر: «فالزمها فإن الجنة تحت رجليها» (النسائي ٣١٠٤، حسّنه الألباني).",
+   "note_en": "The meaning is established in another wording: 'Stay with her, for Paradise is beneath her feet' (al-Nasa'i 3104, graded hasan by al-Albani).",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "593"
+    }
+   ]
+  },
+  {
+   "text_ar": "أنا مدينة العلم وعلي بابها",
+   "text_en": "I am the city of knowledge and Ali is its gate.",
+   "type_ar": "حديث نبوي",
+   "type_en": "Prophetic hadith",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "2955"
+    }
+   ]
+  },
+  {
+   "text_ar": "كنت كنزًا مخفيًا فأحببت أن أعرف فخلقت الخلق",
+   "text_en": "I was a hidden treasure and I loved to be known, so I created creation.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "ليس من كلام النبي ﷺ ولا يُعرف له سند صحيح ولا ضعيف",
+     "grade_en": "Not the Prophet's words; no known chain, sound or weak",
+     "source_ar": "مجموع الفتاوى",
+     "source_en": "Majmu' al-Fatawa",
+     "number": "18/376"
+    }
+   ]
+  },
+  {
+   "text_ar": "ما خاب من استخار ولا ندم من استشار",
+   "text_en": "He who seeks guidance is never let down, and he who consults never regrets.",
+   "type_ar": "حكمة منتشرة",
+   "type_en": "Popular saying",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "611"
+    }
+   ]
+  },
+  {
+   "text_ar": "من لم يهتم بأمر المسلمين فليس منهم",
+   "text_en": "Whoever is not concerned with the affairs of the Muslims is not one of them.",
+   "type_ar": "حديث نبوي",
+   "type_en": "Prophetic hadith",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "309"
+    }
+   ]
+  },
+  {
+   "text_ar": "صوموا تصحوا",
+   "text_en": "Fast and you will be healthy.",
+   "type_ar": "حديث نبوي",
+   "type_en": "Prophetic hadith",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "253"
+    }
+   ]
+  },
+  {
+   "text_ar": "الناس نيام فإذا ماتوا انتبهوا",
+   "text_en": "People are asleep; when they die they wake up.",
+   "type_ar": "قول عالم",
+   "type_en": "Scholar's saying",
+   "grades": [
+    {
+     "grader_ar": "العراقي",
+     "grader_en": "Al-Iraqi",
+     "grade_ar": "لم أجد له أصلًا مرفوعًا",
+     "grade_en": "I found no basis for it as a Prophetic saying",
+     "source_ar": "تخريج أحاديث الإحياء",
+     "source_en": "Takhrij Ahadith al-Ihya'",
+     "number": "4/20"
+    }
+   ]
+  },
+  {
+   "text_ar": "النظافة من الإيمان",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن باز",
+     "grader_en": "Ibn Baz",
+     "grade_ar": "رفعه إلى النبي صلى الله عليه وسلم ليس بصحيح",
+     "grade_en": "Not authentic",
+     "source_ar": "الفوائد العلمية من الدروس البازية",
+     "source_en": "الفوائد العلمية من الدروس البازية",
+     "number": "113",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%86%D8%B8%D8%A7%D9%81%D8%A9%20%D9%85%D9%86%20%D8%A7%D9%84%D8%A5%D9%8A%D9%85%D8%A7%D9%86"
+    },
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "ضعيف لا يصح",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "فتاوى نور على الدرب لابن عثيمين",
+     "source_en": "فتاوى نور على الدرب لابن عثيمين",
+     "number": "537",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%86%D8%B8%D8%A7%D9%81%D8%A9%20%D9%85%D9%86%20%D8%A7%D9%84%D8%A5%D9%8A%D9%85%D8%A7%D9%86"
+    }
+   ],
+   "dorar_text": "النَّظافةُ مِن الإيمانِ [يعني حديث: تخلَّلوا فإنَّه نظافةٌ والنَّظافةُ تدعو إلى الإيمانِ والإيمانُ مع صاحبِه في الجنَّةِ]",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "اعمل لدنياك كأنك تعيش أبدا واعمل لآخرتك كأنك تموت غدا",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له مرفوعاً",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "8",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B9%D9%85%D9%84%20%D9%84%D8%AF%D9%86%D9%8A%D8%A7%D9%83%20%D9%83%D8%A3%D9%86%D9%83%20%D8%AA%D8%B9%D9%8A%D8%B4%20%D8%A3%D8%A8%D8%AF%D8%A7%20%D9%88%D8%A7%D8%B9%D9%85%D9%84%20%D9%84%D8%A2%D8%AE%D8%B1%D8%AA%D9%83%20%D9%83%D8%A3%D9%86%D9%83%20%D8%AA%D9%85%D9%88%D8%AA%20%D8%BA%D8%AF%D8%A7"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "إصلاح المساجد",
+     "source_en": "إصلاح المساجد",
+     "number": "68",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B9%D9%85%D9%84%20%D9%84%D8%AF%D9%86%D9%8A%D8%A7%D9%83%20%D9%83%D8%A3%D9%86%D9%83%20%D8%AA%D8%B9%D9%8A%D8%B4%20%D8%A3%D8%A8%D8%AF%D8%A7%20%D9%88%D8%A7%D8%B9%D9%85%D9%84%20%D9%84%D8%A2%D8%AE%D8%B1%D8%AA%D9%83%20%D9%83%D8%A3%D9%86%D9%83%20%D8%AA%D9%85%D9%88%D8%AA%20%D8%BA%D8%AF%D8%A7"
+    },
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "هذا القول المشهور لا يصح عن النَّبيِّ صلَّى اللهُ عليه وسلَّمَ، فهو من الأحاديث الموضوعة",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "فتاوى نور على الدرب لابن عثيمين",
+     "source_en": "فتاوى نور على الدرب لابن عثيمين",
+     "number": "575",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B9%D9%85%D9%84%20%D9%84%D8%AF%D9%86%D9%8A%D8%A7%D9%83%20%D9%83%D8%A3%D9%86%D9%83%20%D8%AA%D8%B9%D9%8A%D8%B4%20%D8%A3%D8%A8%D8%AF%D8%A7%20%D9%88%D8%A7%D8%B9%D9%85%D9%84%20%D9%84%D8%A2%D8%AE%D8%B1%D8%AA%D9%83%20%D9%83%D8%A3%D9%86%D9%83%20%D8%AA%D9%85%D9%88%D8%AA%20%D8%BA%D8%AF%D8%A7"
+    }
+   ],
+   "dorar_text": "اعمل لدنياك كأنك تعيشُ أبدًا ، واعمل لآخرتِك كأنك تموتُ غدًا",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أدبني ربي فأحسن تأديبي",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "249",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%AF%D8%A8%D9%86%D9%8A%20%D8%B1%D8%A8%D9%8A%20%D9%81%D8%A3%D8%AD%D8%B3%D9%86%20%D8%AA%D8%A3%D8%AF%D9%8A%D8%A8%D9%8A"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "72",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%AF%D8%A8%D9%86%D9%8A%20%D8%B1%D8%A8%D9%8A%20%D9%81%D8%A3%D8%AD%D8%B3%D9%86%20%D8%AA%D8%A3%D8%AF%D9%8A%D8%A8%D9%8A"
+    },
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "المعنى صحيح ، لكن لا يعرف له إسناد ثابت",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "مجموع الفتاوى",
+     "source_en": "Majmu' al-Fatawa",
+     "number": "375",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%AF%D8%A8%D9%86%D9%8A%20%D8%B1%D8%A8%D9%8A%20%D9%81%D8%A3%D8%AD%D8%B3%D9%86%20%D8%AA%D8%A3%D8%AF%D9%8A%D8%A8%D9%8A"
+    }
+   ],
+   "dorar_text": "أدَّبني ربِّي فأحسنَ تأديبي",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "نحن قوم لا نأكل حتى نجوع وإذا أكلنا لا نشبع",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الصحيحة",
+     "source_en": "السلسلة الصحيحة",
+     "number": "1651",
+     "url": "https://dorar.net/hadith/search?q=%D9%86%D8%AD%D9%86%20%D9%82%D9%88%D9%85%20%D9%84%D8%A7%20%D9%86%D8%A3%D9%83%D9%84%20%D8%AD%D8%AA%D9%89%20%D9%86%D8%AC%D9%88%D8%B9%20%D9%88%D8%A5%D8%B0%D8%A7%20%D8%A3%D9%83%D9%84%D9%86%D8%A7%20%D9%84%D8%A7%20%D9%86%D8%B4%D8%A8%D8%B9"
+    },
+    {
+     "grader_ar": "ابن باز",
+     "grader_en": "Ibn Baz",
+     "grade_ar": "إسناده فيه ضعف",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "مجموع فتاوى ابن باز",
+     "source_en": "Majmu' Fatawa Ibn Baz",
+     "number": "4",
+     "url": "https://dorar.net/hadith/search?q=%D9%86%D8%AD%D9%86%20%D9%82%D9%88%D9%85%20%D9%84%D8%A7%20%D9%86%D8%A3%D9%83%D9%84%20%D8%AD%D8%AA%D9%89%20%D9%86%D8%AC%D9%88%D8%B9%20%D9%88%D8%A5%D8%B0%D8%A7%20%D8%A3%D9%83%D9%84%D9%86%D8%A7%20%D9%84%D8%A7%20%D9%86%D8%B4%D8%A8%D8%B9"
+    }
+   ],
+   "dorar_text": "نحن قومٌ لا نأكلُ حتى نجوعَ ، وإذا أكلنا لا نشبعُ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "خير الأمور أوسطها",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "1252",
+     "url": "https://dorar.net/hadith/search?q=%D8%AE%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A3%D9%85%D9%88%D8%B1%20%D8%A3%D9%88%D8%B3%D8%B7%D9%87%D8%A7"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "7056",
+     "url": "https://dorar.net/hadith/search?q=%D8%AE%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A3%D9%85%D9%88%D8%B1%20%D8%A3%D9%88%D8%B3%D8%B7%D9%87%D8%A7"
+    }
+   ],
+   "dorar_text": "أمرًا بينَ أمرينِ، وخيرُ الأُمورِ أَوْسَطُها .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الساكت عن الحق شيطان أخرس",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن باز",
+     "grader_en": "Ibn Baz",
+     "grade_ar": "ليس بحديث، هذا من كلام بعض السلف",
+     "grade_en": "Not a hadith",
+     "source_ar": "مجموع تفسير الشيخ عبد العزيز بن باز",
+     "source_en": "مجموع تفسير الشيخ عبد العزيز بن باز",
+     "number": "241",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%B3%D8%A7%D9%83%D8%AA%20%D8%B9%D9%86%20%D8%A7%D9%84%D8%AD%D9%82%20%D8%B4%D9%8A%D8%B7%D8%A7%D9%86%20%D8%A3%D8%AE%D8%B1%D8%B3"
+    }
+   ],
+   "dorar_text": "السَّاكِتُ مِنَ الحَقِّ شَيطانٌ ناطِقٌ، والسَّاكِتُ عَنِ الحَقِّ شَيطانٌ أخرَسُ .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "رجعنا من الجهاد الأصغر إلى الجهاد الأكبر",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "منكر",
+     "grade_en": "Denounced (munkar)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "2460",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D8%AC%D8%B9%D9%86%D8%A7%20%D9%85%D9%86%20%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A3%D8%B5%D8%BA%D8%B1%20%D8%A5%D9%84%D9%89%20%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A3%D9%83%D8%A8%D8%B1"
+    },
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "المستدرك على مجموع الفتاوى",
+     "source_en": "المستدرك على مجموع الفتاوى",
+     "number": "221",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D8%AC%D8%B9%D9%86%D8%A7%20%D9%85%D9%86%20%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A3%D8%B5%D8%BA%D8%B1%20%D8%A5%D9%84%D9%89%20%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A3%D9%83%D8%A8%D8%B1"
+    },
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "مجموع الفتاوى",
+     "source_en": "Majmu' al-Fatawa",
+     "number": "197",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D8%AC%D8%B9%D9%86%D8%A7%20%D9%85%D9%86%20%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A3%D8%B5%D8%BA%D8%B1%20%D8%A5%D9%84%D9%89%20%D8%A7%D9%84%D8%AC%D9%87%D8%A7%D8%AF%20%D8%A7%D9%84%D8%A3%D9%83%D8%A8%D8%B1"
+    }
+   ],
+   "dorar_text": "رجعْنا من الجهادِ الأصغرِ إلى الجهادِ الأكبرِ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "اللهم بارك لنا في رجب وشعبان وبلغنا رمضان",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "4395",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%84%D9%87%D9%85%20%D8%A8%D8%A7%D8%B1%D9%83%20%D9%84%D9%86%D8%A7%20%D9%81%D9%8A%20%D8%B1%D8%AC%D8%A8%20%D9%88%D8%B4%D8%B9%D8%A8%D8%A7%D9%86%20%D9%88%D8%A8%D9%84%D8%BA%D9%86%D8%A7%20%D8%B1%D9%85%D8%B6%D8%A7%D9%86"
+    },
+    {
+     "grader_ar": "الذهبي",
+     "grader_en": "Al-Dhahabi",
+     "grade_ar": "فيه] زائدة بن أبي الرقاد وزياد النميري ضعيفان",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ميزان الاعتدال",
+     "source_en": "Mizan al-I'tidal",
+     "number": "65",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%84%D9%87%D9%85%20%D8%A8%D8%A7%D8%B1%D9%83%20%D9%84%D9%86%D8%A7%20%D9%81%D9%8A%20%D8%B1%D8%AC%D8%A8%20%D9%88%D8%B4%D8%B9%D8%A8%D8%A7%D9%86%20%D9%88%D8%A8%D9%84%D8%BA%D9%86%D8%A7%20%D8%B1%D9%85%D8%B6%D8%A7%D9%86"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الجامع الصغير",
+     "source_en": "Al-Jami' al-Saghir",
+     "number": "6660",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%84%D9%87%D9%85%20%D8%A8%D8%A7%D8%B1%D9%83%20%D9%84%D9%86%D8%A7%20%D9%81%D9%8A%20%D8%B1%D8%AC%D8%A8%20%D9%88%D8%B4%D8%B9%D8%A8%D8%A7%D9%86%20%D9%88%D8%A8%D9%84%D8%BA%D9%86%D8%A7%20%D8%B1%D9%85%D8%B6%D8%A7%D9%86"
+    }
+   ],
+   "dorar_text": "اللَّهمَّ بارِكْ لَنا في رجبٍ وشعبانَ وبلِّغنا رمضانَ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الدين المعاملة",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن باز",
+     "grader_en": "Ibn Baz",
+     "grade_ar": "ليس بحديث، فهذا لا أصل له، ولكن هو صحيح من حيث المعنى، وليس بحديث",
+     "grade_en": "Not a hadith",
+     "source_ar": "الفوائد العلمية من الدروس البازية",
+     "source_en": "الفوائد العلمية من الدروس البازية",
+     "number": "161",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%AF%D9%8A%D9%86%20%D8%A7%D9%84%D9%85%D8%B9%D8%A7%D9%85%D9%84%D8%A9"
+    }
+   ],
+   "dorar_text": "الدِّينُ حُسنُ المعاملةِ ، أو الدِّينُ المعاملةُ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أول ما خلق الله نور نبيك يا جابر",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل",
+     "grade_en": "False (batil)",
+     "source_ar": "السلسلة الصحيحة",
+     "source_en": "السلسلة الصحيحة",
+     "number": "820",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%88%D9%84%20%D9%85%D8%A7%20%D8%AE%D9%84%D9%82%20%D8%A7%D9%84%D9%84%D9%87%20%D9%86%D9%88%D8%B1%20%D9%86%D8%A8%D9%8A%D9%83%20%D9%8A%D8%A7%20%D8%AC%D8%A7%D8%A8%D8%B1"
+    }
+   ],
+   "dorar_text": "أولُ ما خلق اللهُ نورُ نبيِّكَ يا جابرُ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "سيد القوم خادمهم",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "1502",
+     "url": "https://dorar.net/hadith/search?q=%D8%B3%D9%8A%D8%AF%20%D8%A7%D9%84%D9%82%D9%88%D9%85%20%D8%AE%D8%A7%D8%AF%D9%85%D9%87%D9%85"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "3323",
+     "url": "https://dorar.net/hadith/search?q=%D8%B3%D9%8A%D8%AF%20%D8%A7%D9%84%D9%82%D9%88%D9%85%20%D8%AE%D8%A7%D8%AF%D9%85%D9%87%D9%85"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "في إسناده ضعف وانقطاع",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "293",
+     "url": "https://dorar.net/hadith/search?q=%D8%B3%D9%8A%D8%AF%20%D8%A7%D9%84%D9%82%D9%88%D9%85%20%D8%AE%D8%A7%D8%AF%D9%85%D9%87%D9%85"
+    }
+   ],
+   "dorar_text": "سيِّدُ القومِ خادمُهم .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من أصبح وهمه الدنيا فليس من الله في شيء",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف جداً",
+     "grade_en": "Very weak",
+     "source_ar": "ضعيف الترغيب",
+     "source_en": "Da'if al-Targhib",
+     "number": "1886",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D8%B5%D8%A8%D8%AD%20%D9%88%D9%87%D9%85%D9%87%20%D8%A7%D9%84%D8%AF%D9%86%D9%8A%D8%A7%20%D9%81%D9%84%D9%8A%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D9%81%D9%8A%20%D8%B4%D9%8A%D8%A1"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف جداً",
+     "grade_en": "Very weak",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "310",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D8%B5%D8%A8%D8%AD%20%D9%88%D9%87%D9%85%D9%87%20%D8%A7%D9%84%D8%AF%D9%86%D9%8A%D8%A7%20%D9%81%D9%84%D9%8A%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D9%81%D9%8A%20%D8%B4%D9%8A%D8%A1"
+    },
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "لا يصح ، والمتهم به إسحاق",
+     "grade_en": "Not authentic",
+     "source_ar": "الموضوعات لابن الجوزي",
+     "source_en": "Al-Mawdu'at (Ibn al-Jawzi)",
+     "number": "364",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D8%B5%D8%A8%D8%AD%20%D9%88%D9%87%D9%85%D9%87%20%D8%A7%D9%84%D8%AF%D9%86%D9%8A%D8%A7%20%D9%81%D9%84%D9%8A%D8%B3%20%D9%85%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D9%81%D9%8A%20%D8%B4%D9%8A%D8%A1"
+    }
+   ],
+   "dorar_text": "من أصبح وهمُّه الدُّنيا فليس من اللهِ في شيءٍ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "العلم في الصغر كالنقش على الحجر",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "618",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%B9%D9%84%D9%85%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%B5%D8%BA%D8%B1%20%D9%83%D8%A7%D9%84%D9%86%D9%82%D8%B4%20%D8%B9%D9%84%D9%89%20%D8%A7%D9%84%D8%AD%D8%AC%D8%B1"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "5237",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%B9%D9%84%D9%85%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%B5%D8%BA%D8%B1%20%D9%83%D8%A7%D9%84%D9%86%D9%82%D8%B4%20%D8%B9%D9%84%D9%89%20%D8%A7%D9%84%D8%AD%D8%AC%D8%B1"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الجامع الصغير",
+     "source_en": "Al-Jami' al-Saghir",
+     "number": "8119",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%B9%D9%84%D9%85%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%B5%D8%BA%D8%B1%20%D9%83%D8%A7%D9%84%D9%86%D9%82%D8%B4%20%D8%B9%D9%84%D9%89%20%D8%A7%D9%84%D8%AD%D8%AC%D8%B1"
+    }
+   ],
+   "dorar_text": "العلمُ في الصغَرِ كالنقشِ في الحجرِ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أنا جد كل تقي",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "9",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%86%D8%A7%20%D8%AC%D8%AF%20%D9%83%D9%84%20%D8%AA%D9%82%D9%8A"
+    }
+   ],
+   "dorar_text": "أنا جدُّ كلِّ تقيٍّ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من حج ولم يزرني فقد جفاني",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "دفاع عن الحديث",
+     "source_en": "دفاع عن الحديث",
+     "number": "46",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AD%D8%AC%20%D9%88%D9%84%D9%85%20%D9%8A%D8%B2%D8%B1%D9%86%D9%8A%20%D9%81%D9%82%D8%AF%20%D8%AC%D9%81%D8%A7%D9%86%D9%8A"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "45",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AD%D8%AC%20%D9%88%D9%84%D9%85%20%D9%8A%D8%B2%D8%B1%D9%86%D9%8A%20%D9%81%D9%82%D8%AF%20%D8%AC%D9%81%D8%A7%D9%86%D9%8A"
+    },
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "أورده في كتاب الموضوعات",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات لابن الجوزي",
+     "source_en": "Al-Mawdu'at (Ibn al-Jawzi)",
+     "number": "597",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AD%D8%AC%20%D9%88%D9%84%D9%85%20%D9%8A%D8%B2%D8%B1%D9%86%D9%8A%20%D9%81%D9%82%D8%AF%20%D8%AC%D9%81%D8%A7%D9%86%D9%8A"
+    }
+   ],
+   "dorar_text": "مَن لَم يزُرني فقد جفاني [يعني حديث: من حجَّ البيتَ ولم يَزُرْني فقد جَفاني ]",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "توسلوا بجاهي فإن جاهي عند الله عظيم",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "التوسل للألباني",
+     "source_en": "التوسل للألباني",
+     "number": "115",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D9%88%D8%B3%D9%84%D9%88%D8%A7%20%D8%A8%D8%AC%D8%A7%D9%87%D9%8A%20%D9%81%D8%A5%D9%86%20%D8%AC%D8%A7%D9%87%D9%8A%20%D8%B9%D9%86%D8%AF%20%D8%A7%D9%84%D9%84%D9%87%20%D8%B9%D8%B8%D9%8A%D9%85"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "22",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D9%88%D8%B3%D9%84%D9%88%D8%A7%20%D8%A8%D8%AC%D8%A7%D9%87%D9%8A%20%D9%81%D8%A5%D9%86%20%D8%AC%D8%A7%D9%87%D9%8A%20%D8%B9%D9%86%D8%AF%20%D8%A7%D9%84%D9%84%D9%87%20%D8%B9%D8%B8%D9%8A%D9%85"
+    }
+   ],
+   "dorar_text": "تَوسَّلوا بجاهي فإنَّ جاهي عندَ اللهِ عظيمٌ : وبعضُهُم يرويهِ بلفظِ : إذا سألتمُ اللهَ فاسألوهُ بجاهي ؛ فإنَّ جاهيَ عندَ اللهِ عظيمٌ .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "خير الأسماء ما حمد وعبد",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "ليس بصحيح",
+     "grade_en": "Not authentic",
+     "source_ar": "مجموع فتاوى ابن عثيمين",
+     "source_en": "مجموع فتاوى ابن عثيمين",
+     "number": "3",
+     "url": "https://dorar.net/hadith/search?q=%D8%AE%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A3%D8%B3%D9%85%D8%A7%D8%A1%20%D9%85%D8%A7%20%D8%AD%D9%85%D8%AF%20%D9%88%D8%B9%D8%A8%D8%AF"
+    },
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "شرح مسلم لابن عثيمين",
+     "source_en": "شرح مسلم لابن عثيمين",
+     "number": "571",
+     "url": "https://dorar.net/hadith/search?q=%D8%AE%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A3%D8%B3%D9%85%D8%A7%D8%A1%20%D9%85%D8%A7%20%D8%AD%D9%85%D8%AF%20%D9%88%D8%B9%D8%A8%D8%AF"
+    },
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "الشرح الممتع",
+     "source_en": "الشرح الممتع",
+     "number": "496",
+     "url": "https://dorar.net/hadith/search?q=%D8%AE%D9%8A%D8%B1%20%D8%A7%D9%84%D8%A3%D8%B3%D9%85%D8%A7%D8%A1%20%D9%85%D8%A7%20%D8%AD%D9%85%D8%AF%20%D9%88%D8%B9%D8%A8%D8%AF"
+    }
+   ],
+   "dorar_text": "خيرُ الأسماءِ ما عُبِّدَ وحُمِّدَ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الحديث في المسجد يأكل الحسنات كما تأكل البهائم الحشيش",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "4",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AB%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%85%D8%B3%D8%AC%D8%AF%20%D9%8A%D8%A3%D9%83%D9%84%20%D8%A7%D9%84%D8%AD%D8%B3%D9%86%D8%A7%D8%AA%20%D9%83%D9%85%D8%A7%20%D8%AA%D8%A3%D9%83%D9%84%20%D8%A7%D9%84%D8%A8%D9%87%D8%A7%D8%A6%D9%85%20%D8%A7%D9%84%D8%AD%D8%B4%D9%8A%D8%B4"
+    }
+   ],
+   "dorar_text": "الحديث في المسجدِ يأكلُ الحسناتِ كما تأكلُ البهائمُ الحشيشَ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من أحدث ولم يتوضأ فقد جفاني",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "44",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D8%AD%D8%AF%D8%AB%20%D9%88%D9%84%D9%85%20%D9%8A%D8%AA%D9%88%D8%B6%D8%A3%20%D9%81%D9%82%D8%AF%20%D8%AC%D9%81%D8%A7%D9%86%D9%8A"
+    },
+    {
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات للصغاني",
+     "source_en": "Al-Mawdu'at (al-Saghani)",
+     "number": "43",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D8%AD%D8%AF%D8%AB%20%D9%88%D9%84%D9%85%20%D9%8A%D8%AA%D9%88%D8%B6%D8%A3%20%D9%81%D9%82%D8%AF%20%D8%AC%D9%81%D8%A7%D9%86%D9%8A"
+    }
+   ],
+   "dorar_text": "من أحدث ولم يتوضَّأْ فقد جفاني ، ومن توضَّأ ولم يُصلِّ فقد جفاني ومن صلَّى ولم يدْعُني فقد جفاني ، ومن دعاني ولم أجِبْه فقد جفيْتُه، ولستُ بربٍ جافٍ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "حسنات الأبرار سيئات المقربين",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "100",
+     "url": "https://dorar.net/hadith/search?q=%D8%AD%D8%B3%D9%86%D8%A7%D8%AA%20%D8%A7%D9%84%D8%A3%D8%A8%D8%B1%D8%A7%D8%B1%20%D8%B3%D9%8A%D8%A6%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D9%82%D8%B1%D8%A8%D9%8A%D9%86"
+    },
+    {
+     "grader_ar": "الزرقاني",
+     "grader_en": "Al-Zurqani",
+     "grade_ar": "ليس بحديث",
+     "grade_en": "Not a hadith",
+     "source_ar": "مختصر المقاصد",
+     "source_en": "Mukhtasar al-Maqasid",
+     "number": "378",
+     "url": "https://dorar.net/hadith/search?q=%D8%AD%D8%B3%D9%86%D8%A7%D8%AA%20%D8%A7%D9%84%D8%A3%D8%A8%D8%B1%D8%A7%D8%B1%20%D8%B3%D9%8A%D8%A6%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D9%82%D8%B1%D8%A8%D9%8A%D9%86"
+    },
+    {
+     "grader_ar": "محمد جار الله الصعدي",
+     "grader_en": "Al-Sa'di",
+     "grade_ar": "ليس بحديث",
+     "grade_en": "Not a hadith",
+     "source_ar": "النوافح العطرة",
+     "source_en": "النوافح العطرة",
+     "number": "123",
+     "url": "https://dorar.net/hadith/search?q=%D8%AD%D8%B3%D9%86%D8%A7%D8%AA%20%D8%A7%D9%84%D8%A3%D8%A8%D8%B1%D8%A7%D8%B1%20%D8%B3%D9%8A%D8%A6%D8%A7%D8%AA%20%D8%A7%D9%84%D9%85%D9%82%D8%B1%D8%A8%D9%8A%D9%86"
+    }
+   ],
+   "dorar_text": "حسناتُ الأبرارِ سيِّئاتُ المُقرَّبين",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "عليكم بدين العجائز",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "القائد إلى تصحيح العقائد",
+     "source_en": "القائد إلى تصحيح العقائد",
+     "number": "60",
+     "url": "https://dorar.net/hadith/search?q=%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D8%A8%D8%AF%D9%8A%D9%86%20%D8%A7%D9%84%D8%B9%D8%AC%D8%A7%D8%A6%D8%B2"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "53",
+     "url": "https://dorar.net/hadith/search?q=%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D8%A8%D8%AF%D9%8A%D9%86%20%D8%A7%D9%84%D8%B9%D8%AC%D8%A7%D8%A6%D8%B2"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "لا أصل له بهذا اللفظ",
+     "grade_en": "No basis",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "344",
+     "url": "https://dorar.net/hadith/search?q=%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D8%A8%D8%AF%D9%8A%D9%86%20%D8%A7%D9%84%D8%B9%D8%AC%D8%A7%D8%A6%D8%B2"
+    }
+   ],
+   "dorar_text": "عليكم بدِينِ العَجائزِ .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "كما تكونوا يولى عليكم",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "4275",
+     "url": "https://dorar.net/hadith/search?q=%D9%83%D9%85%D8%A7%20%D8%AA%D9%83%D9%88%D9%86%D9%88%D8%A7%20%D9%8A%D9%88%D9%84%D9%89%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "320",
+     "url": "https://dorar.net/hadith/search?q=%D9%83%D9%85%D8%A7%20%D8%AA%D9%83%D9%88%D9%86%D9%88%D8%A7%20%D9%8A%D9%88%D9%84%D9%89%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
+    },
+    {
+     "grader_ar": "الشوكاني",
+     "grader_en": "Al-Shawkani",
+     "grade_ar": "في إسناده وضاع وفيه انقطاع",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "الفوائد المجموعة",
+     "source_en": "Al-Fawa'id al-Majmu'ah",
+     "number": "210",
+     "url": "https://dorar.net/hadith/search?q=%D9%83%D9%85%D8%A7%20%D8%AA%D9%83%D9%88%D9%86%D9%88%D8%A7%20%D9%8A%D9%88%D9%84%D9%89%20%D8%B9%D9%84%D9%8A%D9%83%D9%85"
+    }
+   ],
+   "dorar_text": "كما تَكونوا يولَّى عليكُم .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من تعلم لغة قوم أمن مكرهم",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "ليس بحديث، ولا يصح لا سندا ولا معنى",
+     "grade_en": "Not a hadith",
+     "source_ar": "لقاء الباب المفتوح",
+     "source_en": "لقاء الباب المفتوح",
+     "number": "49",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AA%D8%B9%D9%84%D9%85%20%D9%84%D8%BA%D8%A9%20%D9%82%D9%88%D9%85%20%D8%A3%D9%85%D9%86%20%D9%85%D9%83%D8%B1%D9%87%D9%85"
+    },
+    {
+     "grader_ar": "الوادعي",
+     "grader_en": "Al-Wadi'i",
+     "grade_ar": "بحث عنه الباحثون فلم يجدوا له أصلا وإن كان معناه صحيحا",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "الفتاوى الحديثية للوادعي",
+     "source_en": "الفتاوى الحديثية للوادعي",
+     "number": "58",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AA%D8%B9%D9%84%D9%85%20%D9%84%D8%BA%D8%A9%20%D9%82%D9%88%D9%85%20%D8%A3%D9%85%D9%86%20%D9%85%D9%83%D8%B1%D9%87%D9%85"
+    }
+   ],
+   "dorar_text": "من تعلَّم لُغةَ قَومٍ أمِنَ مَكرَهم",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "لا تتمارضوا فتمرضوا فتموتوا",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "منكر",
+     "grade_en": "Denounced (munkar)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "259",
+     "url": "https://dorar.net/hadith/search?q=%D9%84%D8%A7%20%D8%AA%D8%AA%D9%85%D8%A7%D8%B1%D8%B6%D9%88%D8%A7%20%D9%81%D8%AA%D9%85%D8%B1%D8%B6%D9%88%D8%A7%20%D9%81%D8%AA%D9%85%D9%88%D8%AA%D9%88%D8%A7"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "538",
+     "url": "https://dorar.net/hadith/search?q=%D9%84%D8%A7%20%D8%AA%D8%AA%D9%85%D8%A7%D8%B1%D8%B6%D9%88%D8%A7%20%D9%81%D8%AA%D9%85%D8%B1%D8%B6%D9%88%D8%A7%20%D9%81%D8%AA%D9%85%D9%88%D8%AA%D9%88%D8%A7"
+    },
+    {
+     "grader_ar": "محمد بن محمد الغزي",
+     "grader_en": "محمد بن محمد الغزي",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "إتقان ما يحسن",
+     "source_en": "إتقان ما يحسن",
+     "number": "690",
+     "url": "https://dorar.net/hadith/search?q=%D9%84%D8%A7%20%D8%AA%D8%AA%D9%85%D8%A7%D8%B1%D8%B6%D9%88%D8%A7%20%D9%81%D8%AA%D9%85%D8%B1%D8%B6%D9%88%D8%A7%20%D9%81%D8%AA%D9%85%D9%88%D8%AA%D9%88%D8%A7"
+    }
+   ],
+   "dorar_text": "لا تتمارضُوا فتمرضُوا ولا تحفرُوا قبورَكم فتموتُوا",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "المعدة بيت الداء والحمية رأس الدواء",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "لا يصح رفعه",
+     "grade_en": "Not authentic",
+     "source_ar": "فتح المغيث",
+     "source_en": "فتح المغيث",
+     "number": "265",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%85%D8%B9%D8%AF%D8%A9%20%D8%A8%D9%8A%D8%AA%20%D8%A7%D9%84%D8%AF%D8%A7%D8%A1%20%D9%88%D8%A7%D9%84%D8%AD%D9%85%D9%8A%D8%A9%20%D8%B1%D8%A3%D8%B3%20%D8%A7%D9%84%D8%AF%D9%88%D8%A7%D8%A1"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "لا يصح رفعه إلى النبي صلى الله عليه وسلم",
+     "grade_en": "Not authentic",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "455",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%85%D8%B9%D8%AF%D8%A9%20%D8%A8%D9%8A%D8%AA%20%D8%A7%D9%84%D8%AF%D8%A7%D8%A1%20%D9%88%D8%A7%D9%84%D8%AD%D9%85%D9%8A%D8%A9%20%D8%B1%D8%A3%D8%B3%20%D8%A7%D9%84%D8%AF%D9%88%D8%A7%D8%A1"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "لا أصل له من كلام النبي",
+     "grade_en": "No basis",
+     "source_ar": "تدريب",
+     "source_en": "تدريب",
+     "number": "485",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%85%D8%B9%D8%AF%D8%A9%20%D8%A8%D9%8A%D8%AA%20%D8%A7%D9%84%D8%AF%D8%A7%D8%A1%20%D9%88%D8%A7%D9%84%D8%AD%D9%85%D9%8A%D8%A9%20%D8%B1%D8%A3%D8%B3%20%D8%A7%D9%84%D8%AF%D9%88%D8%A7%D8%A1"
+    }
+   ],
+   "dorar_text": "المعِدةُ بيتُ الدَّاءِ والحِميَةُ رأسُ الدَّواءِ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "جبلت القلوب على حب من أحسن إليها",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "600",
+     "url": "https://dorar.net/hadith/search?q=%D8%AC%D8%A8%D9%84%D8%AA%20%D8%A7%D9%84%D9%82%D9%84%D9%88%D8%A8%20%D8%B9%D9%84%D9%89%20%D8%AD%D8%A8%20%D9%85%D9%86%20%D8%A3%D8%AD%D8%B3%D9%86%20%D8%A5%D9%84%D9%8A%D9%87%D8%A7"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع مرفوعاً وموقوفا",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "2625",
+     "url": "https://dorar.net/hadith/search?q=%D8%AC%D8%A8%D9%84%D8%AA%20%D8%A7%D9%84%D9%82%D9%84%D9%88%D8%A8%20%D8%B9%D9%84%D9%89%20%D8%AD%D8%A8%20%D9%85%D9%86%20%D8%A3%D8%AD%D8%B3%D9%86%20%D8%A5%D9%84%D9%8A%D9%87%D8%A7"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "باطل مرفوعاً وموقوفا",
+     "grade_en": "False (batil)",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "206",
+     "url": "https://dorar.net/hadith/search?q=%D8%AC%D8%A8%D9%84%D8%AA%20%D8%A7%D9%84%D9%82%D9%84%D9%88%D8%A8%20%D8%B9%D9%84%D9%89%20%D8%AD%D8%A8%20%D9%85%D9%86%20%D8%A3%D8%AD%D8%B3%D9%86%20%D8%A5%D9%84%D9%8A%D9%87%D8%A7"
+    }
+   ],
+   "dorar_text": "جُبِلَتِ القلوبُ على حُبِّ من أحسَنَ إليها",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "شاوروهن وخالفوهن",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "الدرر المنتثرة",
+     "source_en": "الدرر المنتثرة",
+     "number": "85",
+     "url": "https://dorar.net/hadith/search?q=%D8%B4%D8%A7%D9%88%D8%B1%D9%88%D9%87%D9%86%20%D9%88%D8%AE%D8%A7%D9%84%D9%81%D9%88%D9%87%D9%86"
+    },
+    {
+     "grader_ar": "ملا علي قاري",
+     "grader_en": "Mulla Ali al-Qari",
+     "grade_ar": "لا يثبت بهذا المبنى",
+     "grade_en": "Not authentic",
+     "source_ar": "الأسرار المرفوعة",
+     "source_en": "Al-Asrar al-Marfu'ah",
+     "number": "225",
+     "url": "https://dorar.net/hadith/search?q=%D8%B4%D8%A7%D9%88%D8%B1%D9%88%D9%87%D9%86%20%D9%88%D8%AE%D8%A7%D9%84%D9%81%D9%88%D9%87%D9%86"
+    },
+    {
+     "grader_ar": "الزرقاني",
+     "grader_en": "Al-Zurqani",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "مختصر المقاصد",
+     "source_en": "Mukhtasar al-Maqasid",
+     "number": "550",
+     "url": "https://dorar.net/hadith/search?q=%D8%B4%D8%A7%D9%88%D8%B1%D9%88%D9%87%D9%86%20%D9%88%D8%AE%D8%A7%D9%84%D9%81%D9%88%D9%87%D9%86"
+    }
+   ],
+   "dorar_text": "شاوِروهُنَّ وخالِفُوهنَّ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الولد سر أبيه",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "48",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%88%D9%84%D8%AF%20%D8%B3%D8%B1%20%D8%A3%D8%A8%D9%8A%D9%87"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "530",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%88%D9%84%D8%AF%20%D8%B3%D8%B1%20%D8%A3%D8%A8%D9%8A%D9%87"
+    },
+    {
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات للصغاني",
+     "source_en": "Al-Mawdu'at (al-Saghani)",
+     "number": "37",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%88%D9%84%D8%AF%20%D8%B3%D8%B1%20%D8%A3%D8%A8%D9%8A%D9%87"
+    }
+   ],
+   "dorar_text": "الولَدُ سِرُّ أبيه",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من حفظ على أمتي أربعين حديثا من أمر دينها بعثه الله فقيها",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "العلل المتناهية",
+     "source_en": "العلل المتناهية",
+     "number": "120",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AD%D9%81%D8%B8%20%D8%B9%D9%84%D9%89%20%D8%A3%D9%85%D8%AA%D9%8A%20%D8%A3%D8%B1%D8%A8%D8%B9%D9%8A%D9%86%20%D8%AD%D8%AF%D9%8A%D8%AB%D8%A7%20%D9%85%D9%86%20%D8%A3%D9%85%D8%B1%20%D8%AF%D9%8A%D9%86%D9%87%D8%A7%20%D8%A8%D8%B9%D8%AB%D9%87"
+    },
+    {
+     "grader_ar": "النووي",
+     "grader_en": "Al-Nawawi",
+     "grade_ar": "طرقه كلها ضعيفة، ليس هو بثابت",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "المنثورات للنووي",
+     "source_en": "المنثورات للنووي",
+     "number": "286",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AD%D9%81%D8%B8%20%D8%B9%D9%84%D9%89%20%D8%A3%D9%85%D8%AA%D9%8A%20%D8%A3%D8%B1%D8%A8%D8%B9%D9%8A%D9%86%20%D8%AD%D8%AF%D9%8A%D8%AB%D8%A7%20%D9%85%D9%86%20%D8%A3%D9%85%D8%B1%20%D8%AF%D9%8A%D9%86%D9%87%D8%A7%20%D8%A8%D8%B9%D8%AB%D9%87"
+    },
+    {
+     "grader_ar": "النووي",
+     "grader_en": "Al-Nawawi",
+     "grade_ar": "اتفق الحفاظ على أنه حديث ضعيف، وإن كثرت طرقه",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الأربعون النووية",
+     "source_en": "الأربعون النووية",
+     "number": "1",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%AD%D9%81%D8%B8%20%D8%B9%D9%84%D9%89%20%D8%A3%D9%85%D8%AA%D9%8A%20%D8%A3%D8%B1%D8%A8%D8%B9%D9%8A%D9%86%20%D8%AD%D8%AF%D9%8A%D8%AB%D8%A7%20%D9%85%D9%86%20%D8%A3%D9%85%D8%B1%20%D8%AF%D9%8A%D9%86%D9%87%D8%A7%20%D8%A8%D8%B9%D8%AB%D9%87"
+    }
+   ],
+   "dorar_text": "مَن حفِظَ على أمَّتي أربعينَ حديثًا من أمرِ دينِها بعثَهُ اللَّهُ يومَ القيامةِ فقيهًا عالمًا",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أصحابي كالنجوم بأيهم اقتديتم اهتديتم",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "58",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%B5%D8%AD%D8%A7%D8%A8%D9%8A%20%D9%83%D8%A7%D9%84%D9%86%D8%AC%D9%88%D9%85%20%D8%A8%D8%A3%D9%8A%D9%87%D9%85%20%D8%A7%D9%82%D8%AA%D8%AF%D9%8A%D8%AA%D9%85%20%D8%A7%D9%87%D8%AA%D8%AF%D9%8A%D8%AA%D9%85"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل",
+     "grade_en": "False (batil)",
+     "source_ar": "شرح الطحاوية",
+     "source_en": "شرح الطحاوية",
+     "number": "468",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%B5%D8%AD%D8%A7%D8%A8%D9%8A%20%D9%83%D8%A7%D9%84%D9%86%D8%AC%D9%88%D9%85%20%D8%A8%D8%A3%D9%8A%D9%87%D9%85%20%D8%A7%D9%82%D8%AA%D8%AF%D9%8A%D8%AA%D9%85%20%D8%A7%D9%87%D8%AA%D8%AF%D9%8A%D8%AA%D9%85"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل",
+     "grade_en": "False (batil)",
+     "source_ar": "صفة الفتوى",
+     "source_en": "صفة الفتوى",
+     "number": "55",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%B5%D8%AD%D8%A7%D8%A8%D9%8A%20%D9%83%D8%A7%D9%84%D9%86%D8%AC%D9%88%D9%85%20%D8%A8%D8%A3%D9%8A%D9%87%D9%85%20%D8%A7%D9%82%D8%AA%D8%AF%D9%8A%D8%AA%D9%85%20%D8%A7%D9%87%D8%AA%D8%AF%D9%8A%D8%AA%D9%85"
+    }
+   ],
+   "dorar_text": "أصحابي كالنُّجومِ ، بأيِّهم اقتَدَيْتم اهتَدَيْتُم .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من أخلص لله أربعين يوما تفجرت ينابيع الحكمة من قلبه على لسانه",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الزركشي (البدر)",
+     "grader_en": "الزركشي (البدر)",
+     "grade_ar": "مرسل وروي مسندا فيه ضعيف لا يحتج به",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "اللآلئ المنثورة",
+     "source_en": "اللآلئ المنثورة",
+     "number": "137",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D8%AE%D9%84%D8%B5%20%D9%84%D9%84%D9%87%20%D8%A3%D8%B1%D8%A8%D8%B9%D9%8A%D9%86%20%D9%8A%D9%88%D9%85%D8%A7%20%D8%AA%D9%81%D8%AC%D8%B1%D8%AA%20%D9%8A%D9%86%D8%A7%D8%A8%D9%8A%D8%B9%20%D8%A7%D9%84%D8%AD%D9%83%D9%85%D8%A9%20%D9%85%D9%86%20%D9%82%D9%84%D8%A8%D9%87"
+    }
+   ],
+   "dorar_text": "من أخلص للهِ أربعينَ يومًا تفجرتْ ينابيعُ الحكمةِ من قلبِه على لسانِه",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الدنيا جيفة وطلابها كلاب",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات للصغاني",
+     "source_en": "Al-Mawdu'at (al-Saghani)",
+     "number": "38",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%AF%D9%86%D9%8A%D8%A7%20%D8%AC%D9%8A%D9%81%D8%A9%20%D9%88%D8%B7%D9%84%D8%A7%D8%A8%D9%87%D8%A7%20%D9%83%D9%84%D8%A7%D8%A8"
+    }
+   ],
+   "dorar_text": "الدُّنيا جِيفةٌ ، وطُلَّابُها كلابٌ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الفقر فخري",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "كذب",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الفتاوى الكبرى",
+     "source_en": "الفتاوى الكبرى",
+     "number": "89",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%81%D9%82%D8%B1%20%D9%81%D8%AE%D8%B1%D9%8A"
+    },
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "كذب موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "مجموع الفتاوى",
+     "source_en": "Majmu' al-Fatawa",
+     "number": "117",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%81%D9%82%D8%B1%20%D9%81%D8%AE%D8%B1%D9%8A"
+    },
+    {
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات للصغاني",
+     "source_en": "Al-Mawdu'at (al-Saghani)",
+     "number": "52",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%81%D9%82%D8%B1%20%D9%81%D8%AE%D8%B1%D9%8A"
+    }
+   ],
+   "dorar_text": "الفَقرُ فَخْري",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "ركعتان بعمامة خير من سبعين ركعة بغير عمامة",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "5699",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D9%83%D8%B9%D8%AA%D8%A7%D9%86%20%D8%A8%D8%B9%D9%85%D8%A7%D9%85%D8%A9%20%D8%AE%D9%8A%D8%B1%20%D9%85%D9%86%20%D8%B3%D8%A8%D8%B9%D9%8A%D9%86%20%D8%B1%D9%83%D8%B9%D8%A9%20%D8%A8%D8%BA%D9%8A%D8%B1%20%D8%B9%D9%85%D8%A7%D9%85%D8%A9"
+    }
+   ],
+   "dorar_text": "ركعتانِ بعمامةٍ خيرٌ منْ سبعينَ ركعةً بغيرِ عمامةٍ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "جمال الرجل فصاحة لسانه",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "3466",
+     "url": "https://dorar.net/hadith/search?q=%D8%AC%D9%85%D8%A7%D9%84%20%D8%A7%D9%84%D8%B1%D8%AC%D9%84%20%D9%81%D8%B5%D8%A7%D8%AD%D8%A9%20%D9%84%D8%B3%D8%A7%D9%86%D9%87"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "2634",
+     "url": "https://dorar.net/hadith/search?q=%D8%AC%D9%85%D8%A7%D9%84%20%D8%A7%D9%84%D8%B1%D8%AC%D9%84%20%D9%81%D8%B5%D8%A7%D8%AD%D8%A9%20%D9%84%D8%B3%D8%A7%D9%86%D9%87"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "في إسناده أحمد بن عبد الرحمن بن الجارود الرقي كذاب",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "209",
+     "url": "https://dorar.net/hadith/search?q=%D8%AC%D9%85%D8%A7%D9%84%20%D8%A7%D9%84%D8%B1%D8%AC%D9%84%20%D9%81%D8%B5%D8%A7%D8%AD%D8%A9%20%D9%84%D8%B3%D8%A7%D9%86%D9%87"
+    }
+   ],
+   "dorar_text": "جمالُ الرَّجلِ فصاحةُ لسانِه",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أعدى عدوك نفسك التي بين جنبيك",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "1164",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%B9%D8%AF%D9%89%20%D8%B9%D8%AF%D9%88%D9%83%20%D9%86%D9%81%D8%B3%D9%83%20%D8%A7%D9%84%D8%AA%D9%8A%20%D8%A8%D9%8A%D9%86%20%D8%AC%D9%86%D8%A8%D9%8A%D9%83"
+    },
+    {
+     "grader_ar": "العراقي",
+     "grader_en": "Al-Iraqi",
+     "grade_ar": "فيه] محمد بن عبد الرحمن بن غزوان, أحد الوضاعين",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "تخريج الإحياء للعراقي",
+     "source_en": "Takhrij al-Ihya'",
+     "number": "5",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D8%B9%D8%AF%D9%89%20%D8%B9%D8%AF%D9%88%D9%83%20%D9%86%D9%81%D8%B3%D9%83%20%D8%A7%D9%84%D8%AA%D9%8A%20%D8%A8%D9%8A%D9%86%20%D8%AC%D9%86%D8%A8%D9%8A%D9%83"
+    }
+   ],
+   "dorar_text": "أَعْدَى عَدُوِّكَ نفسُكَ التى بين جَنْبَيْكَ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "نوم الصائم عبادة وصمته تسبيح ودعاؤه مستجاب",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "5972",
+     "url": "https://dorar.net/hadith/search?q=%D9%86%D9%88%D9%85%20%D8%A7%D9%84%D8%B5%D8%A7%D8%A6%D9%85%20%D8%B9%D8%A8%D8%A7%D8%AF%D8%A9%20%D9%88%D8%B5%D9%85%D8%AA%D9%87%20%D8%AA%D8%B3%D8%A8%D9%8A%D8%AD%20%D9%88%D8%AF%D8%B9%D8%A7%D8%A4%D9%87%20%D9%85%D8%B3%D8%AA%D8%AC%D8%A7%D8%A8"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الجامع الصغير",
+     "source_en": "Al-Jami' al-Saghir",
+     "number": "9274",
+     "url": "https://dorar.net/hadith/search?q=%D9%86%D9%88%D9%85%20%D8%A7%D9%84%D8%B5%D8%A7%D8%A6%D9%85%20%D8%B9%D8%A8%D8%A7%D8%AF%D8%A9%20%D9%88%D8%B5%D9%85%D8%AA%D9%87%20%D8%AA%D8%B3%D8%A8%D9%8A%D8%AD%20%D9%88%D8%AF%D8%B9%D8%A7%D8%A4%D9%87%20%D9%85%D8%B3%D8%AA%D8%AC%D8%A7%D8%A8"
+    },
+    {
+     "grader_ar": "العراقي",
+     "grader_en": "Al-Iraqi",
+     "grade_ar": "فيه سليمان النخعي أحد الكذابين",
+     "grade_en": "Not authentic (see the Arabic ruling)",
+     "source_ar": "فيض القدير",
+     "source_en": "Fayd al-Qadir",
+     "number": "291",
+     "url": "https://dorar.net/hadith/search?q=%D9%86%D9%88%D9%85%20%D8%A7%D9%84%D8%B5%D8%A7%D8%A6%D9%85%20%D8%B9%D8%A8%D8%A7%D8%AF%D8%A9%20%D9%88%D8%B5%D9%85%D8%AA%D9%87%20%D8%AA%D8%B3%D8%A8%D9%8A%D8%AD%20%D9%88%D8%AF%D8%B9%D8%A7%D8%A4%D9%87%20%D9%85%D8%B3%D8%AA%D8%AC%D8%A7%D8%A8"
+    }
+   ],
+   "dorar_text": "نومُ الصائمِ عبادةٌ ، و صمتُهُ تسبيحٌ ، و عملُهُ مضاعفٌ و دعاؤُهُ مستجابٌ ، و ذنبُهُ مغفورٌ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "لكل شيء عروس وعروس القرآن الرحمن",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "4729",
+     "url": "https://dorar.net/hadith/search?q=%D9%84%D9%83%D9%84%20%D8%B4%D9%8A%D8%A1%20%D8%B9%D8%B1%D9%88%D8%B3%20%D9%88%D8%B9%D8%B1%D9%88%D8%B3%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "منكر",
+     "grade_en": "Denounced (munkar)",
+     "source_ar": "هداية الرواة",
+     "source_en": "هداية الرواة",
+     "number": "2121",
+     "url": "https://dorar.net/hadith/search?q=%D9%84%D9%83%D9%84%20%D8%B4%D9%8A%D8%A1%20%D8%B9%D8%B1%D9%88%D8%B3%20%D9%88%D8%B9%D8%B1%D9%88%D8%B3%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "منكر",
+     "grade_en": "Denounced (munkar)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "1350",
+     "url": "https://dorar.net/hadith/search?q=%D9%84%D9%83%D9%84%20%D8%B4%D9%8A%D8%A1%20%D8%B9%D8%B1%D9%88%D8%B3%20%D9%88%D8%B9%D8%B1%D9%88%D8%B3%20%D8%A7%D9%84%D9%82%D8%B1%D8%A2%D9%86%20%D8%A7%D9%84%D8%B1%D8%AD%D9%85%D9%86"
+    }
+   ],
+   "dorar_text": "لِكلِّ شيءٍ عروسٌ وعروسُ القرآنِ الرَّحمنُ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "رمضان أوله رحمة وأوسطه مغفرة وآخره عتق من النار",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "منكر",
+     "grade_en": "Denounced (munkar)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "1569",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D9%85%D8%B6%D8%A7%D9%86%20%D8%A3%D9%88%D9%84%D9%87%20%D8%B1%D8%AD%D9%85%D8%A9%20%D9%88%D8%A3%D9%88%D8%B3%D8%B7%D9%87%20%D9%85%D8%BA%D9%81%D8%B1%D8%A9%20%D9%88%D8%A2%D8%AE%D8%B1%D9%87%20%D8%B9%D8%AA%D9%82%20%D9%85%D9%86%20%D8%A7%D9%84%D9%86%D8%A7%D8%B1"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف جداً",
+     "grade_en": "Very weak",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "2135",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D9%85%D8%B6%D8%A7%D9%86%20%D8%A3%D9%88%D9%84%D9%87%20%D8%B1%D8%AD%D9%85%D8%A9%20%D9%88%D8%A3%D9%88%D8%B3%D8%B7%D9%87%20%D9%85%D8%BA%D9%81%D8%B1%D8%A9%20%D9%88%D8%A2%D8%AE%D8%B1%D9%87%20%D8%B9%D8%AA%D9%82%20%D9%85%D9%86%20%D8%A7%D9%84%D9%86%D8%A7%D8%B1"
+    },
+    {
+     "grader_ar": "ابن عثيمين",
+     "grader_en": "Ibn Uthaymin",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "المناهي اللفظية",
+     "source_en": "المناهي اللفظية",
+     "number": "326",
+     "url": "https://dorar.net/hadith/search?q=%D8%B1%D9%85%D8%B6%D8%A7%D9%86%20%D8%A3%D9%88%D9%84%D9%87%20%D8%B1%D8%AD%D9%85%D8%A9%20%D9%88%D8%A3%D9%88%D8%B3%D8%B7%D9%87%20%D9%85%D8%BA%D9%81%D8%B1%D8%A9%20%D9%88%D8%A2%D8%AE%D8%B1%D9%87%20%D8%B9%D8%AA%D9%82%20%D9%85%D9%86%20%D8%A7%D9%84%D9%86%D8%A7%D8%B1"
+    }
+   ],
+   "dorar_text": "أولُ رمضانَ رحمةٌ ، [ وأوسطُه مغفرةٌ ، وآخرُه عتقٌ من النارِ ]",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "اطلبوا الرزق في خبايا الأرض",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "منكر",
+     "grade_en": "Denounced (munkar)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "2489",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B7%D9%84%D8%A8%D9%88%D8%A7%20%D8%A7%D9%84%D8%B1%D8%B2%D9%82%20%D9%81%D9%8A%20%D8%AE%D8%A8%D8%A7%D9%8A%D8%A7%20%D8%A7%D9%84%D8%A3%D8%B1%D8%B6"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "905",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B7%D9%84%D8%A8%D9%88%D8%A7%20%D8%A7%D9%84%D8%B1%D8%B2%D9%82%20%D9%81%D9%8A%20%D8%AE%D8%A8%D8%A7%D9%8A%D8%A7%20%D8%A7%D9%84%D8%A3%D8%B1%D8%B6"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الجامع الصغير",
+     "source_en": "Al-Jami' al-Saghir",
+     "number": "1104",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B7%D9%84%D8%A8%D9%88%D8%A7%20%D8%A7%D9%84%D8%B1%D8%B2%D9%82%20%D9%81%D9%8A%20%D8%AE%D8%A8%D8%A7%D9%8A%D8%A7%20%D8%A7%D9%84%D8%A3%D8%B1%D8%B6"
+    }
+   ],
+   "dorar_text": "اطلبوا الرِّزقَ في خبايا الأرضِ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "إن الله يحب الملحين في الدعاء",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "باطل",
+     "grade_en": "False (batil)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "637",
+     "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D9%8A%D8%AD%D8%A8%20%D8%A7%D9%84%D9%85%D9%84%D8%AD%D9%8A%D9%86%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AF%D8%B9%D8%A7%D8%A1"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "إرواء الغليل",
+     "source_en": "إرواء الغليل",
+     "number": "677",
+     "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D9%8A%D8%AD%D8%A8%20%D8%A7%D9%84%D9%85%D9%84%D8%AD%D9%8A%D9%86%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AF%D8%B9%D8%A7%D8%A1"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "1710",
+     "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D9%8A%D8%AD%D8%A8%20%D8%A7%D9%84%D9%85%D9%84%D8%AD%D9%8A%D9%86%20%D9%81%D9%8A%20%D8%A7%D9%84%D8%AF%D8%B9%D8%A7%D8%A1"
+    }
+   ],
+   "dorar_text": "إن اللهَ يحبُّ الملحين في الدعاءِ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من سعادة المرء أن يشبه أباه",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "5301",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B3%D8%B9%D8%A7%D8%AF%D8%A9%20%D8%A7%D9%84%D9%85%D8%B1%D8%A1%20%D8%A3%D9%86%20%D9%8A%D8%B4%D8%A8%D9%87%20%D8%A3%D8%A8%D8%A7%D9%87"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "4522",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B3%D8%B9%D8%A7%D8%AF%D8%A9%20%D8%A7%D9%84%D9%85%D8%B1%D8%A1%20%D8%A3%D9%86%20%D9%8A%D8%B4%D8%A8%D9%87%20%D8%A3%D8%A8%D8%A7%D9%87"
+    },
+    {
+     "grader_ar": "السفاريني الحنبلي",
+     "grader_en": "Al-Saffarini",
+     "grade_ar": "إسناده ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "شرح كتاب الشهاب",
+     "source_en": "شرح كتاب الشهاب",
+     "number": "438",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B3%D8%B9%D8%A7%D8%AF%D8%A9%20%D8%A7%D9%84%D9%85%D8%B1%D8%A1%20%D8%A3%D9%86%20%D9%8A%D8%B4%D8%A8%D9%87%20%D8%A3%D8%A8%D8%A7%D9%87"
+    }
+   ],
+   "dorar_text": "من سعادةِ المرءِ أن يُشبه أباهُ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أكرموا الخبز فإن الله أنزله من بركات السماء",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "1126",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%83%D8%B1%D9%85%D9%88%D8%A7%20%D8%A7%D9%84%D8%AE%D8%A8%D8%B2%20%D9%81%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D8%A3%D9%86%D8%B2%D9%84%D9%87%20%D9%85%D9%86%20%D8%A8%D8%B1%D9%83%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B3%D9%85%D8%A7%D8%A1"
+    },
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "هذا من عمل طلحة الحضرمي ، قال أحمد والنسائي : متروك الحديث . وقال يحيى : ليس بشيء",
+     "grade_en": "Very weak",
+     "source_ar": "الموضوعات لابن الجوزي",
+     "source_en": "Al-Mawdu'at (Ibn al-Jawzi)",
+     "number": "104",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%83%D8%B1%D9%85%D9%88%D8%A7%20%D8%A7%D9%84%D8%AE%D8%A8%D8%B2%20%D9%81%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D8%A3%D9%86%D8%B2%D9%84%D9%87%20%D9%85%D9%86%20%D8%A8%D8%B1%D9%83%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B3%D9%85%D8%A7%D8%A1"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "ضعيف مضطرب",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "103",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%83%D8%B1%D9%85%D9%88%D8%A7%20%D8%A7%D9%84%D8%AE%D8%A8%D8%B2%20%D9%81%D8%A5%D9%86%20%D8%A7%D9%84%D9%84%D9%87%20%D8%A3%D9%86%D8%B2%D9%84%D9%87%20%D9%85%D9%86%20%D8%A8%D8%B1%D9%83%D8%A7%D8%AA%20%D8%A7%D9%84%D8%B3%D9%85%D8%A7%D8%A1"
+    }
+   ],
+   "dorar_text": "أَكْرِمُوا الخُبْزَ ، فإنَّ اللهَ أَنْزَلَه من بَرَكاتِ السماءِ ، وأَخْرَجَهُ من بَرَكاتِ الأرضِ.",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "عليكم بالعدس فإنه مبارك",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات لابن الجوزي",
+     "source_en": "Al-Mawdu'at (Ibn al-Jawzi)",
+     "number": "113",
+     "url": "https://dorar.net/hadith/search?q=%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D8%A8%D8%A7%D9%84%D8%B9%D8%AF%D8%B3%20%D9%81%D8%A5%D9%86%D9%87%20%D9%85%D8%A8%D8%A7%D8%B1%D9%83"
+    },
+    {
+     "grader_ar": "الذهبي",
+     "grader_en": "Al-Dhahabi",
+     "grade_ar": "مرسل [وفيه] عيسى بن شعيب – ضعيف -",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ترتيب الموضوعات",
+     "source_en": "ترتيب الموضوعات",
+     "number": "213",
+     "url": "https://dorar.net/hadith/search?q=%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D8%A8%D8%A7%D9%84%D8%B9%D8%AF%D8%B3%20%D9%81%D8%A5%D9%86%D9%87%20%D9%85%D8%A8%D8%A7%D8%B1%D9%83"
+    },
+    {
+     "grader_ar": "الصغاني",
+     "grader_en": "Al-Saghani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الموضوعات للصغاني",
+     "source_en": "Al-Mawdu'at (al-Saghani)",
+     "number": "67",
+     "url": "https://dorar.net/hadith/search?q=%D8%B9%D9%84%D9%8A%D9%83%D9%85%20%D8%A8%D8%A7%D9%84%D8%B9%D8%AF%D8%B3%20%D9%81%D8%A5%D9%86%D9%87%20%D9%85%D8%A8%D8%A7%D8%B1%D9%83"
+    }
+   ],
+   "dorar_text": "عليْكم بالعَدَسِ فإنَّهُ مبارَكٌ فإنَّهُ يَرِقُّ لهُ القلبَ ويُكثِرُ الدَّمعةَ وفي لفظ قُدِّسَ العدَسُ على لسانِ سبعينَ نبيًّا.",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الباذنجان لما أكل له",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "170",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86%20%D9%84%D9%85%D8%A7%20%D8%A3%D9%83%D9%84%20%D9%84%D9%87"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "تدريب",
+     "source_en": "تدريب",
+     "number": "167",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86%20%D9%84%D9%85%D8%A7%20%D8%A3%D9%83%D9%84%20%D9%84%D9%87"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الدرر المنتثرة",
+     "source_en": "الدرر المنتثرة",
+     "number": "54",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%A8%D8%A7%D8%B0%D9%86%D8%AC%D8%A7%D9%86%20%D9%84%D9%85%D8%A7%20%D8%A3%D9%83%D9%84%20%D9%84%D9%87"
+    }
+   ],
+   "dorar_text": "الباذِنْجانُ لِما أُكِلَ له.",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من أكل مع مغفور له غفر له",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "كذب لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "315",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D9%83%D9%84%20%D9%85%D8%B9%20%D9%85%D8%BA%D9%81%D9%88%D8%B1%20%D9%84%D9%87%20%D8%BA%D9%81%D8%B1%20%D9%84%D9%87"
+    },
+    {
+     "grader_ar": "ملا علي قاري",
+     "grader_en": "Mulla Ali al-Qari",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الأسرار المرفوعة",
+     "source_en": "Al-Asrar al-Marfu'ah",
+     "number": "475",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D9%83%D9%84%20%D9%85%D8%B9%20%D9%85%D8%BA%D9%81%D9%88%D8%B1%20%D9%84%D9%87%20%D8%BA%D9%81%D8%B1%20%D9%84%D9%87"
+    },
+    {
+     "grader_ar": "مرعي الكرمي",
+     "grader_en": "مرعي الكرمي",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "الفوائد الموضوعة",
+     "source_en": "الفوائد الموضوعة",
+     "number": "108",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%A3%D9%83%D9%84%20%D9%85%D8%B9%20%D9%85%D8%BA%D9%81%D9%88%D8%B1%20%D9%84%D9%87%20%D8%BA%D9%81%D8%B1%20%D9%84%D9%87"
+    }
+   ],
+   "dorar_text": "من أكل مع مغفورٍ له غُفِرَ له",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "أكرموا عمتكم النخلة",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "263",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%83%D8%B1%D9%85%D9%88%D8%A7%20%D8%B9%D9%85%D8%AA%D9%83%D9%85%20%D8%A7%D9%84%D9%86%D8%AE%D9%84%D8%A9"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "1136",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%83%D8%B1%D9%85%D9%88%D8%A7%20%D8%B9%D9%85%D8%AA%D9%83%D9%85%20%D8%A7%D9%84%D9%86%D8%AE%D9%84%D8%A9"
+    },
+    {
+     "grader_ar": "ابن الجوزي",
+     "grader_en": "Ibn al-Jawzi",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "الموضوعات لابن الجوزي",
+     "source_en": "Al-Mawdu'at (Ibn al-Jawzi)",
+     "number": "291",
+     "url": "https://dorar.net/hadith/search?q=%D8%A3%D9%83%D8%B1%D9%85%D9%88%D8%A7%20%D8%B9%D9%85%D8%AA%D9%83%D9%85%20%D8%A7%D9%84%D9%86%D8%AE%D9%84%D8%A9"
+    }
+   ],
+   "dorar_text": "أَكْرِمُوا عمَّتَكُمُ النخلةَ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "اذكروا الفاجر بما فيه يحذره الناس",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "104",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B0%D9%83%D8%B1%D9%88%D8%A7%20%D8%A7%D9%84%D9%81%D8%A7%D8%AC%D8%B1%20%D8%A8%D9%85%D8%A7%20%D9%81%D9%8A%D9%87%20%D9%8A%D8%AD%D8%B0%D8%B1%D9%87%20%D8%A7%D9%84%D9%86%D8%A7%D8%B3"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الجامع الصغير",
+     "source_en": "Al-Jami' al-Saghir",
+     "number": "108",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B0%D9%83%D8%B1%D9%88%D8%A7%20%D8%A7%D9%84%D9%81%D8%A7%D8%AC%D8%B1%20%D8%A8%D9%85%D8%A7%20%D9%81%D9%8A%D9%87%20%D9%8A%D8%AD%D8%B0%D8%B1%D9%87%20%D8%A7%D9%84%D9%86%D8%A7%D8%B3"
+    },
+    {
+     "grader_ar": "السمهودي",
+     "grader_en": "Al-Samhudi",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "الغماز على اللماز",
+     "source_en": "الغماز على اللماز",
+     "number": "19",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D8%B0%D9%83%D8%B1%D9%88%D8%A7%20%D8%A7%D9%84%D9%81%D8%A7%D8%AC%D8%B1%20%D8%A8%D9%85%D8%A7%20%D9%81%D9%8A%D9%87%20%D9%8A%D8%AD%D8%B0%D8%B1%D9%87%20%D8%A7%D9%84%D9%86%D8%A7%D8%B3"
+    }
+   ],
+   "dorar_text": "اذكُروا الفاجِرَ بما فيهِ [يعني حديث: أَتَرْعُونَ عن ذِكْرِ الفاجرِ ؟ اذكروا الفاجرَ بما فيهِ يحذرُهُ الناسُ ]",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "تزوجوا فقراء يغنكم الله",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن كثير",
+     "grader_en": "Ibn Kathir",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "تفسير القرآن العظيم",
+     "source_en": "تفسير القرآن العظيم",
+     "number": "55",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D8%B2%D9%88%D8%AC%D9%88%D8%A7%20%D9%81%D9%82%D8%B1%D8%A7%D8%A1%20%D9%8A%D8%BA%D9%86%D9%83%D9%85%20%D8%A7%D9%84%D9%84%D9%87"
+    },
+    {
+     "grader_ar": "القسطلاني",
+     "grader_en": "القسطلاني",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "إرشاد الساري",
+     "source_en": "إرشاد الساري",
+     "number": "17",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D8%B2%D9%88%D8%AC%D9%88%D8%A7%20%D9%81%D9%82%D8%B1%D8%A7%D8%A1%20%D9%8A%D8%BA%D9%86%D9%83%D9%85%20%D8%A7%D9%84%D9%84%D9%87"
+    }
+   ],
+   "dorar_text": "تزوَّجوا فقراءَ يغنِكمُ اللَّهُ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "تختموا بالعقيق",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "226",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D8%AE%D8%AA%D9%85%D9%88%D8%A7%20%D8%A8%D8%A7%D9%84%D8%B9%D9%82%D9%8A%D9%82"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "إرواء الغليل",
+     "source_en": "إرواء الغليل",
+     "number": "826",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D8%AE%D8%AA%D9%85%D9%88%D8%A7%20%D8%A8%D8%A7%D9%84%D8%B9%D9%82%D9%8A%D9%82"
+    },
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "ضعيف الجامع",
+     "source_en": "Da'if al-Jami'",
+     "number": "2410",
+     "url": "https://dorar.net/hadith/search?q=%D8%AA%D8%AE%D8%AA%D9%85%D9%88%D8%A7%20%D8%A8%D8%A7%D9%84%D8%B9%D9%82%D9%8A%D9%82"
+    }
+   ],
+   "dorar_text": "تختَّموا بالعَقيقِ .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "إياكم وخضراء الدمن",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "ضعيف جداً",
+     "grade_en": "Very weak",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "14",
+     "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%8A%D8%A7%D9%83%D9%85%20%D9%88%D8%AE%D8%B6%D8%B1%D8%A7%D8%A1%20%D8%A7%D9%84%D8%AF%D9%85%D9%86"
+    },
+    {
+     "grader_ar": "ملا علي قاري",
+     "grader_en": "Mulla Ali al-Qari",
+     "grade_ar": "ليس موضوعا",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "الأسرار المرفوعة",
+     "source_en": "Al-Asrar al-Marfu'ah",
+     "number": "155",
+     "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%8A%D8%A7%D9%83%D9%85%20%D9%88%D8%AE%D8%B6%D8%B1%D8%A7%D8%A1%20%D8%A7%D9%84%D8%AF%D9%85%D9%86"
+    },
+    {
+     "grader_ar": "الزرقاني",
+     "grader_en": "Al-Zurqani",
+     "grade_ar": "ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "مختصر المقاصد",
+     "source_en": "Mukhtasar al-Maqasid",
+     "number": "249",
+     "url": "https://dorar.net/hadith/search?q=%D8%A5%D9%8A%D8%A7%D9%83%D9%85%20%D9%88%D8%AE%D8%B6%D8%B1%D8%A7%D8%A1%20%D8%A7%D9%84%D8%AF%D9%85%D9%86"
+    }
+   ],
+   "dorar_text": "إيَّاكُم وخضراءَ الدِّمَنِ فقيلَ : وما خَضراءُ الدِّمنِ ؟ قالَ : المرأةُ الحسناءُ في المنبتِ السُّوءِ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "يوم صومكم يوم نحركم",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "ابن تيمية",
+     "grader_en": "Ibn Taymiyyah",
+     "grade_ar": "لا يعرف في شيء من كتب الإسلام ولا رواه عالم قط",
+     "grade_en": "Very weak",
+     "source_ar": "مجموع الفتاوى",
+     "source_en": "Majmu' al-Fatawa",
+     "number": "180",
+     "url": "https://dorar.net/hadith/search?q=%D9%8A%D9%88%D9%85%20%D8%B5%D9%88%D9%85%D9%83%D9%85%20%D9%8A%D9%88%D9%85%20%D9%86%D8%AD%D8%B1%D9%83%D9%85"
+    },
+    {
+     "grader_ar": "السخاوي",
+     "grader_en": "Al-Sakhawi",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "المقاصد الحسنة",
+     "source_en": "Al-Maqasid al-Hasanah",
+     "number": "559",
+     "url": "https://dorar.net/hadith/search?q=%D9%8A%D9%88%D9%85%20%D8%B5%D9%88%D9%85%D9%83%D9%85%20%D9%8A%D9%88%D9%85%20%D9%86%D8%AD%D8%B1%D9%83%D9%85"
+    },
+    {
+     "grader_ar": "السيوطي",
+     "grader_en": "Al-Suyuti",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "تدريب",
+     "source_en": "تدريب",
+     "number": "167",
+     "url": "https://dorar.net/hadith/search?q=%D9%8A%D9%88%D9%85%20%D8%B5%D9%88%D9%85%D9%83%D9%85%20%D9%8A%D9%88%D9%85%20%D9%86%D8%AD%D8%B1%D9%83%D9%85"
+    }
+   ],
+   "dorar_text": "يومُ صَومِكم يومُ نحرِكم",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من صام يوما من رجب كان كصيام سنة",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الشوكاني",
+     "grader_en": "Al-Shawkani",
+     "grade_ar": "باطل لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "الفتح الرباني",
+     "source_en": "الفتح الرباني",
+     "number": "3211",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B5%D8%A7%D9%85%20%D9%8A%D9%88%D9%85%D8%A7%20%D9%85%D9%86%20%D8%B1%D8%AC%D8%A8%20%D9%83%D8%A7%D9%86%20%D9%83%D8%B5%D9%8A%D8%A7%D9%85%20%D8%B3%D9%86%D8%A9"
+    },
+    {
+     "grader_ar": "ابن حجر العسقلاني",
+     "grader_en": "Ibn Hajar al-Asqalani",
+     "grade_ar": "إسناده ضعيف",
+     "grade_en": "Weak (da'if)",
+     "source_ar": "الإصابة في تمييز الصحابة",
+     "source_en": "الإصابة في تمييز الصحابة",
+     "number": "156",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B5%D8%A7%D9%85%20%D9%8A%D9%88%D9%85%D8%A7%20%D9%85%D9%86%20%D8%B1%D8%AC%D8%A8%20%D9%83%D8%A7%D9%86%20%D9%83%D8%B5%D9%8A%D8%A7%D9%85%20%D8%B3%D9%86%D8%A9"
+    },
+    {
+     "grader_ar": "ابن حجر العسقلاني",
+     "grader_en": "Ibn Hajar al-Asqalani",
+     "grade_ar": "فيه عثمان بن مطر كذبه ابن حبان وأجمع الأئمة على ضعفه",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "تبيين العجب",
+     "source_en": "تبيين العجب",
+     "number": "29",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B5%D8%A7%D9%85%20%D9%8A%D9%88%D9%85%D8%A7%20%D9%85%D9%86%20%D8%B1%D8%AC%D8%A8%20%D9%83%D8%A7%D9%86%20%D9%83%D8%B5%D9%8A%D8%A7%D9%85%20%D8%B3%D9%86%D8%A9"
+    }
+   ],
+   "dorar_text": "من صام يومًا من رجبٍ كان كصيامِ سنةٍ ، ومن صام سبعةَ أيامٍ غُلِّقَتْ عنه سبعةُ أبوابٍ جهنمَ، ومن صام ثمانيةَ أيامٍ فُتِّحَتْ له ثمانيةُ أبوابٍ من الجنةِ، ومن صام عشرةَ أيامٍ لم يسألِ اللهَ شيئًا إلا أعطاه، ومن صام خمسةَ عشرَ يومًا نادى منادٍ من السماءِ قد غفرتُ لك ما سلف فاستأنفِ العملَ، قد بدَّلتُ سيئاتِك حسناتٍ، ومن زاد زادَه اللهُ، وفي رجبٍ حمل نوحٌ في السفينةِ فصام نوحٌ وأمر من معهُ أن يصوموا، وجَرَتْ بهم السفينةُ ستةَ أشهرٍ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "النظر في المصحف عبادة",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "موضوع",
+     "grade_en": "Fabricated (mawdu')",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "356",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%86%D8%B8%D8%B1%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%85%D8%B5%D8%AD%D9%81%20%D8%B9%D8%A8%D8%A7%D8%AF%D8%A9"
+    },
+    {
+     "grader_ar": "ابن حجر العسقلاني",
+     "grader_en": "Ibn Hajar al-Asqalani",
+     "grade_ar": "لهذا المتن طريق أخرى من حديث عائشة بسند واه ، ولفظه كتاب الله بدل المصحف",
+     "grade_en": "Very weak",
+     "source_ar": "الإصابة في تمييز الصحابة",
+     "source_en": "الإصابة في تمييز الصحابة",
+     "number": "627",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D9%86%D8%B8%D8%B1%20%D9%81%D9%8A%20%D8%A7%D9%84%D9%85%D8%B5%D8%AD%D9%81%20%D8%B9%D8%A8%D8%A7%D8%AF%D8%A9"
+    }
+   ],
+   "dorar_text": "النظرُ في المصحَفِ عبادَةٌ ونظرُ الولَدِ إلِى الوالديْنِ عبادَةٌ والنظَرُ إلى علِيِّ بْنِ أبي طالِبٍ عبادَةٌ",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "من صلى خلف عالم تقي فكأنما صلى خلف نبي",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "573",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B5%D9%84%D9%89%20%D8%AE%D9%84%D9%81%20%D8%B9%D8%A7%D9%84%D9%85%20%D8%AA%D9%82%D9%8A%20%D9%81%D9%83%D8%A3%D9%86%D9%85%D8%A7%20%D8%B5%D9%84%D9%89%20%D8%AE%D9%84%D9%81%20%D9%86%D8%A8%D9%8A"
+    },
+    {
+     "grader_ar": "الشوكاني",
+     "grader_en": "Al-Shawkani",
+     "grade_ar": "لا يصح",
+     "grade_en": "Not authentic",
+     "source_ar": "الفوائد المجموعة",
+     "source_en": "Al-Fawa'id al-Majmu'ah",
+     "number": "32",
+     "url": "https://dorar.net/hadith/search?q=%D9%85%D9%86%20%D8%B5%D9%84%D9%89%20%D8%AE%D9%84%D9%81%20%D8%B9%D8%A7%D9%84%D9%85%20%D8%AA%D9%82%D9%8A%20%D9%81%D9%83%D8%A3%D9%86%D9%85%D8%A7%20%D8%B5%D9%84%D9%89%20%D8%AE%D9%84%D9%81%20%D9%86%D8%A8%D9%8A"
+    }
+   ],
+   "dorar_text": "من صلى خلف عالمٍ تقيٍّ . فكأنما صلى خلف نبيٍّ .",
+   "source": "dorar"
+  },
+  {
+   "text_ar": "الأقربون أولى بالمعروف",
+   "text_en": "",
+   "type_ar": "قول منتشر منسوب إلى النبي ﷺ",
+   "type_en": "Circulated saying attributed to the Prophet ﷺ",
+   "grades": [
+    {
+     "grader_ar": "الألباني",
+     "grader_en": "Al-Albani",
+     "grade_ar": "لا أصل له بهذا اللفظ",
+     "grade_en": "No basis",
+     "source_ar": "السلسلة الضعيفة",
+     "source_en": "Al-Silsilah al-Da'ifah",
+     "number": "376",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%A3%D9%82%D8%B1%D8%A8%D9%88%D9%86%20%D8%A3%D9%88%D9%84%D9%89%20%D8%A8%D8%A7%D9%84%D9%85%D8%B9%D8%B1%D9%88%D9%81"
+    },
+    {
+     "grader_ar": "ملا علي قاري",
+     "grader_en": "Mulla Ali al-Qari",
+     "grade_ar": "قيل لا أصل له أو بأصله موضوع",
+     "grade_en": "No basis",
+     "source_ar": "الأسرار المرفوعة",
+     "source_en": "Al-Asrar al-Marfu'ah",
+     "number": "124",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%A3%D9%82%D8%B1%D8%A8%D9%88%D9%86%20%D8%A3%D9%88%D9%84%D9%89%20%D8%A8%D8%A7%D9%84%D9%85%D8%B9%D8%B1%D9%88%D9%81"
+    },
+    {
+     "grader_ar": "محمد جار الله الصعدي",
+     "grader_en": "Al-Sa'di",
+     "grade_ar": "لم يرد بلفظه",
+     "grade_en": "No basis",
+     "source_ar": "النوافح العطرة",
+     "source_en": "النوافح العطرة",
+     "number": "51",
+     "url": "https://dorar.net/hadith/search?q=%D8%A7%D9%84%D8%A3%D9%82%D8%B1%D8%A8%D9%88%D9%86%20%D8%A3%D9%88%D9%84%D9%89%20%D8%A8%D8%A7%D9%84%D9%85%D8%B9%D8%B1%D9%88%D9%81"
+    }
+   ],
+   "dorar_text": "الأقربونَ أَوْلَى بالمعروفِ",
+   "source": "dorar"
+  }
+ ]
 }

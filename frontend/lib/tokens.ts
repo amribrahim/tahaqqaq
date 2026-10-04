@@ -28,7 +28,7 @@ export function gradeFamily(gradeAr: string): GradeFamily {
   const g = gradeAr || "";
   if (/آية/.test(g)) return "ayah";
   if (/موضوع|باطل|لا أصل|لا اصل|منكر|ليس|لم أجد|لا يصح|كذب|مكذوب/.test(g)) return "mawdu";
-  if (/ضعيف/.test(g)) return "daif";
+  if (/ضعيف|ضعف|واه|متروك/.test(g)) return "daif";
   if (/صحيح/.test(g) && !/ضعيف/.test(g)) return "sahih";
   if (/حسن/.test(g)) return "hasan";
   return "other";
