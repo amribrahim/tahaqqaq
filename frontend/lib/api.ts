@@ -20,6 +20,7 @@ export type Report = {
   via: "text" | "image" | "url"; extracted_text: string; source: Source | null; grade: Grade | null; grades: Grade[]; closest_only: boolean;
   diff_input: Token[]; diff_source: Token[]; translation: Translation | null; glossary_terms: Issue[]; quran_note: { ar: string; en: string } | null;
   candidates: Candidate[]; narrations: Narration[]; match_check: MatchCheck | null; segments: Segment[]; cleaned_text: string; extraction_model: string | null; machine_translation: { language: string; english: string; model: string } | null; ai_explanation: string | null; ai_model: string | null; created_at: string; timings_ms: Record<string, number>;
+  server_id?: string;  // the API's id (r.id is replaced by the session id in the URL)
 };
 export type ApiError = { code: string; message: string };
 
@@ -119,6 +120,34 @@ export async function requestReview(report: Report, note = ""): Promise<{ accept
   });
   if (!res.ok) throw await errorOf(res);
   return res.json();
+}
+
+/** The report as a PDF for a review request: the server renders the report it produced (never one sent by the
+ *  browser) and keeps it behind a private link for `retain_days`. */
+export async function createReviewPdf(report: Report, lang: string, name: string, email: string): Promise<{ token: string; path: string; retain_days: number; report_id: string; state: State; confidence: number }> {
+  const res = await fetch(`${API}/api/review/pdf`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ report_id: report.server_id || report.id, text: report.input_text, lang, name, email }),
+  });
+  if (!res.ok) throw await errorOf(res);
+  return res.json();
+}
+
+/** Public form key of the site's Web3Forms contact form (meant to be in the page; it can only send to the owner). */
+export const WEB3FORMS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "e4f68388-9a7c-4ede-a724-4c28f2b9762b";
+
+/** Send the review request to the team's inbox through the contact form. Web3Forms' free plan takes browser
+ *  submissions only and no attachments, so the message carries the PDF link. */
+export async function sendReviewForm(f: { name: string; email: string; subject: string; message: string; botcheck: boolean }): Promise<void> {
+  let ok = false;
+  try {
+    const res = await fetch("https://api.web3forms.com/submit", {
+      method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ access_key: WEB3FORMS_KEY, from_name: "Tahaqqaq", ...f }),
+    });
+    ok = res.ok && (await res.json()).success === true;
+  } catch {}
+  if (!ok) throw new VerifyError("form_failed", "contact form unavailable");
 }
 
 export async function health(): Promise<{ status: string; counts: Record<string, number>; embedder: string; llm: boolean; llm_provider: string; llm_chain: string[]; ocr: boolean } | null> {

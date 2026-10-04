@@ -213,3 +213,59 @@ def test_templates_cover_every_state():
             t = template_brief(facts, lang)
             assert t and check_brief(t, facts) == []
     assert template_brief(FACTS, "tr") is None
+
+
+def test_groq_key_adds_the_lite_model_as_the_last_fallback():
+    assert LLMClient(_settings()).chain() == ["gemini", "groq", "openrouter", "groq-lite"]
+    assert "groq-lite" not in LLMClient(_settings(llm_fallbacks="openrouter")).chain()   # Groq left out on purpose
+
+    def handler(request: httpx.Request) -> httpx.Response:   # every quota used up except the lite model's
+        lite = json.loads(request.content).get("model") == "openai/gpt-oss-20b"
+        return httpx.Response(200, json={"choices": [{"message": {"content": "ok"}}]}) if lite else httpx.Response(429, json={})
+
+    out = LLMClient(_settings(), transport=httpx.MockTransport(handler)).complete("sys", "user")
+    assert out == ("ok", "groq-lite/openai/gpt-oss-20b")
+
+
+def test_match_check_sends_english_only_and_reuses_a_verdict(monkeypatch):
+    from app import llm as llm_mod
+
+    bodies: list[dict] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        bodies.append(json.loads(json.loads(request.content)["messages"][1]["content"]))
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"candidates": [{"n": 1, "same": true}, {"n": 2, "same": false}]}'}}]})
+
+    monkeypatch.setattr(llm_mod, "_client", LLMClient(_settings(llm_provider="groq", llm_fallbacks=""), transport=httpx.MockTransport(handler)))
+    cands = [{"kind": "hadith", "text_en": "Actions are by intentions", "text_ar": "إنما الأعمال بالنيات"},
+             {"kind": "seed", "text_en": "", "text_ar": "اطلبوا العلم"}]
+    first = llm_mod.check_match("Deeds are judged by intentions", cands)
+    again = llm_mod.check_match("Deeds are judged by intentions", cands)
+    assert first == again and first["verdicts"] == {1: True, 2: False}
+    assert len(bodies) == 1                                    # the second check came from the cache
+    sent = bodies[0]["candidates"]
+    assert "text_ar" not in sent[0] and sent[1]["text_ar"] == "اطلبوا العلم"
+
+
+def test_light_model_never_writes_an_arabic_or_english_brief(monkeypatch):
+    from app import llm as llm_mod
+
+    models: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:   # only the light model has quota left
+        model = json.loads(request.content).get("model")
+        models.append(model)
+        if model != "openai/gpt-oss-20b":
+            return httpx.Response(429, json={})
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"explanation": "Une explication."}'}}]})
+
+    monkeypatch.setattr(llm_mod, "_client", LLMClient(_settings(), transport=httpx.MockTransport(handler)))
+    facts = {"state": "verified", "confidence": 100, "ruling": {"grade_ar": "صحيح", "grader_ar": "البخاري"},
+             "source": {"book_ar": "صحيح البخاري", "number": "1"}}
+    text, model = llm_mod.explain(facts, "ar")
+    assert model == "template (models unavailable)" and "المصدر المعتمد" in text
+    assert "openai/gpt-oss-20b" not in models
+    # another language has no fixed wording: there the light model may answer (its text still goes through the checks)
+    monkeypatch.setattr(llm_mod, "fact_check", lambda text, payload: [])
+    out = llm_mod.explain(facts, "fr")
+    assert out is not None and out[1] == "groq-lite/openai/gpt-oss-20b"

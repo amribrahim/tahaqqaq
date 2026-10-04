@@ -23,6 +23,12 @@ const SCREENS: { name: string; path: string; ready: (p: Page) => Promise<void> }
     ready: async (p) => { await expect(p.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 }); } },
   { name: "result (abstain)", path: `/result/?id=a11y-a&text=${encodeURIComponent("الصبر مفتاح كل باب مغلق في الدنيا والآخرة")}`,
     ready: async (p) => { await expect(p.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 }); } },
+  { name: "review dialog", path: `/result/?id=a11y-r&text=${encodeURIComponent("إنما الأعمال بالنيات")}`,
+    ready: async (p) => {
+      await expect(p.getByTestId("status-banner")).toBeVisible({ timeout: 30_000 });
+      await p.getByTestId("review-btn-aside").click();
+      await expect(p.getByTestId("review-dialog")).toBeVisible();
+    } },
   { name: "sources", path: "/sources/", ready: async (p) => { await expect(p.locator("main")).toBeVisible(); } },
   { name: "recent", path: "/recent/", ready: async (p) => { await expect(p.locator("main")).toBeVisible(); } },
 ];

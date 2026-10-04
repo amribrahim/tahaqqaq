@@ -160,7 +160,10 @@ review. Of 142 candidates, 56 were added. Every saying's first ruling must resol
 enforces it.
 
 **What is never stored:** user input. Texts, images and links are processed in memory and dropped after the response.
-The recent-checks list lives in the browser's `sessionStorage` only.
+The recent-checks list lives in the browser's `sessionStorage` only. The one exception is a **human-review request**
+the person sends with their name and email: the report PDF is then kept for 14 days so the reviewer can open it (see
+[the API reference](#12-api-reference)). Reports stay in the API's memory for up to six hours, so that a review request
+renders exactly the report the person saw.
 
 **Not used:** المكتبة الشاملة, and dorar.net/aqeeda. The tool answers no creed questions, and personal religious
 questions are referred to scholars.
@@ -326,7 +329,7 @@ Each call has a fixed prompt, returns JSON, is validated by code, and has a non-
 | **Transcriber** (vision) | Image input | Image → the text as written | Validated as an image before upload; whole transcription shown for user review; Tesseract fallback | Tesseract + OpenCV |
 | **Extractor** | Long text, image or link | Text → cleaned text + quoted segments with type | Every segment must exist **literally** in the input; a rewritten "cleaned text" is discarded; honorific/reference spans are dropped | Rule-based spans |
 | **Translator** | Input not in Arabic or English | Text → English, for matching only | Labelled in the report; never graded as the user's translation | Abstain with a clear reason |
-| **Match checker** | English or translated input, top three non-exact records | Input + records → same report or not, for each | Only a strong model (Groq `gpt-oss-120b`, or Anthropic) may **raise** a record, to partial at most; any model may **reject**; a Qur'an verse is never raised; "when unsure, false"; a match resting on meaning alone needs this confirmation | Wording-based matches stand; meaning-only matches are shown as the closest text |
+| **Match checker** | English or translated input, top three non-exact records | Input + records → same report or not, for each | Only a strong model (Groq `gpt-oss-120b`, or Anthropic) may **raise** a record, to partial at most; any model may **reject**; a Qur'an verse is never raised; "when unsure, false"; a match resting on meaning alone needs this confirmation. English is compared with English (the Arabic is sent only for a record without a translation, a third fewer tokens), and a verdict is reused for the same text | Wording-based matches stand; meaning-only matches are shown as the closest text |
 | **Brief explainer** + **fact checker** | Every report, if enabled | Facts → 2–4 sentences in the chosen language | Code checks: no grade contradicting the record, no verdict when abstaining, no number absent from the facts. A second model pass flags claims the facts do not support (meaning, virtues, invented references). One rewrite with the problems listed, then a fixed template built only from the facts | Not shown |
 | **Grounded explainer** | Extended explanation, on request | Facts + retrieved شرح/tafsir → summary | Source text is the only input; source link shown; no source → no text; language checked by script | Not shown |
 | **Assistant classifier** | Assistant message the rules cannot place | Message → verify, report, tool or other | Only classifies; the action is code. A "verify" pointer must be text found literally in the message | Out-of-scope reply |
@@ -335,14 +338,42 @@ Each call has a fixed prompt, returns JSON, is validated by code, and has a non-
 | **Speech transcriber** (Whisper) | Voice input in the assistant | Audio → transcript, Arabic or English | Refused on silence, low confidence, repetition, other languages; transcript confirmed by the user before verifying | Typing only |
 
 **Provider chain** (`app/llm.py`): one OpenAI-compatible client. The default order is Gemini (`gemini-flash-lite-latest`),
-then Groq (`openai/gpt-oss-120b`), then OpenRouter (`google/gemma-4-26b-a4b-it:free`), and optionally Anthropic.
-Rules:
+then Groq (`openai/gpt-oss-120b`), then OpenRouter (`google/gemma-4-26b-a4b-it:free`), and optionally Anthropic. With a
+Groq key, Groq's smaller `openai/gpt-oss-20b` is added as the last fallback: it has its own free quota. It is not a
+strong judge, so it can never raise a match. It never writes an Arabic or English brief either: in a test it called
+al-Bukhari «الراوي» (narrator) instead of the compiler. There, the fixed wording built from the facts is used. Rules:
 
 - A provider that rate-limits or fails (408, 409, 425, 429, 5xx) cools down for 45 seconds, and the next one is tried.
 - Each call has a 20-second total budget.
 - The match checker prefers Groq.
 - Reasoning models get `reasoning_effort: low`.
 - Answers in the wrong language are retried once, then dropped.
+
+**Free quotas and what they allow** (limits read from the providers' own responses on 4 October 2026; they change):
+
+| Service | Free limit | Used by | Roughly allows per day |
+|---|---|---|---|
+| Gemini `flash-lite` | 500 requests a day | Brief explanations, translation for matching, assistant answers, OCR reading | 500 model answers |
+| Groq `gpt-oss-120b` | 1,000 requests and 200,000 tokens a day, 8,000 tokens a minute | Match checker (preferred), fallback for the rest | ~250 match checks (600 to 1,500 tokens each) |
+| Groq `gpt-oss-20b` | 1,000 requests a day, 8,000 tokens a minute, its own daily tokens | Last fallback | a few hundred answers |
+| Groq Whisper `large-v3` | 2,000 requests a day | Assistant voice input | 2,000 spoken turns |
+| OpenRouter free models | A small daily cap | Fallback | a few dozen answers |
+| Piper (self-hosted) | None | The assistant's voice | Unlimited (server CPU) |
+
+What each action costs:
+
+- **No model at all:** matching and verdicts, Arabic verification with explanations off, assistant greetings and small
+  talk, the spoken voice.
+- **One model call:** a brief explanation (plus a fact check), a question to the assistant about the tool or the
+  open report, a text in a language other than Arabic or English (translation), an English text whose match is not
+  exact (match check).
+- **One Whisper call:** each spoken assistant turn.
+
+When a quota runs out, the next provider answers. When all are used up, verification still works (wording-based
+matches stand), the assistant answers from its curated text, and explanations are hidden. Per-visitor limits in the
+API keep one person from using the shared quota: 30 assistant messages, 40 voice turns, 120 spoken sentences and 10
+review PDFs per 10 minutes. Benchmarks should run with separate keys, because they use the same daily quotas as the
+live site.
 
 ## 11a. The assistant
 
@@ -455,6 +486,8 @@ a labels file and run the same way.
 | POST | `/api/tts` | One sentence → natural speech (WAV); 503 lets the browser use the device voice |
 | POST | `/api/stt` | Audio (multipart) → transcript, language, duration, confidence; or a `stt_*` error with a message |
 | POST | `/api/review` | Ask for a human review (forwarded to a webhook when configured; nothing stored) |
+| POST | `/api/review/pdf` | `{report_id, text, lang, name, email}` → the report as a PDF behind a private link, kept 14 days. Only reports this server produced are rendered: the one just shown (kept in memory), otherwise the text is verified again. 10 per 10 minutes per visitor |
+| GET | `/api/review/pdf/{token}` | The review PDF (`noindex`, not cached); 404 once expired |
 
 Errors use `{detail: {code, message}}`, for example `too_long` (413), `image_too_large` (413), `ocr_failed` (415/422),
 `url_unreachable` (422).
@@ -478,6 +511,10 @@ Details:
 - **Languages:** Arabic RTL by default, English LTR. The choice is kept in `localStorage`.
 - **PDF export:** the browser's print-to-PDF with a dedicated print layout (A4). The browser draws Arabic correctly and
   keeps the text selectable, which JavaScript PDF libraries often fail at. A disclaimer footer is added.
+- **Human review:** the review button opens a dialog for name and email. The server renders the report as a PDF
+  (WeasyPrint with the Amiri font, right to left in Arabic). The browser then sends the request to the team's inbox
+  through a Web3Forms contact form, with the PDF link. The free Web3Forms plan accepts browser submissions only and has
+  no attachments, hence the link. The form key is public by design: it can only send to the form's owner.
 - **Share image:** a 1080 × 1350 PNG drawn on a canvas with the page's fonts. It shows the state, the input, the recorded
   ruling and its source, the disclaimer and the site address. Phones use the system share sheet; computers download it.
 - **Assistant widget:** a floating button at the bottom right opens the chat panel on every page. It supports text,
@@ -494,12 +531,12 @@ Details:
 
 | Suite | Count | Command |
 |---|---|---|
-| Backend unit tests (offline, real saved fixtures) | 167 | `cd backend && .venv/bin/pytest -q` |
+| Backend unit tests (offline, real saved fixtures) | 177 | `cd backend && .venv/bin/pytest -q` |
 | Integration tests against the running stack | 37 | `TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q` |
-| Browser tests (Playwright, Chrome), Arabic and English | 57 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
-| Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages | 10 | `npx playwright test e2e/a11y.spec.ts` |
+| Browser tests (Playwright, Chrome), Arabic and English | 58 | `cd frontend && npx playwright test e2e/matrix.spec.ts` |
+| Accessibility audit (axe-core, WCAG 2.1 A/AA), every screen in both languages, and the review dialog | 12 | `npx playwright test e2e/a11y.spec.ts` |
 | Phone-size tests (Pixel 7, iPhone 13 size), touch flow, no sideways scroll | 4 | `npx playwright test e2e/mobile.spec.ts` |
-| Assistant: verification in chat, scope, report questions, voice confirm/error/silence, spoken call with yes and no, spoken greeting, keyboard, accessibility | 14 | `npx playwright test e2e/assistant.spec.ts` |
+| Assistant: verification in chat, scope, report questions, voice confirm/error/silence, spoken call with yes and no, spoken greeting, keyboard, accessibility | 15 | `npx playwright test e2e/assistant.spec.ts` |
 
 **Benchmarks** (`backend/eval/`, run against a live API):
 
@@ -508,6 +545,8 @@ Details:
 | Labelled corpus set (`benchmark.jsonl`, 98 inputs, fixed seed) | Exact and variant quotes of Sahihayn hadiths, fabricated/weak seeds, exact and misquoted verses, invented texts, fatwa questions | 98% strict, **100% same hadith**, 0 attributions to another hadith, 6/6 invented texts abstain, median latency ~0.3 s |
 | Circulated texts (`circulated.jsonl`, 50 sayings, 46 scored) | Sayings that circulate on social media; labels decided from الدرر rulings, quoted per item | Authentic 21/21 confirmed; weak/fabricated/not hadith 22/25 flagged or abstained, 3 closest text only; **0 dangerous errors** |
 | Voice (`eval/voice/`, 33 recordings) | Arabic hadiths and English translations read by synthetic voices, plus silence, French and noise | Arabic 20/20 right hadith, English 9/10; Arabic word error rate 10% as heard, 0% median after spelling correction; English 5%; 3/3 refusals correct; no attribution to another hadith |
+| English pastes (`run_english_paste.py`, 40 records) | The full published English of Bukhari and Muslim records as pasted from translation sites, narrator line and story included | **40/40** right hadith (34/40 before the like-for-like key and full-text comparison were added) |
+| Translated pastes (`translated_paste.jsonl`, 39 inputs) | The same full texts translated by a model into French, Indonesian, Urdu and Turkish | 26/39 right hadith (fr 8/9, id 6/10, ur 7/10, tr 5/10). The two "other" records are the same saying of Anas in other chapters of al-Bukhari (600 → 661, 572), so **0 attributed to a different hadith**. Measured while Groq's daily quota ran out, so part of the run had no match check |
 | Multilingual paraphrases (`multilingual.jsonl`, 90 inputs) | Authentic hadiths rewritten loosely by a model in French, Indonesian, Urdu, Turkish and English | 31% confirmed the right hadith; 56 abstained or closest text only; 3 of 90 attributed to another hadith (different incident, same topic). Measured with the model check available |
 
 "Same hadith" means the returned record is the labelled one, or the labelled record appears among the returned
@@ -515,7 +554,8 @@ record's narrations, or it is a parallel narration listed in `multilingual_equiv
 
 ## 15. Security and privacy
 
-- No user input is stored on the server. No accounts, no analytics.
+- No user input is stored on the server, except a review PDF that the person asks for with their name and email
+  (deleted after 14 days, behind an unguessable link). No accounts, no analytics.
 - The database is not exposed, and the API is reached only through Caddy over HTTPS.
 - CORS allows only the site's origin and localhost.
 - Input limits: 2,000 characters, images up to 10 MB in PNG or JPG only, and the bytes are validated as an image before
@@ -553,7 +593,8 @@ Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertai
   removes that dependency.
 - Voice is accepted in Arabic and English only, and the voice benchmark uses synthetic voices. Real recordings in noisy
   places will do worse; the confidence rules then refuse rather than guess.
-- Free model tiers rate-limit under load. The provider chain and the non-AI fallbacks keep verification working.
+- Free model tiers have daily quotas (see [Free quotas](#11-ai-components-and-how-they-are-controlled)). The provider
+  chain and the non-AI fallbacks keep verification working when they run out.
 
 ## 18. Repository layout
 

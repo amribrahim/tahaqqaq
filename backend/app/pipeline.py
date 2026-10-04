@@ -190,7 +190,7 @@ def run(text: str, lang_ui: str = "ar", via: str = "text", extracted: str = "", 
         if ai_spans and len(merged) > 8:
             merged = merged[:8]
         # a short typed text is itself a candidate: a fragment only replaces it when it is clearly the quote
-        whole = text if via == "text" and len(text) <= 400 else None
+        whole = text if via == "text" and len(text) <= 1500 else None
         focus, others, seg_results = _best_quote(text, lang_in, merged, whole=whole)
         focus = focus or pick_quote(text)
     query = classify.strip_attribution(focus) or focus

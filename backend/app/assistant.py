@@ -17,7 +17,7 @@ from pathlib import Path
 
 import numpy as np
 
-from . import classify, llm, pipeline
+from . import classify, llm, pipeline, review_pdf
 from .embeddings import get_embedder
 from .normalize import detect_script_language, normalize_ar
 from .quotes import quote_candidates
@@ -224,6 +224,7 @@ def compose_verify(r: dict, lang: str) -> str:
 
 def _verify(text: str, lang: str) -> dict:
     report = pipeline.run(text, lang_ui=lang, via="text", explain=False).model_dump()
+    review_pdf.remember(report)
     return {"kind": "verify", "reply": compose_verify(report, lang), "lang": lang, "report": report}
 
 

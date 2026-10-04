@@ -11,6 +11,7 @@ import json
 import logging
 import threading
 import time
+from collections import OrderedDict
 from dataclasses import dataclass
 
 import httpx
@@ -136,6 +137,9 @@ PROVIDERS: dict[str, Provider] = {
                        "gemini-flash-lite-latest", vision=True, json_mode=True),  # lite: answers in ~2 s; flash-latest often exceeds the timeout
     "groq": Provider("groq", "https://api.groq.com/openai/v1", "groq_api_key",
                      "openai/gpt-oss-120b", vision=False, json_mode=True),
+    # the same Groq key, a smaller model with its own free quota: the last fallback when the others are used up
+    "groq-lite": Provider("groq-lite", "https://api.groq.com/openai/v1", "groq_api_key",
+                          "openai/gpt-oss-20b", vision=False, json_mode=True),
     # gemma (instruction-tuned, vision) rather than the free Qwen, which spends the token budget on hidden reasoning
     "openrouter": Provider("openrouter", "https://openrouter.ai/api/v1", "openrouter_api_key",
                            "google/gemma-4-26b-a4b-it:free", vision=True, json_mode=False),
@@ -169,6 +173,8 @@ class LLMClient:
             p = PROVIDERS.get(n)
             if p and getattr(self.s, p.key_attr, "") and n not in out:
                 out.append(n)
+        if "groq" in out and "groq-lite" not in out:
+            out.append("groq-lite")
         return out
 
     @property
@@ -184,13 +190,14 @@ class LLMClient:
 
     # -- core call --------------------------------------------------------------------------------
     def complete(self, system: str, user: list[dict] | str, *, json_mode: bool = False, need_vision: bool = False,
-                 max_tokens: int = 1024, prefer: tuple[str, ...] = ()) -> tuple[str, str] | None:
+                 max_tokens: int = 1024, prefer: tuple[str, ...] = (), exclude: tuple[str, ...] = ()) -> tuple[str, str] | None:
         """Return (text, "provider/model") from the first provider that answers, else None.
-        `prefer` moves the named providers to the front (e.g. a stronger model for a judgement task)."""
+        `prefer` moves the named providers to the front (e.g. a stronger model for a judgement task); `exclude` skips
+        providers that are not good enough for the task."""
         now = time.time()
         started = now
         chain = self.chain()
-        chain = [n for n in prefer if n in chain] + [n for n in chain if n not in prefer]
+        chain = [n for n in prefer if n in chain] + [n for n in chain if n not in prefer and n not in exclude]
         for name in chain:
             p = PROVIDERS[name]
             if need_vision and not p.vision:
@@ -322,10 +329,14 @@ def explain(payload: dict, lang: str = "ar", mode: str = "brief", source_text: s
         f"An answer in any other language is wrong."
     )
     user = f"Language: {language}\nFacts (do not alter): {facts}"
+    # where a fixed wording built from the facts exists (a brief in Arabic or English), the light fallback model is
+    # not used: in tests it confused the compiler with the narrator («الراوي البخاري»); the template is exact
+    has_template = not extended and lang in ("ar", "en")
     for attempt in range(2):
-        out = client.complete(system, user, json_mode=True, max_tokens=1600 if extended else 700)
+        out = client.complete(system, user, json_mode=True, max_tokens=1600 if extended else 700,
+                              exclude=("groq-lite",) if has_template else ())
         if not out:
-            return None
+            break
         text, model = out
         try:
             parsed = json.loads(text)
@@ -346,7 +357,7 @@ def explain(payload: dict, lang: str = "ar", mode: str = "brief", source_text: s
     if not extended:
         fallback = template_brief(payload, lang)
         if fallback:
-            return fallback, "template (fact check)"
+            return fallback, "template (fact check)" if out else "template (models unavailable)"
     return None
 
 
@@ -363,15 +374,27 @@ When unsure, answer false. You never judge authenticity; you only compare the te
 Return JSON: {"candidates": [{"n": <candidate number>, "why": "<at most 12 words>", "same": true or false}]}"""
 
 
+_check_cache: OrderedDict[str, dict] = OrderedDict()
+_check_lock = threading.Lock()
+
+
 def check_match(user_text: str, candidates: list[dict]) -> dict | None:
     """{"verdicts": {n: bool}, "model": str} for candidates numbered from 1, or None when no provider answered."""
     client = get_client()
     if not client.enabled or not candidates:
         return None
-    items = [{"n": i, "kind": c.get("kind", "hadith"), "text_en": (c.get("text_en") or "")[:700], "text_ar": (c.get("text_ar") or "")[:500]}
+    # English is compared with English: the Arabic is sent only for a record without a translation (it would double
+    # the tokens, and the strong judge's free quota is counted in tokens)
+    items = [{"n": i, "kind": c.get("kind", "hadith"), "text_en": (c.get("text_en") or "")[:700],
+              **({} if c.get("text_en") else {"text_ar": (c.get("text_ar") or "")[:500]})}
              for i, c in enumerate(candidates, 1)]
-    out = client.complete(MATCHCHECK_SYSTEM, json.dumps({"user_text": user_text[:1500], "candidates": items}, ensure_ascii=False),
-                          json_mode=True, max_tokens=700, prefer=("groq", "anthropic"))
+    payload = json.dumps({"user_text": user_text[:1500], "candidates": items}, ensure_ascii=False)
+    key = f"{id(client)}:{payload}"
+    with _check_lock:
+        if key in _check_cache:              # the same text checked again (a retry, a review PDF): no new model call
+            _check_cache.move_to_end(key)
+            return _check_cache[key]
+    out = client.complete(MATCHCHECK_SYSTEM, payload, json_mode=True, max_tokens=700, prefer=("groq", "anthropic"))
     if not out:
         return None
     try:
@@ -380,7 +403,14 @@ def check_match(user_text: str, candidates: list[dict]) -> dict | None:
         verdicts = {int(r["n"]): bool(r["same"]) for r in rows if isinstance(r, dict) and "n" in r and "same" in r}
     except (ValueError, TypeError, KeyError):
         return None
-    return {"verdicts": verdicts, "model": out[1]} if verdicts else None
+    if not verdicts:
+        return None
+    res = {"verdicts": verdicts, "model": out[1]}
+    with _check_lock:
+        _check_cache[key] = res
+        while len(_check_cache) > 256:
+            _check_cache.popitem(last=False)
+    return res
 
 
 # -- fact checks for the brief explanation ---------------------------------------------------------

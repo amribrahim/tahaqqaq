@@ -12,6 +12,7 @@ Verify a hadith before you publish it. Built for the **AI Challenge Serving Isla
 - **Report:** the ruling *verbatim* with grader, book, number and links; **every scholar's ruling from الدرر السنية** for the matched hadith; **the same report in other books** (its narrations), each with its own recorded ruling; a word-level diff against the correct wording; translation accuracy for English input; glossary notes for terms that must not be translated literally.
 - **Sanad (سند), the assistant:** a button at the bottom right of every page. Sanad greets you aloud, makes small talk and talks with you: press «تحدث مع سند», say a hadith, confirm what it heard with «نعم», and hear the verdict in a natural voice. You can also type. Type or **say** a hadith in Arabic or English and it is verified with the same engine; ask about the open report or about the tool. It stays in scope, never issues a ruling, refers fatwa questions, shows the voice transcript for confirmation before verifying, and says so plainly when it could not hear clearly.
 - **Share and keep:** export the report as a **PDF** (Arabic or English), or as an **image to share** that carries the recorded ruling, its source and the disclaimer, ready to post as a correction.
+- **Human review request:** the person leaves a name and email; the server renders its own report as a PDF, and the request reaches the review team's inbox through a contact form with the PDF link.
 - **AI explanation:** brief, or extended (شرح موسّع) in 25 languages. The extended text is **summarised only from the hadith's شرح or the verse's tafsir at الدرر السنية**; when none exists, nothing is shown.
 
 ## Sources, and what each one is used for
@@ -29,7 +30,7 @@ The challenge's reference table lists the approved content per field. The app is
 
 **Where the searchable texts come from (stated plainly):** the Six Books texts, their published English translations and the editors' grades are indexed from the open **hadith-api** dataset (CC0, derived from sunnah.com). It is the matching index; the approved reference for rulings is الدرر السنية, shown next to every hadith result. The Qur'an text is the Madinah Mushaf Uthmani text (fetched through the Quran.com API).
 
-**What the database holds (the retrieval corpus):** 34,153 hadiths · 6,236 verses · 68 circulated sayings with rulings quoted from الدرر (grown by `ingest/build_seed_from_dorar.py`, which keeps only sayings with no authentic ruling on any wording) · 10 glossary terms · a growing `source_cache` of الدرر rulings, شروح and tafsir sections. User input is never stored.
+**What the database holds (the retrieval corpus):** 34,153 hadiths · 6,236 verses · 68 circulated sayings with rulings quoted from الدرر (grown by `ingest/build_seed_from_dorar.py`, which keeps only sayings with no authentic ruling on any wording) · 10 glossary terms · a growing `source_cache` of الدرر rulings, شروح and tafsir sections. User input is never stored, except the report PDF of a human-review request (kept 14 days).
 
 ## Is it RAG?
 
@@ -76,11 +77,11 @@ Re-runnable ingestion steps: `ingest.ingest_hadith`, `ingest.ingest_quran`, `ing
 ## Tests
 
 ```bash
-cd backend && .venv/bin/pytest -q                                  # 167 unit tests (offline, real fixtures)
+cd backend && .venv/bin/pytest -q                                  # 177 unit tests (offline, real fixtures)
 docker compose --profile qa up -d db api web fixtures
 cd backend && TAHQAQ_STACK=1 .venv/bin/pytest tests/integration -q   # 37 checks against the running stack
-cd frontend && npx playwright test                                 # 85 browser tests: 57 scenarios in Arabic and English, 14 assistant
-                                                                   # tests, 10 accessibility audits (axe-core, WCAG 2.1 AA), 4 phone-size runs
+cd frontend && npx playwright test                                 # 89 browser tests: 58 scenarios in Arabic and English, 15 assistant
+                                                                   # tests, 12 accessibility audits (axe-core, WCAG 2.1 AA), 4 phone-size runs
 ```
 
 Every failure found and fixed is recorded in [`QA_LOG.md`](QA_LOG.md). Test fixtures, screenshots and the benchmark report are generated into a local `qa/` folder, which is not published.

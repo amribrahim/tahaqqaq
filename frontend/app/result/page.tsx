@@ -20,6 +20,7 @@ import { ExplanationCard } from "@/components/result/ExplanationCard";
 import { SegmentsCard } from "@/components/result/Segments";
 import { DorarCard } from "@/components/result/DorarCard";
 import { NarrationsCard } from "@/components/result/NarrationsCard";
+import { ReviewDialog } from "@/components/result/ReviewDialog";
 import { drawShareCard, shareOrDownload } from "@/lib/shareCard";
 
 export default function ResultPage() {
@@ -56,6 +57,8 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
   const [report, setRep] = useState<Report | null>(init.report);
   const [err, setErr] = useState<{ code: string; message: string }>({ code: "", message: "" });
   const [reviewSent, setReviewSent] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewPdf, setReviewPdf] = useState("");
   const [shareState, setShareState] = useState<"" | "busy" | "shared" | "downloaded">("");
   const s = useTranslations("states");
   const inputText = init.pending?.text || init.pending?.url || "";
@@ -65,6 +68,7 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
     let alive = true;
     verifyStream({ text: pending.text, url: pending.url, lang, via: pending.via }, (st) => { if (alive) setStep(Math.max(0, st)); })
       .then((r) => {
+        r.server_id = r.id;
         r.id = id;  // the session id in the URL is the key for the cached report and the history row
         r.via = pending.via;
         if (pending.extracted) r.extracted_text = pending.extracted;
@@ -116,10 +120,10 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
       setShareState(await shareOrDownload(blob, `${t("pdfFileName")}.png`, t("shareBrand")));
     } catch { setShareState(""); }
   };
-  const onReview = async () => {
-    if (!report || reviewSent) return;
-    try { await requestReview(report); } catch {}
-    setReviewSent(true);
+  const onReview = () => { if (report && !reviewSent) setReviewOpen(true); };
+  const onReviewSent = (pdfUrl: string) => {
+    setReviewOpen(false); setReviewPdf(pdfUrl); setReviewSent(true);
+    if (report) requestReview(report, `PDF: ${pdfUrl}`).catch(() => {});  // also to the review webhook, when one is configured
   };
 
   const r = report;
@@ -179,7 +183,8 @@ function ResultView({ id, direct }: { id: string; direct: string | null }) {
           {status === "done" && r && (
             <>
               {r.state !== "referral" && <Candidates r={r} />}
-              <Actions abstain={!!abstainLike} referral={r.state === "referral"} onExport={onExport} onShare={onShare} shareState={shareState} onReview={onReview} reviewSent={reviewSent} />
+              <Actions abstain={!!abstainLike} referral={r.state === "referral"} onExport={onExport} onShare={onShare} shareState={shareState} onReview={onReview} reviewSent={reviewSent} reviewPdf={reviewPdf} />
+              <ReviewDialog report={r} open={reviewOpen} onClose={() => setReviewOpen(false)} onSent={onReviewSent} />
             </>
           )}
         </aside>

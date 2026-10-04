@@ -23,6 +23,7 @@ from .embeddings import get_embedder
 from .normalize import normalize_ar, normalize_latin
 from .records import Record, is_cross_reference
 from .store import get_store
+from .translation import quoted_part
 
 TRIGRAM_MIN = 0.60      # stage 2: pg_trgm word_similarity
 COSINE_MIN = 0.80       # stage 3: pgvector cosine …
@@ -146,21 +147,28 @@ def search(text: str, lang: str = "ar", kinds: list[str] | None = None, limit: i
     norm = normalize_query(text, lang)
     if not norm:
         return []
-    vec = emb.embed([" ".join(norm.split()[:40])])[0]
+    # English pasted from a published translation carries the narrator preamble and the story around the Prophet's
+    # words; the English index keeps only those words, so the query is reduced the same way (like for like)
+    key = normalize_latin(quoted_part(text)) if lang == "en" else ""
+    keyed = bool(key) and key != norm and len(key.split()) >= 4
+    probes = [norm, key] if keyed else [norm]
+    vec = emb.embed([" ".join((key if keyed else norm).split()[:40])])[0]
     by_id: dict[int, Record] = {}
-    if len(norm) >= 12:
-        for r in store.exact_search(norm, lang, kinds, 10):
-            by_id[r.id] = r
+    for p in probes:
+        if len(p) >= 12:
+            for r in store.exact_search(p, lang, kinds, 10):
+                by_id[r.id] = r
     for r in store.vector_search(vec, lang, kinds, 25):
         if r.id in by_id:
             by_id[r.id].semantic = max(by_id[r.id].semantic, r.semantic)
         else:
             by_id[r.id] = r
-    for r in store.lexical_search(norm, lang, kinds, 25):
-        if r.id in by_id:
-            by_id[r.id].lexical = max(by_id[r.id].lexical, r.lexical)
-        else:
-            by_id[r.id] = r
+    for p in probes:
+        for r in store.lexical_search(p, lang, kinds, 25):
+            if r.id in by_id:
+                by_id[r.id].lexical = max(by_id[r.id].lexical, r.lexical)
+            else:
+                by_id[r.id] = r
     # Rescore everything with both signals
     cands = []
     docs = {r.id: (r.text_en_norm if lang == "en" else r.matn_norm) for r in by_id.values()}
@@ -179,6 +187,10 @@ def search(text: str, lang: str = "ar", kinds: list[str] | None = None, limit: i
         del by_id[rid]
     for r in by_id.values():
         lex = _lexical(norm, docs[r.id], lang)
+        if keyed:
+            lex = max(lex, _lexical(key, docs[r.id], lang))                    # the Prophet's words against the index
+        if lang == "en" and r.text_en and len(norm.split()) >= 12:
+            lex = max(lex, _lexical(norm, normalize_latin(r.text_en), lang))   # a full paste against the full translation
         sem = _semantic(r.semantic, lang)
         score = confidence(lex, sem, lang)
         stage, conf = _stage(r, lex, score, lang, _short_quote_missing_word(norm, docs[r.id], lang))

@@ -18,6 +18,8 @@ jobs:
         with:
           path: ~/.cache/fastembed
           key: fastembed-minilm-multilingual-v1
+      - name: Pango for the review-report PDF
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 fonts-dejavu-core
       - run: pip install -e ".[dev]"
       - run: ruff check app ingest tests eval
       - run: pytest -q

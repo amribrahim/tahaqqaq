@@ -123,7 +123,9 @@ def test_no_user_input_stored():
     dsn = os.environ.get("DATABASE_URL", "postgresql://tahqaq:tahqaq@localhost:5432/tahqaq")
     with psycopg.connect(dsn) as conn:
         tables = {r[0] for r in conn.execute("SELECT tablename FROM pg_tables WHERE schemaname='public'")}
-        assert tables == {"texts", "chunks", "glossary", "ingest_meta", "source_cache"}
+        # review_pdfs holds only the PDFs of review requests a person sent with their name and email (kept 14 days)
+        assert tables - {"review_pdfs"} == {"texts", "chunks", "glossary", "ingest_meta", "source_cache"}
+        pdfs = conn.execute("SELECT count(*) FROM review_pdfs").fetchone()[0] if "review_pdfs" in tables else 0
         # the reference cache is keyed by source wording only: no user text can be in it
         cached = conn.execute("SELECT count(*) FROM source_cache WHERE payload::text LIKE '%لا يُحفظ%' OR key LIKE '%لا يحفظ%'").fetchone()[0]
         assert cached == 0
@@ -134,6 +136,8 @@ def test_no_user_input_stored():
     with psycopg.connect(dsn) as conn:
         assert conn.execute("SELECT count(*) FROM texts").fetchone()[0] == n
         assert conn.execute("SELECT count(*) FROM texts WHERE text_ar LIKE '%لا يُحفظ%'").fetchone()[0] == 0
+        if "review_pdfs" in tables:   # a verification or a plain review request never writes a PDF
+            assert conn.execute("SELECT count(*) FROM review_pdfs").fetchone()[0] == pdfs
 
 
 # ---- spec item 7: fixture pages and the OCR image resolve like typed text -----------------------

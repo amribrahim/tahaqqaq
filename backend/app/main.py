@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import shutil
 import time
 from collections.abc import Iterator
@@ -11,7 +12,7 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 
-from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, stt, tts, voice_fix
+from . import assistant, fetch_url, llm, ocr, pipeline, ratelimit, review_pdf, stt, tts, voice_fix
 from .config import get_settings
 from .embeddings import get_embedder
 from .normalize import detect_language
@@ -20,6 +21,7 @@ from .schemas import (
     ExplainOut,
     ExplainRequest,
     HealthOut,
+    ReviewPdfRequest,
     ReviewRequest,
     TTSRequest,
     VerifyRequest,
@@ -91,10 +93,12 @@ def _resolve_input(req: VerifyRequest) -> tuple[str, str, str]:
 def verify(req: VerifyRequest) -> VerifyResponse:
     text, via, extracted = _resolve_input(req)
     try:
-        return pipeline.run(text, req.lang, via, extracted, explain=req.explain)
+        out = pipeline.run(text, req.lang, via, extracted, explain=req.explain)
     except Exception as e:
         log.exception("verify failed")
         raise HTTPException(503, {"code": "sources_unreachable", "message": str(e)}) from e
+    review_pdf.remember(out.model_dump())
+    return out
 
 
 @app.post("/api/verify/stream")
@@ -105,6 +109,8 @@ def verify_stream(req: VerifyRequest) -> StreamingResponse:
     def gen() -> Iterator[str]:
         try:
             for ev in pipeline.run_streaming(text, req.lang, via, extracted, explain=req.explain):
+                if ev["event"] == "result":
+                    review_pdf.remember(ev["data"])
                 yield f"event: {ev['event']}\ndata: {json.dumps(ev['data'], ensure_ascii=False)}\n\n"
         except Exception as e:
             log.exception("verify stream failed")
@@ -217,6 +223,42 @@ def review(req: ReviewRequest) -> dict:
         except httpx.HTTPError as e:
             log.warning("review webhook failed: %s", e)
     return {"accepted": True, "forwarded": forwarded, "sla_hours": 48, "ts": int(time.time())}
+
+
+@app.post("/api/review/pdf")
+def review_pdf_create(req: ReviewPdfRequest, request: Request) -> dict:
+    """The report as a PDF for a human-review request, kept for RETAIN_DAYS behind an unguessable link. Only reports
+    this server produced are rendered: the one just shown (kept in memory), otherwise the text is verified again."""
+    ratelimit.check(request, "review-pdf", limit=10, window_s=600, lang=req.lang)
+    report = review_pdf.recall(req.report_id)
+    if report is None:
+        text = _validate_text(req.text)
+        try:
+            report = pipeline.run(text, req.lang, "text", explain=False).model_dump()
+        except Exception as e:
+            log.exception("review pdf: verify failed")
+            raise HTTPException(503, {"code": "sources_unreachable", "message": str(e)}) from e
+    try:
+        pdf = review_pdf.render_pdf(report, req.lang, req.name.strip(), req.email.strip())
+        token = review_pdf.save(pdf, report["id"])
+    except Exception as e:
+        log.exception("review pdf failed")
+        raise HTTPException(503, {"code": "pdf_unavailable", "message": str(e)}) from e
+    return {"token": token, "path": f"/api/review/pdf/{token}", "retain_days": review_pdf.RETAIN_DAYS,
+            "report_id": report["id"], "state": report["state"], "confidence": report["confidence"]}
+
+
+@app.get("/api/review/pdf/{token}")
+def review_pdf_get(token: str) -> Response:
+    if not re.fullmatch(r"[A-Za-z0-9_-]{20,64}", token):
+        raise HTTPException(404, {"code": "not_found", "message": "no such report"})
+    found = review_pdf.load(token)
+    if not found:
+        raise HTTPException(404, {"code": "not_found", "message": "this report link has expired or does not exist"})
+    pdf, report_id = found
+    return Response(pdf, media_type="application/pdf", headers={
+        "Content-Disposition": f'inline; filename="tahaqqaq-report-{report_id}.pdf"',
+        "Cache-Control": "private, no-store", "X-Robots-Tag": "noindex"})
 
 
 @app.post("/api/assistant")

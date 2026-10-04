@@ -95,7 +95,7 @@
     "accepted": "Accepted match",
     "actions": "Actions",
     "review": "Request human review",
-    "reviewSent": "Request sent. A specialist will review it within 48 hours.",
+    "reviewSent": "Request sent to the review team with the report. A specialist will review it within 48 hours.",
     "another": "Check another text",
     "note": "We relay hadith scholars’ gradings from their sources. We never issue automated verdicts.",
     "loadingTitle": "Verifying…",
@@ -190,7 +190,19 @@
     "shareDone": "✓ Shared",
     "shareBrand": "Tahaqqaq",
     "shareTagline": "Verify a hadith before you publish it",
-    "shareFooter": "The ruling is quoted from the approved source as recorded; the tool issues no ruling and is no substitute for asking scholars."
+    "shareFooter": "The ruling is quoted from the approved source as recorded; the tool issues no ruling and is no substitute for asking scholars.",
+    "reviewTitle": "Request human review",
+    "reviewIntro": "The report goes to the review team as a PDF, and a specialist replies to your email.",
+    "reviewName": "Name",
+    "reviewEmail": "Email",
+    "reviewConsent": "By sending, you agree to share your name, email and the text with the review team. The report file is kept for {days} days, then deleted.",
+    "reviewSend": "Send request",
+    "reviewSending": "Sending…",
+    "reviewCancel": "Cancel",
+    "reviewErrInvalid": "Enter your name and a valid email address.",
+    "reviewErrPdf": "The report could not be created right now. Please try again shortly.",
+    "reviewErrSend": "The report was created but the request could not be sent. Please try again.",
+    "reviewOpenPdf": "Open the PDF report"
   },
   "states": {
     "verified": {
