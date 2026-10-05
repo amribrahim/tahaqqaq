@@ -211,16 +211,16 @@ export function AssistantWidget() {
               <span style={{ fontSize: 12, color: "#c9c3ff" }}>{t("subtitle")}</span>
             </div>
             {!calling && (
-              <button type="button" onClick={newConversation} aria-label={t("newChat")} title={t("newChat")} data-testid="assistant-new"
-                style={{ background: "transparent", color: "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer", fontSize: 18, flex: "none" }}>
-                <span aria-hidden="true">↺</span>
+              <button type="button" onClick={newConversation} aria-label={t("newChat")} title={t("newChat")} data-testid="assistant-new" className="assistant-hbtn">
+                <HeaderIcon name="new" />
               </button>
             )}
             <button type="button" onClick={() => { const v = !speak; setSpeak(v); try { localStorage.setItem(VOICE_PREF, v ? "1" : "0"); } catch {} if (!v) speaker.current?.hush(); }}
               aria-pressed={speak} aria-label={speak ? t("speakOff") : t("speakOn")} title={speak ? t("speakOff") : t("speakOn")} data-testid="assistant-speak"
-              style={{ flex: "none", background: speak ? "#3ee6c0" : "transparent", color: speak ? "#0d1035" : "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer" }}>{speak ? "🔊" : "🔇"}</button>
-            <button type="button" onClick={close} aria-label={t("close")} data-testid="assistant-close"
-              style={{ flex: "none", background: "transparent", color: "#fff", border: "1px solid rgba(201,195,255,0.4)", borderRadius: 10, width: 36, height: 36, cursor: "pointer", fontSize: 18 }}>×</button>
+              className={`assistant-hbtn${speak ? " on" : ""}`}><HeaderIcon name={speak ? "speakerOn" : "speakerOff"} /></button>
+            <button type="button" onClick={close} aria-label={t("close")} title={t("close")} data-testid="assistant-close" className="assistant-hbtn">
+              <HeaderIcon name="close" />
+            </button>
           </header>
 
           <div style={{ display: calling ? "contents" : "block", padding: calling ? 0 : "10px 14px 0", background: "#f6f5fb" }}>
@@ -292,5 +292,18 @@ export function AssistantWidget() {
         <span className="assistant-fab-label">{t("open")}</span>
       </button>
     </div>
+  );
+}
+
+/** Drawn header icons: one stroke, one size, centred (text glyphs such as ↺ and emoji render differently per device). */
+function HeaderIcon({ name }: { name: "new" | "speakerOn" | "speakerOff" | "close" }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {name === "new" && <><path d="M9.5 5.94A7 7 0 1 1 6.42 9.61" /><path d="M2.78 10.84 6.69 8.86 8.42 12.9" /></>}
+      {(name === "speakerOn" || name === "speakerOff") && <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" />}
+      {name === "speakerOn" && <><path d="M15.5 9a4 4 0 0 1 0 6" /><path d="M18 6.5a7.5 7.5 0 0 1 0 11" /></>}
+      {name === "speakerOff" && <path d="m16 9.5 5 5m0-5-5 5" />}
+      {name === "close" && <path d="m6.5 6.5 11 11m0-11-11 11" />}
+    </svg>
   );
 }
