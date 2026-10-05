@@ -1,7 +1,7 @@
 # تحقّق — Tahaqqaq
 
 Verify a hadith before you publish it. Built for the **AI Challenge Serving Islamic Content 2026** (hadith track).
-[النسخة العربية ← README.ar.md](README.ar.md) · **Live:** https://tahaqqaq.pages.dev · **How it is built:** [TECHNICAL.md](TECHNICAL.md)
+[النسخة العربية ← README.ar.md](README.ar.md) · **Live:** https://tahaqqaq.pages.dev · **How it is built:** [TECHNICAL.md](TECHNICAL.md) ([بالعربية](TECHNICAL.ar.md))
 
 **Principle:** the tool *relays* the scholars' rulings from approved sources. It never issues a verdict of its own, and when no reliable match exists it says so and abstains.
 
@@ -10,7 +10,7 @@ Verify a hadith before you publish it. Built for the **AI Challenge Serving Isla
 - **Input:** text in **Arabic in the Arabic interface** or in **English in the English interface** (another language is refused with a clear message and never machine-translated, because a translation changes the wording the verdict rests on), a **screenshot** of a post (vision-model transcription with Tesseract/OpenCV fallback), or a **link** (public articles, sunnah.com pages, X posts).
 - **Result states:** مؤيَّد بمصدر (confirmed) · مؤيَّد جزئيًا – اختلاف رواية (variant wording) · غير مؤكد (closest text only) · وُجد النص وحكمه موضوع/ضعيف (found, fabricated/weak) · لا مرجع – يُمتنع (abstain) · إحالة (personal fatwa question → referred to scholars).
 - **Report:** the ruling *verbatim* with grader, book, number and links; **every scholar's ruling from الدرر السنية** for the matched hadith; **the same report in other books** (its narrations), each with its own recorded ruling; a word-level diff against the correct wording; translation accuracy for English input; glossary notes for terms that must not be translated literally.
-- **Sanad (سند), the assistant:** a button at the bottom right of every page. Sanad greets you aloud, makes small talk and talks with you: press «تحدث مع سند», say a hadith, confirm what it heard with «نعم», and hear the verdict in a natural voice. You can also type. Type or **say** a hadith in Arabic or English and it is verified with the same engine; ask about the open report or about the tool. It stays in scope, never issues a ruling, refers fatwa questions, shows the voice transcript for confirmation before verifying, and says so plainly when it could not hear clearly.
+- **Sanad (سند), the assistant:** a button at the bottom right of every page. Sanad greets you aloud, makes small talk and talks with you: press «تحدث مع سند», say a hadith, confirm what it heard with «نعم», and hear the verdict in a natural voice. You can also type. Type or **say** a hadith in the interface language (Arabic or English) and it is verified with the same engine; ask about the open report or about the tool. It stays in scope, never issues a ruling, refers fatwa questions, shows the voice transcript for confirmation before verifying, and says so plainly when it could not hear clearly.
 - **Share and keep:** export the report as a **PDF** (Arabic or English), or as an **image to share** that carries the recorded ruling, its source and the disclaimer, ready to post as a correction.
 - **Human review request:** the person leaves a name and email; the server prints the same PDF as the export button, from its own report, and the request reaches the review team's inbox through a contact form with the PDF link.
 - **AI explanation:** brief, or extended (شرح موسّع) in 25 languages. The extended text is **summarised only from the hadith's شرح or the verse's tafsir at الدرر السنية**; when none exists, nothing is shown.
@@ -42,7 +42,7 @@ Yes, constrained:
 | Ruling | **None** | Read verbatim from the source record; no attribution without a recorded ruling |
 | Extended explanation | LLM summarises the **retrieved** شرح/tafsir from الدرر السنية | Source text is the only input; the source link is shown; no source → no text |
 | Brief explanation | LLM words the fixed facts (ruling, source, state) | Labelled «شرح مولَّد بالذكاء الاصطناعي»; checked by code (no contradicting grade, no invented numbers, no verdict when abstaining) and by a second model pass (no claims the facts do not support); otherwise a fixed template built from the facts |
-| Match check | For English or translated input, a model compares the input with the top records: same report or not | Only a strong model may confirm, and only up to "partial"; any model may reject (→ closest text only); a Qur'an verse is never raised; a match that rests on meaning rather than shared wording is attributed only when confirmed |
+| Match check | For English input, a model compares the input with the top records: same report or not | Only a strong model may confirm, and only up to "partial"; any model may reject (→ closest text only); a Qur'an verse is never raised; a match that rests on meaning rather than shared wording is attributed only when confirmed |
 | Images, links, long text | Vision transcription; extraction of quoted segments | Every segment must exist literally in the input |
 | Input language | Arabic in the Arabic interface, English in the English interface | Every Arabic text and every published English translation in the corpus is recognised; another language gets a clear message, never a machine translation |
 | Assistant | Classifies ambiguous messages; answers questions about the tool from a curated knowledge base, and about the open report from its facts | Verification replies are built by code from the report; answers may not add numbers or contradict a ruling, otherwise the curated text is returned |
@@ -52,7 +52,7 @@ LLM providers: Gemini → Groq → OpenRouter (free tiers) or Claude, behind one
 
 ## Measured accuracy
 
-Three benchmarks in [`backend/eval`](backend/eval), run against the live API:
+Five measurements, with their sets and runners in [`backend/eval`](backend/eval), run against the live API:
 
 | Set | What it is | Result |
 |---|---|---|
@@ -89,9 +89,10 @@ Every failure found and fixed is recorded in [`QA_LOG.md`](QA_LOG.md). Test fixt
 
 ## Deploy
 
-- **Backend:** an Oracle Cloud Always Free Arm VM runs `docker-compose.prod.yml` (Postgres + API). Caddy serves the API over HTTPS at `https://<ip-with-dashes>.sslip.io` with an automatic Let's Encrypt certificate; Postgres is never exposed.
-- **Frontend:** Cloudflare Pages (static export).
-- **Automatic deploy:** after CI passes on `main`, `.github/workflows/deploy.yml` connects over SSH, resets `/opt/tahaqqaq` to the pushed commit, rebuilds and waits for `/health`.
+- **Backend:** an Oracle Cloud Always Free Arm VM (VM.Standard.A1.Flex, 4 OCPU, 24 GB RAM, 100 GB disk) runs `docker-compose.prod.yml` (Postgres, the API and Caddy). Caddy serves the API over HTTPS at `https://<ip-with-dashes>.sslip.io` with an automatic Let's Encrypt certificate; Postgres is never exposed.
+- **Frontend:** Cloudflare Pages (static export), published with Wrangler.
+- **Automatic deploy:** after CI passes on `main`, `.github/workflows/deploy.yml` connects over SSH, resets `/opt/tahaqqaq` to the pushed commit, rebuilds and waits for `/health`, then builds the static site and publishes it to Cloudflare Pages.
+- **Review-request email:** sent from the browser through a Web3Forms contact form (free plan), with a link to the PDF the server printed.
 - **Repository secrets:** `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`. Add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` for Pages.
 - **Repository variables:** `DEPLOY_ENABLED=true`. Add `CF_PAGES_PROJECT` and `API_URL` for Pages.
 - **Server-only settings:** the model keys, `POSTGRES_PASSWORD` and `API_HOST` live in `/opt/tahaqqaq/.env`, never in git. The database is restored once from a `pg_dump` of a local ingest.
@@ -103,17 +104,18 @@ CI (`ci.yml`) runs lint, unit tests, type-check and the production build on ever
 ## Known limits
 
 - الدرر rulings are found by searching the matched hadith's text; entries with the same book and number are ranked first. Shamela is not used.
-- The curated list of circulated sayings is small and should be reviewed by a specialist before launch.
 - Instagram, Facebook, YouTube and TikTok links cannot be read; paste the text or a screenshot.
 - The embedding model (multilingual MiniLM) is weak on long Arabic passages, so retrieval uses short windows and wording decides.
 - Only Arabic and English texts are checked: other languages are refused rather than machine-translated.
 - Loosely paraphrased English often abstains: the tool prefers no answer to a wrong attribution.
-- The curated list of circulated sayings, the circulated-texts labels and the parallel-narration review were prepared by the developer from الدرر rulings, not by a hadith specialist; a specialist review comes before a public launch.
+- The curated list of circulated sayings (68) and the circulated-texts labels were prepared by the developer from الدرر rulings, not by a hadith specialist; a specialist review comes before a public launch.
 
 ## Repository layout
 
 ```
 design/      exported UI design (source of truth for layout, colours, copy)
 frontend/    Next.js app (static export), Playwright e2e
-backend/     FastAPI app, ingestion, evaluation set, tests
+backend/     FastAPI app, ingestion, evaluation sets, tests
+deploy/      Caddyfile, nightly backup script
+TECHNICAL.md / TECHNICAL.ar.md   technical documentation in English and Arabic
 ```

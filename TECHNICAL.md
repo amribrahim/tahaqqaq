@@ -5,6 +5,7 @@ where every piece of data comes from, how a verification runs, where AI is used 
 quality is measured. It is written for engineers, reviewers and judges who want to understand or rebuild the system.
 
 For what the product does and how to run it, see [README.md](README.md) / [README.ar.md](README.ar.md).
+النسخة العربية من هذا التوثيق: [TECHNICAL.ar.md](TECHNICAL.ar.md).
 
 ## Contents
 
@@ -46,14 +47,18 @@ A ruling is shown only when it exists in the data next to a matched source recor
 flowchart LR
   U[Browser] -->|static pages| CF[Cloudflare Pages<br/>Next.js static export]
   U -->|HTTPS JSON / SSE| CA[Caddy<br/>TLS, Let's Encrypt]
-  subgraph VM[Oracle Cloud VM · Always Free · Arm 2 OCPU / 12 GB · docker compose]
+  subgraph VM[Oracle Cloud VM · Always Free · Arm 4 OCPU / 24 GB · docker compose]
     CA --> API[FastAPI pipeline]
     API --> PG[(PostgreSQL 16<br/>pgvector + pg_trgm)]
     API --> EMB[fastembed MiniLM<br/>local, CPU]
     API --> OCR[OpenCV + Tesseract<br/>OCR fallback]
+    API --> TTS[Piper voice<br/>self-hosted]
+    API --> PDF[Headless Chromium<br/>review PDF]
   end
   API -->|rulings, sharh, tafsir| DORAR[dorar.net<br/>cached in source_cache]
   API -->|bounded calls, JSON| LLM[LLM provider chain<br/>Gemini → Groq → OpenRouter]
+  API -->|speech to text| STT[Whisper on Groq]
+  U -->|review request| W3F[Web3Forms<br/>contact form]
   GH[GitHub Actions] -->|CI, then deploy over SSH| VM
   GH -->|wrangler| CF
 ```
@@ -63,7 +68,7 @@ flowchart LR
   on the server's CPU, with no external embedding service.
 - **الدرر السنية** (dorar.net) is fetched live for rulings, شرح and tafsir, and cached in the database.
 - **LLMs** are optional helpers in clearly bounded steps (section 11). Without any provider configured, every
-  verification feature still works except the explanations, model-based image transcription and other-language input.
+  verification feature still works except the explanations and model-based image transcription.
 
 ## 3. Technology stack
 
@@ -81,6 +86,8 @@ flowchart LR
 | Speech to text | Whisper large-v3 on Groq (same key as the text models) | Arabic and English voice input for the assistant, with confidence data per segment |
 | Text to speech | Piper (self-hosted, MIT) with Arabic and English voices; Groq Orpheus optional | Sanad's voice with no quota; correct Arabic vowels through automatic diacritisation |
 | LLM access | One OpenAI-compatible HTTP client with a provider chain (Gemini, Groq, OpenRouter; Anthropic optional) | Free tiers, automatic fallback on rate limits |
+| Review PDF | Headless Chromium driven by Playwright, printing the site's own result page | The emailed PDF is the same document as the export button |
+| Contact form | Web3Forms (free plan, sent from the browser) | Review requests reach the team's inbox with no mail server to run |
 | Reverse proxy | Caddy 2 | Automatic HTTPS certificates |
 | Containers | Docker Compose (dev and prod files) | One command to run the stack |
 | CI/CD | GitHub Actions (CI, deploy, uptime) and Wrangler for Cloudflare Pages | Every push is tested, then deployed |
@@ -93,12 +100,13 @@ flowchart LR
 | Part | Where | Notes |
 |---|---|---|
 | Frontend | Cloudflare Pages, project `tahaqqaq` → https://tahaqqaq.pages.dev | Static export (`frontend/out`), built in GitHub Actions |
-| API + database | Oracle Cloud Always Free VM: VM.Standard.A1.Flex, 2 OCPU / 12 GB RAM, Oracle Linux 9 (aarch64) | `docker-compose.prod.yml`: `db`, `api`, `caddy` |
+| API + database | Oracle Cloud Always Free VM: VM.Standard.A1.Flex, 4 OCPU / 24 GB RAM, Oracle Linux 9 (aarch64), 100 GB boot volume (98 GB for `/`) | `docker-compose.prod.yml`: `db`, `api`, `caddy` |
 | HTTPS for the API | Caddy with a Let's Encrypt certificate for `<ip-with-dashes>.sslip.io` | sslip.io maps the hostname to the IP; no domain purchase needed |
+| Review-request email | Web3Forms, free plan | Sent from the browser with a link to the PDF; the free plan has no attachments |
 
 **Production compose** (`docker-compose.prod.yml`):
 
-- `db`: `pgvector/pgvector:pg16`, tuned for 12 GB (`shared_buffers=2GB`, `effective_cache_size=6GB`,
+- `db`: `pgvector/pgvector:pg16`, tuned conservatively (`shared_buffers=2GB`, `effective_cache_size=6GB`,
   `maintenance_work_mem=512MB`), `shm_size: 1gb` because parallel HNSW index builds need more than Docker's 64 MB.
   Not published on any port.
 - `api`: built from `backend/Dockerfile`. It listens on `127.0.0.1:8000` only, for health checks on the machine.
@@ -184,7 +192,8 @@ PostgreSQL 16 with two extensions: `vector` (pgvector) and `pg_trgm`. Schema in 
 GIN trigram indexes on `texts.matn_norm` and `texts.text_en_norm`; `(collection, number)` unique.
 
 **Why short windows:** MiniLM embeds long Arabic passages poorly, and users quote fragments. Each text is embedded as
-overlapping word windows (`app/chunking.py`), and a text's semantic score is its best window.
+overlapping word windows (`app/chunking.py`): Arabic windows of 8 words every 5 words (at most 5 per text), English
+windows of 16 words every 10 words (at most 3). A text's semantic score is its best window.
 
 ## 7. Ingestion
 
@@ -239,7 +248,7 @@ used by the site). The code is `backend/app/pipeline.py::run`.
    Each span is verified. For a short typed text, the whole text competes too. A fragment replaces it only when it is
    presented as a quotation and scores at least as high, or when it scores at least 10 points higher.
 5. **Retrieval and scoring** (section 9): exact or substring, then trigram, then semantic, else abstain.
-6. **Match check, for English and translated input** (section 11, the match checker). A strong model compares the input
+6. **Match check, for English input** (section 11, the match checker). A strong model compares the input
    with the top records: same report or not. It can confirm, which raises a record to partial at most, or reject, which
    caps it at closest text only. An English match that rests on meaning rather than shared wording (lexical below 70)
    **must** be confirmed. Without a strong model's confirmation, because it said no, was unavailable or was
@@ -503,7 +512,8 @@ interface to use).
 
 Next.js App Router, statically exported (`frontend/out`), with four screens:
 
-- **Verify** (`/`): text, image or link input, with example chips.
+- **Verify** (`/`): text (Arabic in the Arabic interface, English in the English one), image or link input, with
+  example chips in the interface language.
 - **Result** (`/result/?id=`): status banner, then these cards:
   - extracted text;
   - segments;
@@ -526,8 +536,9 @@ Details:
 - **Share image:** a 1080 × 1350 PNG drawn on a canvas with the page's fonts. It shows the state, the input, the recorded
   ruling and its source, the disclaimer and the site address. Phones use the system share sheet; computers download it.
 - **Assistant widget:** a floating button at the bottom right opens the chat panel on every page. It supports text,
-  voice with a confirmation step, reading replies aloud with the device's voice, and Escape to close. The conversation
-  is kept in `sessionStorage` only.
+  voice with a confirmation step, a spoken conversation, replies read aloud by the server's Piper voice (the device's
+  voice is the fallback), a new-conversation button, and Escape to close. The conversation is kept in
+  `sessionStorage` only.
 - **Accessibility:** skip link, focus rings, live regions for progress and results, meter roles, colour contrast that
   passes WCAG AA (audited with axe-core).
 - **Storage:** reports and history in `sessionStorage`, preferences in `localStorage`. Nothing about the user's texts
@@ -578,13 +589,20 @@ record's narrations.
 | `DATABASE_URL` | `postgresql://tahqaq:tahqaq@localhost:5432/tahqaq` | Database |
 | `EMBEDDER` / `EMBED_MODEL` | `local` / MiniLM-L12 | Embedding backend and model (`openai` and `hash` exist for small hosts and tests) |
 | `LLM_PROVIDER` / `LLM_FALLBACKS` | `none` / empty | Provider chain, for example `gemini` and `groq,openrouter` |
-| `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY` | empty | Provider keys |
+| `GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `CEREBRAS_API_KEY`, `ANTHROPIC_API_KEY` | empty | Provider keys (the Groq key also serves Whisper) |
+| `ANTHROPIC_MODEL` | `claude-opus-5-5` | Model used when Anthropic is in the chain |
+| `TTS_PIPER_DIR`, `TTS_PIPER_VOICE_AR`, `TTS_PIPER_VOICE_EN` | Docker: `/opt/piper`; `ar_JO-kareem-medium`, `en_US-ryan-medium` | Sanad's self-hosted voice |
+| `TTS_GROQ_VOICE_AR`, `TTS_GROQ_VOICE_EN` | empty | Groq Orpheus voices, used first when set (needs the model terms accepted) |
+| `TTS_GEMINI`, `TTS_GEMINI_VOICE` | `false`, `Charon` | Gemini TTS, off by default (10 free requests a day) |
+| `FRONTEND_URL` | `https://tahaqqaq.pages.dev` | The site whose result page is printed as the review PDF (local stack: `http://web:3000`) |
+| `PDF_CHROMIUM_PATH` | empty | Chromium for the review PDF; empty means `/usr/bin/chromium` (Docker) or the installed Chrome |
 | `LLM_MODEL`, `LLM_TIMEOUT` | empty, 15 s | Override the primary model; per-request timeout |
 | `CORS_ORIGINS` | `http://localhost:3000` | Allowed browser origins |
 | `REVIEW_WEBHOOK_URL` | empty | Where human-review requests are forwarded |
 | `API_HOST` (prod) | — | Hostname Caddy serves and certifies |
 | `POSTGRES_PASSWORD` (prod) | — | Database password |
 | `NEXT_PUBLIC_API_URL` (frontend build) | `http://localhost:8000` | API address baked into the static site |
+| `NEXT_PUBLIC_WEB3FORMS_KEY` (frontend build) | the project's public form key | Web3Forms contact form for review requests |
 
 Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertain` 50) are in `app/config.py`.
 
@@ -594,7 +612,7 @@ Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertai
   is not matched. The tool abstains, and the الدرر link lets the user search further.
 - Only Arabic and English texts are checked; another language is refused, not machine-translated.
 - Loosely paraphrased English often abstains. This is by design: precision before recall.
-- The curated list of circulated sayings and the parallel-narration review were made by the developer from الدرر
+- The curated list of circulated sayings and the circulated-texts labels were made by the developer from الدرر
   rulings, not by a hadith specialist. A specialist review is the next step before a public launch.
 - Instagram, Facebook, YouTube and TikTok links cannot be read. Paste the text or a screenshot instead.
 - The API address is tied to the VM's public IP through sslip.io. A reserved IP, or a domain with a Cloudflare Tunnel,
@@ -608,20 +626,24 @@ Thresholds (`threshold_verified` 90, `threshold_partial` 75, `threshold_uncertai
 
 ```
 backend/
-  app/          FastAPI app: pipeline, matcher, store, normalize, quotes, dorar, llm, ocr, fetch_url, schemas,
-                assistant (+ assistant_kb.md), stt, ratelimit
+  app/          FastAPI app: main (API), pipeline, matcher, store, records, chunking, embeddings, normalize,
+                classify, quotes, grades, diff, translation, dorar, llm, ocr, fetch_url, schemas, ratelimit,
+                assistant (+ assistant_kb.md), stt, tts, voice_fix, review_pdf
   ingest/       idempotent ingestion steps and seeds
   eval/         benchmark sets, generators and runners (corpus, circulated, English pastes, voice)
   tests/        unit tests and integration tests (TAHQAQ_STACK=1)
 frontend/
   app/          pages: verify, result, sources, recent
-  components/   home and result cards, header, footer, banner
-  lib/          API client, i18n, storage, session, share image, tokens
-  e2e/          Playwright: matrix, accessibility, phones
+  components/   home and result cards, the assistant (widget, voice call), header, footer, banner
+  lib/          API client, i18n, language check, storage, session, voice engine, share image, tokens
+  e2e/          Playwright: matrix, accessibility, phones, assistant
   messages/     ar.json, en.json
 deploy/         Caddyfile, backup script
 design/         the exported UI design (source of truth for layout, colours and copy)
 docker-compose.yml        development stack (db, api, web, ingest, fixtures)
 docker-compose.prod.yml   production stack (db, api, caddy)
 .github/workflows/        ci, deploy, uptime
+README.md, README.ar.md   what the product does, sources, accuracy, how to run
+TECHNICAL.md, TECHNICAL.ar.md   this document, in English and Arabic
+QA_LOG.md                 every problem found and how it was fixed
 ```
