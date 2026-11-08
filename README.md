@@ -1,9 +1,5 @@
 # تحقّق — Tahaqqaq
 
-Verify a hadith before you publish it. Built for the **AI Challenge Serving Islamic Content 2026** (hadith track).
-[النسخة العربية ← README.ar.md](README.ar.md) · **Live:** https://tahaqqaq.pages.dev · **How it is built:** [TECHNICAL.md](TECHNICAL.md) ([بالعربية](TECHNICAL.ar.md))
-
-**Principle:** the tool *relays* the scholars' rulings from approved sources. It never issues a verdict of its own, and when no reliable match exists it says so and abstains.
 
 ## What it does
 
